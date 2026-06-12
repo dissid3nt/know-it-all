@@ -480,7 +480,7 @@ let gameCode = null;
 let isHost = false;
 let playerName = null;
 let playerId = null;
-let currentQIndex = 0;
+let currentQIndex = -1;
 let timerInterval = null;
 let timeLeft = 20;
 let playerAnswered = false;
@@ -766,6 +766,7 @@ async function endGame() {
 }
 
 window.resetGame = function() {
+  currentQIndex = -1; playerAnswered = false; playerScore = 0;
   questions = []; gameCode = null;
   unsubscribers.forEach(u => u()); unsubscribers = [];
   showScreen('screen-landing');
