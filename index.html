@@ -255,6 +255,13 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .add-q-dashed{border:2px dashed var(--border);background:transparent;border-radius:12px;padding:12px;width:100%;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .add-q-dashed:hover{border-color:var(--accent);color:var(--accent2);}
 .gen-options-title{font-size:0.82rem;font-weight:600;color:var(--muted);margin-bottom:2px;}
+
+/* ── DRAG & DROP ── */
+.question-item{cursor:grab;}
+.question-item.dragging{opacity:0.4;cursor:grabbing;}
+.question-item.drag-over{border-color:var(--accent2);background:color-mix(in srgb,var(--accent) 10%,var(--surface));}
+.drag-handle{cursor:grab;color:var(--muted);font-size:1rem;padding:2px 4px;flex-shrink:0;user-select:none;}
+.drag-handle:hover{color:var(--text);}
 </style>
 </head>
 <body>
@@ -342,6 +349,11 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         <div class="dash-card-icon">⚙️</div>
         <div class="dash-card-title" id="dc-settings-title">Ajustes</div>
         <div class="dash-card-desc" id="dc-settings-desc">Personaliza tu cuenta y preferencias</div>
+      </div>
+      <div class="dash-card" style="border-color:color-mix(in srgb,var(--green) 30%,var(--border));" onclick="showPlayerJoinFromDash()">
+        <div class="dash-card-icon">🎯</div>
+        <div class="dash-card-title" id="dc-join-title">Unirse a sala</div>
+        <div class="dash-card-desc" id="dc-join-desc">Entra a la partida de otro host con un código</div>
       </div>
     </div>
     <div class="dash-recent">
@@ -439,74 +451,13 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
   </div>
   <div class="builder-body">
-    <!-- AI SECTION -->
-    <div class="ai-generate-section ai-card">
-      <h3 id="ai-section-title" style="display:flex;align-items:center;gap:8px;">✨ Generar con IA <span style="font-size:0.68rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Claude AI</span></h3>
-      <p class="muted" style="margin-bottom:4px;font-size:0.8rem;line-height:1.5;" id="ai-section-desc">Pega las respuestas de tus participantes en texto libre. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
-      <label id="raw-data-label">Datos de los participantes</label>
-      <textarea id="raw-data" style="min-height:130px;" placeholder="Ejemplo:&#10;&#10;Juan: 24 años, mascota: Winnie (perro)&#10;&#10;Denise:&#10;Something funny you've done?&#10;- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER&#10;- I found my dog in a shelter&#10;- I ran a half marathon&#10;&#10;Lucía: 25 años, trabaja en Google, le gusta el sushi"></textarea>
-
-      <!-- Options row with titles + tooltips -->
-      <div style="margin-top:12px;">
-        <div class="gen-options-title" id="gen-options-title">Opciones de generación</div>
-        <div class="gen-options-row">
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-num">Número de preguntas</span>
-              <div class="tooltip-wrap">
-                <div class="tooltip-icon">?</div>
-                <div class="tooltip-box" id="tooltip-num">Cuántas preguntas quieres que la IA genere. Más datos = más variedad. Si tienes pocos datos, elige un número menor.</div>
-              </div>
-            </div>
-            <select id="num-questions" style="width:100%;">
-              <option value="5">5 preguntas</option>
-              <option value="10" selected>10 preguntas</option>
-              <option value="15">15 preguntas</option>
-              <option value="20">20 preguntas</option>
-            </select>
-          </div>
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-type">Tipo de pregunta</span>
-              <div class="tooltip-wrap">
-                <div class="tooltip-icon">?</div>
-                <div class="tooltip-box" id="tooltip-type"><strong>Mixto:</strong> combina A/B/C/D con Verdadero/Falso.<br><br><strong>Solo A-D:</strong> todas con 4 opciones.<br><br><strong>Solo V/F:</strong> más fáciles y rápidas.</div>
-              </div>
-            </div>
-            <select id="q-type-gen" style="width:100%;">
-              <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
-              <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
-              <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
-            </select>
-          </div>
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-diff">Dificultad</span>
-              <div class="tooltip-wrap">
-                <div class="tooltip-icon">?</div>
-                <div class="tooltip-box" id="tooltip-diff"><strong>Fácil:</strong> distractores claramente distintos.<br><br><strong>Medio:</strong> plausibles pero distinguibles.<br><br><strong>Difícil:</strong> opciones muy similares — solo quien conoce bien a la persona acertará.</div>
-              </div>
-            </div>
-            <select id="q-difficulty" style="width:100%;">
-              <option value="easy" id="opt-easy">Fácil</option>
-              <option value="medium" selected id="opt-medium">Medio</option>
-              <option value="hard" id="opt-hard">Difícil</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn" style="width:auto;">✨ Generar</button>
-        <div id="gen-status" style="font-size:0.8rem;color:var(--muted);"></div>
-      </div>
-      <div class="step-indicator" id="step-indicator" style="display:none;">
-        <div class="step" id="step-1">1. Leyendo datos</div>
-        <span style="color:var(--border);">›</span>
-        <div class="step" id="step-2">2. Generando</div>
-        <span style="color:var(--border);">›</span>
-        <div class="step" id="step-3">3. Revisando</div>
-      </div>
+    <!-- AI SECTION (hidden, available for future) -->
+    <div style="display:none;">
+      <textarea id="raw-data"></textarea>
+      <select id="num-questions"><option value="10" selected>10</option></select>
+      <select id="q-type-gen"><option value="mixed" id="opt-mixed">Mixto</option><option value="multiple" id="opt-multiple">Solo A-D</option><option value="truefalse" id="opt-tf">Solo V/F</option></select>
+      <select id="q-difficulty"><option value="medium" selected id="opt-medium">Medio</option></select>
+      <div id="gen-status"></div><div id="step-indicator"><div id="step-1"></div><div id="step-2"></div><div id="step-3"></div></div>
     </div>
 
     <!-- QUESTIONS LIST -->
@@ -516,30 +467,12 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     </div>
     <div class="questions-list" id="questions-list"></div>
 
-    <!-- legacy modal editor kept for manual add fallback -->
-    <div id="manual-editor" class="card" style="display:none;">
-      <h3 style="margin-bottom:14px;font-size:1rem;" id="editor-title">✏️ Nueva pregunta</h3>
-      <label id="label-question">Pregunta</label>
-      <input type="text" id="edit-q-text" style="margin-bottom:12px;">
-      <div id="edit-options-area"></div>
-      <label style="margin-top:12px;" id="label-correct">Respuesta correcta</label>
-      <select id="edit-correct" style="margin-bottom:12px;">
-        <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
-      </select>
-      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
-        <label style="margin:0;" id="label-type">Tipo:</label>
-        <select id="edit-type" onchange="updateEditorType()" style="width:auto;">
-          <option value="multiple" id="edit-opt-multiple">Opción múltiple</option>
-          <option value="truefalse" id="edit-opt-tf">Verdadero / Falso</option>
-        </select>
-      </div>
-      <label id="label-time">Tiempo (seg)</label>
-      <input type="number" id="edit-time" value="20" min="5" max="60" style="margin-bottom:14px;width:100px;">
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-primary btn-sm" onclick="saveEditedQuestion()" id="btn-save">Guardar</button>
-        <button class="btn btn-secondary btn-sm" onclick="cancelEdit()" id="btn-cancel">Cancelar</button>
-        <button class="btn btn-sm" style="background:var(--surface2);color:var(--red);margin-left:auto;" onclick="deleteEditedQuestion()" id="btn-delete">Eliminar</button>
-      </div>
+    <!-- legacy editor stubs (hidden) -->
+    <div id="manual-editor" style="display:none;">
+      <input type="text" id="edit-q-text"><div id="edit-options-area"></div>
+      <select id="edit-correct"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+      <select id="edit-type"><option value="multiple" id="edit-opt-multiple">Múltiple</option><option value="truefalse" id="edit-opt-tf">V/F</option></select>
+      <input type="number" id="edit-time" value="20">
     </div>
   </div>
 </div>
@@ -749,6 +682,7 @@ const T = {
     settingsSaved:'✅ Preferencias guardadas',
     btnEditName:'Editar',
     backBtn:'←',
+    dcJoinTitle:'Unirse a sala', dcJoinDesc:'Entra a la partida de otro host con un código',
   },
   en:{
     tagline:'How well do you know the people around you?',
@@ -830,6 +764,7 @@ const T = {
     settingsSaved:'✅ Preferences saved',
     btnEditName:'Edit',
     backBtn:'←',
+    dcJoinTitle:'Join a game', dcJoinDesc:'Enter another host\'s game with a code',
   }
 };
 
@@ -1182,8 +1117,11 @@ window.renderQuestionsList = function() {
 
     const div = document.createElement('div');
     div.className = 'question-item'+(isExp?' expanded':'');
+    div.setAttribute('data-index', i);
+    div.setAttribute('draggable', 'true');
     div.innerHTML = `
       <div class="q-header" onclick="toggleExpandInline(${i})" style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;cursor:pointer;">
+        <span class="drag-handle" onclick="event.stopPropagation()" title="Arrastrar para reordenar">⠿</span>
         <span class="q-num">${String(i+1).padStart(2,'0')}</span>
         <div style="flex:1;">
           <div class="q-text">${q.text}</div>
@@ -1225,6 +1163,7 @@ window.renderQuestionsList = function() {
     list.appendChild(div);
   });
   // add-manual dashed button at bottom of list
+  initDragDrop();
   if(questions.length > 0) {
     const addBtn = document.createElement('button');
     addBtn.className = 'add-q-dashed';
@@ -1655,6 +1594,56 @@ function showPlayerFinal(game) {
   s('player-final-title',myRank===1?t.won:myRank<=3?t.great:t.goodGame);
   document.getElementById('player-final-emoji').textContent=myRank===1?'🏆':myRank<=3?'🥈':'🎮';
   renderScoreboard(players,'player-final-scoreboard');
+}
+
+
+// ── JOIN FROM DASHBOARD ───────────────────────────────
+window.showPlayerJoinFromDash = function() {
+  showScreen('screen-player-join');
+  document.getElementById('player-code-input').value = '';
+  document.getElementById('player-name-input').value =
+    currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
+}
+
+// ── DRAG & DROP REORDER ───────────────────────────────
+let dragSrcIndex = null;
+
+function initDragDrop() {
+  const list = document.getElementById('questions-list');
+  if (!list) return;
+  list.addEventListener('dragstart', e => {
+    const item = e.target.closest('.question-item');
+    if (!item) return;
+    dragSrcIndex = parseInt(item.dataset.index);
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  list.addEventListener('dragend', e => {
+    document.querySelectorAll('.question-item').forEach(el => {
+      el.classList.remove('dragging', 'drag-over');
+    });
+  });
+  list.addEventListener('dragover', e => {
+    e.preventDefault();
+    const item = e.target.closest('.question-item');
+    if (!item || parseInt(item.dataset.index) === dragSrcIndex) return;
+    document.querySelectorAll('.question-item').forEach(el => el.classList.remove('drag-over'));
+    item.classList.add('drag-over');
+  });
+  list.addEventListener('drop', e => {
+    e.preventDefault();
+    const item = e.target.closest('.question-item');
+    if (!item) return;
+    const destIndex = parseInt(item.dataset.index);
+    if (dragSrcIndex === null || dragSrcIndex === destIndex) return;
+    const moved = questions.splice(dragSrcIndex, 1)[0];
+    questions.splice(destIndex, 0, moved);
+    if (editingIndex === dragSrcIndex) editingIndex = destIndex;
+    else if (editingIndex > dragSrcIndex && editingIndex <= destIndex) editingIndex--;
+    else if (editingIndex < dragSrcIndex && editingIndex >= destIndex) editingIndex++;
+    dragSrcIndex = null;
+    renderQuestionsList();
+  });
 }
 
 // ── AUTO ROUTE ────────────────────────────────────────
