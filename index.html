@@ -3,19 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-// Safety net: if module JS fails, always show at least the landing screen
-window.addEventListener('error', function(e) {
-  var screens = document.querySelectorAll('.screen');
-  var anyActive = false;
-  screens.forEach(function(s) { if(s.classList.contains('active')) anyActive = true; });
-  if (!anyActive && screens.length > 0) {
-    screens[0].classList.add('active');
-  }
-});
-</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237C3AED'/><rect x='18' y='16' width='64' height='50' rx='14' fill='white'/><polygon points='28,66 10,88 46,66' fill='white'/><text x='50' y='58' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'>?</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237C3AED'/><rect x='18' y='16' width='64' height='50' rx='14' fill='white'/><polygon points='28,66 10,88 46,66' fill='white'/><text x='50' y='58' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'>?</text></svg>">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Crect x='18' y='16' width='64' height='50' rx='14' fill='white'/%3E%3Cpolygon points='28,66 10,88 46,66' fill='white'/%3E%3Ctext x='50' y='58' font-family='Arial' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E" type="image/svg+xml">
 <meta name="theme-color" content="#7C3AED">
 <title>Know It All 🎯</title>
 <style>
@@ -712,25 +701,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   <div class="scoreboard" id="player-final-scoreboard" style="max-width:400px;"></div>
   <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-play-again-p">Volver</button>
 </div>
-
-<script>
-// Run immediately before module loads — handle routing synchronously
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var code = params.get('code');
-  if (code) {
-    // Show player join immediately, don't wait for Firebase
-    var screens = document.querySelectorAll('.screen');
-    screens.forEach(function(s) { s.classList.remove('active'); });
-    var joinScreen = document.getElementById('screen-player-join');
-    if (joinScreen) {
-      joinScreen.classList.add('active');
-      var codeInput = document.getElementById('player-code-input');
-      if (codeInput) codeInput.value = code.toUpperCase();
-    }
-  }
-})();
-</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1993,6 +1963,35 @@ try {
   screens.forEach(s => { if(s.classList.contains('active')) anyActive = true; });
   if (!anyActive) showScreen('screen-landing');
 }
+</script>
+
+<script>
+// Sync routing — runs after DOM is ready, before Firebase resolves
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var code = params.get('code');
+    if (code) {
+      var screens = document.querySelectorAll('.screen');
+      screens.forEach(function(s) { s.classList.remove('active'); });
+      var joinScreen = document.getElementById('screen-player-join');
+      if (joinScreen) {
+        joinScreen.classList.add('active');
+        var codeInput = document.getElementById('player-code-input');
+        if (codeInput) codeInput.value = code.toUpperCase();
+      }
+    }
+    // Safety net — if nothing is active, show landing
+    var anyActive = false;
+    document.querySelectorAll('.screen').forEach(function(s) {
+      if (s.classList.contains('active')) anyActive = true;
+    });
+    if (!anyActive) {
+      var landing = document.getElementById('screen-landing');
+      if (landing) landing.classList.add('active');
+    }
+  } catch(e) { console.error('Routing error:', e); }
+})();
 </script>
 </body>
 </html>
