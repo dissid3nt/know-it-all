@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Crect x='18' y='16' width='64' height='50' rx='14' fill='white'/%3E%3Cpolygon points='28,66 10,88 46,66' fill='white'/%3E%3Ctext x='50' y='58' font-family='Arial' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E" type="image/svg+xml">
-<meta name="theme-color" content="#7C3AED">
 <title>Know It All 🎯</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
@@ -123,8 +120,6 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .btn{padding:12px 24px;border:none;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;width:100%;}
 .btn-primary{background:var(--accent);color:white;}
 .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
-.btn-primary:disabled{background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:not-allowed;transform:none;opacity:1;}
-.btn-primary:disabled:hover{background:var(--surface2);transform:none;filter:none;}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
 .btn-secondary:hover{border-color:var(--accent);}
 .btn-green{background:var(--green);color:white;}
@@ -267,71 +262,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .question-item.drag-over{border-color:var(--accent2);background:color-mix(in srgb,var(--accent) 10%,var(--surface));}
 .drag-handle{cursor:grab;color:var(--muted);font-size:1rem;padding:2px 4px;flex-shrink:0;user-select:none;}
 .drag-handle:hover{color:var(--text);}
-
-/* ── MOBILE IN-GAME FONT BOOST ── */
-@media (max-width: 480px) {
-  /* Question text */
-  .player-q-text {
-    font-size: 1.25rem;
-    line-height: 1.55;
-  }
-  /* Timer */
-  .player-timer {
-    font-size: 2.6rem;
-  }
-  /* Answer buttons — bigger text, taller tap targets */
-  .answer-btn {
-    font-size: 1.1rem;
-    padding: 22px 10px;
-  }
-  .answer-btn .opt-letter {
-    font-size: 0.85rem;
-  }
-  /* True/False buttons */
-  .tf-btn {
-    font-size: 1.25rem;
-    padding: 28px 16px;
-  }
-  /* Score display */
-  .player-score-display {
-    font-size: 1.75rem;
-  }
-  /* Result badge */
-  .result-badge {
-    font-size: 1.15rem;
-    padding: 18px 20px;
-  }
-  /* Question counter + score row */
-  #screen-player-answer .muted {
-    font-size: 0.9rem;
-  }
-  /* Wait screen */
-  #player-wait-name {
-    font-size: 1.75rem !important;
-  }
-  #screen-player-wait .muted {
-    font-size: 1rem;
-  }
-  /* Final screen */
-  #player-final-title {
-    font-size: 1.75rem;
-  }
-  #player-final-score {
-    font-size: 2.75rem !important;
-  }
-  #player-final-rank {
-    font-size: 1rem;
-  }
-  .score-row {
-    padding: 14px 12px;
-  }
-  .score-name {
-    font-size: 1rem;
-  }
-  .score-pts {
-    font-size: 1rem;
-  }
-}
 </style>
 </head>
 <body>
@@ -508,7 +438,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     </div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveProject()" id="btn-save-project">Guardar y lanzar</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('modal-save-project').classList.remove('open')" id="btn-cancel-save">Cancelar</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-save-project')" id="btn-cancel-save">Cancelar</button>
     </div>
   </div>
 </div>
@@ -521,62 +451,13 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
   </div>
   <div class="builder-body">
-    <!-- AI SECTION -->
-    <div class="ai-generate-section ai-card">
-      <h3 id="ai-section-title" style="display:flex;align-items:center;gap:8px;">✨ Generar con IA <span style="font-size:0.68rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Gemini</span></h3>
-      <p class="muted" style="margin-bottom:4px;font-size:0.8rem;line-height:1.5;" id="ai-section-desc">Pega las respuestas de tus participantes en texto libre. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
-      <label id="raw-data-label">Datos de los participantes</label>
-      <textarea id="raw-data" style="min-height:130px;" placeholder="Ejemplo:&#10;&#10;Juan: 24 años, mascota: Winnie (perro)&#10;&#10;Denise:&#10;Something funny you've done?&#10;- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER&#10;- I found my dog in a shelter&#10;- I ran a half marathon&#10;&#10;Lucía: 25 años, trabaja en Google, le gusta el sushi"></textarea>
-      <div style="margin-top:12px;">
-        <div class="gen-options-title" id="gen-options-title">Opciones de generación</div>
-        <div class="gen-options-row">
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-num">Número de preguntas</span>
-              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-num">Cuántas preguntas quieres que la IA genere. Más datos = más variedad.</div></div>
-            </div>
-            <select id="num-questions" style="width:100%;">
-              <option value="5">5 preguntas</option>
-              <option value="10" selected>10 preguntas</option>
-              <option value="15">15 preguntas</option>
-              <option value="20">20 preguntas</option>
-            </select>
-          </div>
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-type">Tipo de pregunta</span>
-              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-type"><strong>Mixto:</strong> A/B/C/D + V/F.<br><br><strong>Solo A-D:</strong> 4 opciones.<br><br><strong>Solo V/F:</strong> más rápidas.</div></div>
-            </div>
-            <select id="q-type-gen" style="width:100%;">
-              <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
-              <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
-              <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
-            </select>
-          </div>
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-diff">Dificultad</span>
-              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-diff"><strong>Fácil:</strong> distractores distintos.<br><br><strong>Medio:</strong> plausibles.<br><br><strong>Difícil:</strong> muy similares.</div></div>
-            </div>
-            <select id="q-difficulty" style="width:100%;">
-              <option value="easy">Fácil</option>
-              <option value="medium" selected id="opt-medium">Medio</option>
-              <option value="hard">Difícil</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn" style="width:auto;">✨ Generar</button>
-        <div id="gen-status" style="font-size:0.8rem;color:var(--muted);"></div>
-      </div>
-      <div class="step-indicator" id="step-indicator" style="display:none;">
-        <div class="step" id="step-1">1. Leyendo datos</div>
-        <span style="color:var(--border);">›</span>
-        <div class="step" id="step-2">2. Generando</div>
-        <span style="color:var(--border);">›</span>
-        <div class="step" id="step-3">3. Revisando</div>
-      </div>
+    <!-- AI SECTION (hidden, available for future) -->
+    <div style="display:none;">
+      <textarea id="raw-data"></textarea>
+      <select id="num-questions"><option value="10" selected>10</option></select>
+      <select id="q-type-gen"><option value="mixed" id="opt-mixed">Mixto</option><option value="multiple" id="opt-multiple">Solo A-D</option><option value="truefalse" id="opt-tf">Solo V/F</option></select>
+      <select id="q-difficulty"><option value="medium" selected id="opt-medium">Medio</option></select>
+      <div id="gen-status"></div><div id="step-indicator"><div id="step-1"></div><div id="step-2"></div><div id="step-3"></div></div>
     </div>
 
     <!-- QUESTIONS LIST -->
@@ -612,58 +493,11 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   </div>
 </div>
 
-<!-- ══ INSTRUCTIONS FLYOUT ══ -->
-<div class="modal-overlay" id="modal-instructions">
-  <div class="modal" style="max-width:480px;position:relative;">
-    <button onclick="document.getElementById('modal-instructions').classList.remove('open');launchGame()" style="position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">✕</button>
-    <div style="font-size:2.5rem;margin-bottom:10px;text-align:center;">🎯</div>
-    <h2 id="instr-title" style="text-align:center;margin-bottom:4px;">¡Todo listo para jugar!</h2>
-    <p class="muted" id="instr-subtitle" style="text-align:center;margin-bottom:24px;font-size:0.85rem;"></p>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
-      <div style="display:flex;align-items:flex-start;gap:14px;background:var(--surface2);border-radius:12px;padding:14px;">
-        <span style="font-size:1.4rem;flex-shrink:0;">📱</span>
-        <div>
-          <div style="font-weight:600;font-size:0.9rem;" id="instr-step1-title">Jugadores listos</div>
-          <div class="muted" style="font-size:0.8rem;margin-top:2px;" id="instr-step1-desc">Todos deben tener la pantalla de espera abierta en su celular antes de continuar.</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:flex-start;gap:14px;background:var(--surface2);border-radius:12px;padding:14px;">
-        <span style="font-size:1.4rem;flex-shrink:0;">⏱</span>
-        <div>
-          <div style="font-weight:600;font-size:0.9rem;" id="instr-step2-title">Tiempo por pregunta</div>
-          <div class="muted" style="font-size:0.8rem;margin-top:2px;" id="instr-step2-desc">Cada pregunta tiene un temporizador. Responder más rápido da más puntos.</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:flex-start;gap:14px;background:var(--surface2);border-radius:12px;padding:14px;">
-        <span style="font-size:1.4rem;flex-shrink:0;">🏆</span>
-        <div>
-          <div style="font-weight:600;font-size:0.9rem;" id="instr-step3-title">Puntaje</div>
-          <div class="muted" style="font-size:0.8rem;margin-top:2px;" id="instr-step3-desc">Respuesta correcta: hasta 1000 pts. El marcador se actualiza en tiempo real.</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:flex-start;gap:14px;background:var(--surface2);border-radius:12px;padding:14px;">
-        <span style="font-size:1.4rem;flex-shrink:0;">🎮</span>
-        <div>
-          <div style="font-weight:600;font-size:0.9rem;" id="instr-step4-title">Rol del host</div>
-          <div class="muted" style="font-size:0.8rem;margin-top:2px;" id="instr-step4-desc">Tú controlas el ritmo. La ronda avanza automáticamente cuando todos respondan o se acabe el tiempo.</div>
-        </div>
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="document.getElementById('modal-instructions').classList.remove('open');launchGame()" id="btn-start-now">🚀 ¡Empezar ahora!</button>
-  </div>
-</div>
-
-<!-- ══ CANCEL GAME FLYOUT ══ -->
 <!-- ══ HOST GAME ══ -->
 <div id="screen-host-game" class="screen">
-  <!-- cancel modal moved to end of body -->
   <div class="host-header">
     <span class="muted" id="host-q-counter">Pregunta 1/10</span>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <span class="chip" id="host-game-code-chip" title="Código para unirse" style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);cursor:pointer;" onclick="copyGameCode()">🔗 <span id="host-game-code-display">----</span></span>
-      <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 resp</span></span>
-      <button class="btn btn-sm" onclick="document.getElementById('modal-cancel-game').classList.add('open')" id="btn-cancel-game" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,var(--border));padding:5px 12px;font-size:0.78rem;">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
-    </div>
+    <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 resp</span></span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
   <div class="q-display">
@@ -678,9 +512,9 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   </div>
   <div style="display:flex;gap:10px;width:100%;max-width:700px;">
     <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
-    <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn" disabled>Siguiente →</button>
+    <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn">Siguiente →</button>
   </div>
-</div><!-- /screen-host-game -->
+</div>
 
 <!-- ══ HOST FINAL ══ -->
 <div id="screen-final" class="screen">
@@ -694,10 +528,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 <!-- ══ PLAYER JOIN ══ -->
 <div id="screen-player-join" class="screen">
   <div class="logo" style="font-size:2rem;">Know It <span>All</span></div>
-  <div class="lang-toggle">
-    <button class="lang-btn active" onclick="setLang('es')" id="player-lang-es">🇨🇴 Español</button>
-    <button class="lang-btn" onclick="setLang('en')" id="player-lang-en">🇺🇸 English</button>
-  </div>
   <div class="card" style="text-align:left;">
     <h2 id="join-title">Unirse al juego</h2>
     <label id="label-code">Código del juego</label>
@@ -739,36 +569,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   <div class="scoreboard" id="player-final-scoreboard" style="max-width:400px;"></div>
   <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-play-again-p">Volver</button>
 </div>
-
-<script>
-// Critical navigation functions — defined before module loads
-// These work even if Firebase/module hasn't loaded yet
-function showPlayerJoin() {
-  var screens = document.querySelectorAll('.screen');
-  screens.forEach(function(s) { s.classList.remove('active'); });
-  document.getElementById('screen-player-join').classList.add('active');
-}
-function showScreen(id) {
-  var screens = document.querySelectorAll('.screen');
-  screens.forEach(function(s) { s.classList.remove('active'); });
-  var el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
-// openModal / closeModal — needed for cancel button before module loads
-function openModal(id) {
-  var el = document.getElementById(id);
-  if (el) el.classList.add('open');
-}
-function closeModal(id) {
-  var el = document.getElementById(id);
-  if (el) el.classList.remove('open');
-}
-window.openModal = openModal;
-window.closeModal = closeModal;
-// These will be overridden by the module once it loads
-window.showPlayerJoin = showPlayerJoin;
-window.showScreen = showScreen;
-</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -876,25 +676,6 @@ const T = {
     btnEditName:'Editar',
     backBtn:'←',
     dcJoinTitle:'Unirse a sala', dcJoinDesc:'Entra a la partida de otro host con un código',
-    btnEditName:'Editar',
-    nameUpdated:'✅ Nombre actualizado',
-    copyLink:'🔗 Link copiado!',
-    optMixedFull:'Mixto (A-D + V/F)', optMultipleFull:'Solo opción múltiple', optTFFull:'Solo V/F', optMedium:'Medio',
-    cancelGameTitle:'¿Cancelar partida?',
-    cancelGameDesc:'Se terminará el juego para todos los jugadores y no se guardará el resultado.',
-    cancelGameConfirm:'Sí, cancelar',
-    cancelGameKeep:'No, seguir jugando',
-    cancelGameBtnLabel:'Cancelar',
-    instrTitle:'¡Todo listo para jugar!',
-    instrStep1Title:'Jugadores listos',
-    instrStep1Desc:'Todos deben tener la pantalla de espera abierta en su celular antes de continuar.',
-    instrStep2Title:'Tiempo por pregunta',
-    instrStep2Desc:'Cada pregunta tiene un temporizador. Responder más rápido da más puntos.',
-    instrStep3Title:'Puntaje',
-    instrStep3Desc:'Respuesta correcta: hasta 1000 pts. El marcador se actualiza en tiempo real.',
-    instrStep4Title:'Rol del host',
-    instrStep4Desc:'Tú controlas el ritmo. La ronda avanza automáticamente cuando todos respondan o se acabe el tiempo.',
-    instrStartNow:'🚀 ¡Empezar ahora!',
     settingsDangerTitle:'ZONA DE PELIGRO',
     settingsSignoutLabel:'Cerrar sesión',
     inlineDone:'✓ Listo', inlineOptions:'OPCIONES (marca la correcta)',
@@ -982,25 +763,6 @@ const T = {
     btnEditName:'Edit',
     backBtn:'←',
     dcJoinTitle:'Join a game', dcJoinDesc:'Enter another host\'s game with a code',
-    btnEditName:'Edit',
-    nameUpdated:'✅ Name updated',
-    copyLink:'🔗 Link copied!',
-    optMixedFull:'Mixed (A-D + T/F)', optMultipleFull:'Multiple choice only', optTFFull:'True/False only', optMedium:'Medium',
-    cancelGameTitle:'Cancel game?',
-    cancelGameDesc:'The game will end for all players and results will not be saved.',
-    cancelGameConfirm:'Yes, cancel',
-    cancelGameKeep:'No, keep playing',
-    cancelGameBtnLabel:'Cancel',
-    instrTitle:'All set to play!',
-    instrStep1Title:'Players ready',
-    instrStep1Desc:'Everyone should have the waiting screen open on their phone before continuing.',
-    instrStep2Title:'Time per question',
-    instrStep2Desc:'Each question has a timer. Answering faster earns more points.',
-    instrStep3Title:'Scoring',
-    instrStep3Desc:'Correct answer: up to 1000 pts. The scoreboard updates in real time.',
-    instrStep4Title:'Host role',
-    instrStep4Desc:'You control the pace. The round advances automatically when everyone answers or time runs out.',
-    instrStartNow:'🚀 Start now!',
     settingsDangerTitle:'DANGER ZONE',
     settingsSignoutLabel:'Sign out',
     inlineDone:'✓ Done', inlineOptions:'OPTIONS (mark correct)',
@@ -1033,7 +795,7 @@ function openModal(id) { document.getElementById(id).classList.add('open'); }
 // ── LANGUAGE ──────────────────────────────────────────
 window.setLang = function(l) {
   lang = l; t = T[l];
-  ['lang-es','lang-en','dash-lang-es','dash-lang-en','set-lang-es','set-lang-en','player-lang-es','player-lang-en'].forEach(id => {
+  ['lang-es','lang-en','dash-lang-es','dash-lang-en','set-lang-es','set-lang-en'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', id.endsWith(l));
   });
@@ -1062,25 +824,10 @@ function applyTranslations() {
   s('btn-signout', t.btnSignout); s('btn-signout2', t.btnSignout2);
   s('settings-danger-title', t.settingsDangerTitle);
   s('settings-signout-label', t.settingsSignoutLabel);
-  s('cancel-game-title', t.cancelGameTitle);
-  s('cancel-game-desc', t.cancelGameDesc);
-  s('btn-confirm-cancel', t.cancelGameConfirm);
-  s('btn-keep-playing', t.cancelGameKeep);
-  s('cancel-game-btn-label', t.cancelGameBtnLabel);
-  s('instr-title', t.instrTitle);
-  s('instr-step1-title', t.instrStep1Title); s('instr-step1-desc', t.instrStep1Desc);
-  s('instr-step2-title', t.instrStep2Title); s('instr-step2-desc', t.instrStep2Desc);
-  s('instr-step3-title', t.instrStep3Title); s('instr-step3-desc', t.instrStep3Desc);
-  s('instr-step4-title', t.instrStep4Title); s('instr-step4-desc', t.instrStep4Desc);
-  s('btn-start-now', t.instrStartNow);
   s('modal-save-title', t.modalSaveTitle); s('modal-proj-name-label', t.modalProjNameLabel);
   s('btn-save-project', t.btnSaveProject); s('btn-cancel-save', t.btnCancelSave);
   s('builder-title', t.builderTitle); s('btn-create-room', t.btnCreateRoom);
   s('btn-add-manual', t.addManual);
-  s('dc-join-title', t.dcJoinTitle); s('dc-join-desc', t.dcJoinDesc);
-  s('btn-edit-name', t.btnEditName);
-  s('opt-mixed', t.optMixedFull); s('opt-multiple', t.optMultipleFull); s('opt-tf', t.optTFFull);
-  s('opt-medium', t.optMedium);
   s('lobby-title', t.lobbyTitle); s('live-label', t.liveLabel); s('code-label', t.codeLabel);
   s('qr-hint', t.qrHint); s('btn-edit-q', t.editQBtn);
   s('start-game-btn', t.startGame); s('scoreboard-label', t.scoreboardLabel);
@@ -1142,36 +889,16 @@ window.signOut = async function() {
 }
 
 onAuthStateChanged(auth, user => {
-  try {
-    currentUser = user;
-
-    // If URL has ?code=, always go to player join — never redirect to dashboard
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('code')) {
-      showScreen('screen-player-join');
-      document.getElementById('player-code-input').value = urlParams.get('code').toUpperCase();
-      if (user) {
-        const name = user.displayName || user.email?.split('@')[0] || '';
-        document.getElementById('player-name-input').value = name;
-      }
-      return;
-    }
-
-    if (user) {
-      get(ref(db, `users/${user.uid}/settings`)).then(snap => {
-        const prefs = snap.val() || {};
-        if (prefs.lang) setLang(prefs.lang);
-        if (prefs.defaultTimer) {
-          const timerEl = document.getElementById('default-timer');
-          if (timerEl) timerEl.value = prefs.defaultTimer;
-        }
-      }).catch(e => console.warn('Settings load failed:', e));
-      loadDashboard();
-      showScreen('screen-dashboard');
-    }
-  } catch(e) {
-    console.error('Auth state error:', e);
-    showScreen('screen-landing');
+  currentUser = user;
+  if (user) {
+    // Load user settings
+    get(ref(db, `users/${user.uid}/settings`)).then(snap => {
+      const prefs = snap.val() || {};
+      if (prefs.lang) setLang(prefs.lang);
+      if (prefs.defaultTimer) document.getElementById('default-timer').value = prefs.defaultTimer;
+    });
+    loadDashboard();
+    showScreen('screen-dashboard');
   }
 });
 
@@ -1237,7 +964,7 @@ window.loadProjects = async function() {
         <div class="project-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">${lang==='es'?'▶ Lanzar':'▶ Launch'}</button>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">▶ Lanzar</button>
         <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();deleteProject('${id}')">🗑</button>
       </div>
     </div>`).join('');
@@ -1256,26 +983,8 @@ window.openProject = async function(id) {
 }
 
 window.deleteProject = async function(id) {
-  if (!currentUser) return;
-  const confirmMsg = lang === 'es'
-    ? '¿Eliminar este proyecto? También se eliminarán todos sus resultados de partidas.'
-    : 'Delete this project? All its game history will also be deleted.';
-  if (!confirm(confirmMsg)) return;
-
-  // Delete the project itself
+  if (!currentUser || !confirm('¿Eliminar este proyecto?')) return;
   await set(ref(db, `users/${currentUser.uid}/projects/${id}`), null);
-
-  // Delete all gameHistory entries linked to this project
-  const histSnap = await get(ref(db, `users/${currentUser.uid}/gameHistory`));
-  if (histSnap.exists()) {
-    const history = histSnap.val();
-    const deletes = Object.entries(history)
-      .filter(([, g]) => g.projectId === id)
-      .map(([hid]) => set(ref(db, `users/${currentUser.uid}/gameHistory/${hid}`), null));
-    await Promise.all(deletes);
-  }
-
-  toast(lang === 'es' ? '🗑 Proyecto eliminado' : '🗑 Project deleted');
   loadProjects();
 }
 
@@ -1362,7 +1071,7 @@ window.editDisplayName = async function() {
     await updateProfile(currentUser, { displayName: newName.trim() });
     s('settings-name-val', newName.trim());
     s('dash-user-name', newName.trim());
-    toast(t.nameUpdated);
+    toast('✅ Nombre actualizado');
   }
 }
 
@@ -1505,7 +1214,6 @@ window.cancelEdit = function() { editingIndex=-1; renderQuestionsList(); }
 
 // ── AI GENERATE ───────────────────────────────────────
 window.generateQuestions = async function() {
-  const WORKER_URL = 'https://broken-fire-ccaf.desidente.workers.dev';
   const rawData = document.getElementById('raw-data').value.trim();
   if(!rawData){toast('⚠️ '+(lang==='es'?'Pega los datos primero':'Paste the data first'));return;}
   const numQ   = document.getElementById('num-questions').value;
@@ -1559,22 +1267,13 @@ ${rawData}`;
   try {
     setStep(1); await new Promise(r=>setTimeout(r,500));
     setStep(2);
-    const res = await fetch(WORKER_URL, {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
-      })
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2048,
+        messages:[{role:"user",content:prompt}]})
     });
-    // Get raw text first to handle any response format
-    const rawText = await res.text();
-    if (!rawText || rawText.trim() === '') throw new Error('Empty response from worker');
-    let data;
-    try { data = JSON.parse(rawText); } catch(e) { throw new Error('Worker returned invalid JSON: ' + rawText.substring(0,200)); }
-    // Check for worker-level error
-    if (data.error) throw new Error('Worker error: ' + JSON.stringify(data.error));
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!text) throw new Error('No text in response: ' + JSON.stringify(data).substring(0,200));
+    const data = await res.json();
+    const text = data.content?.find(b=>b.type==='text')?.text||'';
     setStep(3); await new Promise(r=>setTimeout(r,300));
     const clean = text.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
@@ -1596,7 +1295,7 @@ ${rawData}`;
 // ── LOBBY ─────────────────────────────────────────────
 async function goToLobby() {
   gameCode = Math.random().toString(36).substring(2,8).toUpperCase();
-  await set(ref(db,`games/${gameCode}`),{status:'lobby',currentQuestion:-1,questions,createdAt:Date.now(),lang,projectName:currentProjectName,projectId:currentProjectId||null});
+  await set(ref(db,`games/${gameCode}`),{status:'lobby',currentQuestion:-1,questions,createdAt:Date.now(),lang,projectName:currentProjectName});
   showScreen('screen-host-lobby');
   document.getElementById('lobby-code').textContent=gameCode;
   const joinURL=`${window.location.origin}${window.location.pathname}?code=${gameCode}`;
@@ -1621,38 +1320,10 @@ function listenPlayers() {
   unsubscribers.push(unsub);
 }
 
-window.startGame = function() {
-  // Update subtitle with player count
-  get(ref(db,`games/${gameCode}/players`)).then(snap=>{
-    const count = Object.keys(snap.val()||{}).length;
-    const sub = lang==='es'
-      ? `${count} jugador${count!==1?'es':''} conectado${count!==1?'s':''} · ${questions.length} pregunta${questions.length!==1?'s':''}`
-      : `${count} player${count!==1?'s':''} connected · ${questions.length} question${questions.length!==1?'s':''}`;
-    document.getElementById('instr-subtitle').textContent = sub;
-  });
-  openModal('modal-instructions');
-}
-
-window.launchGame = async function() {
+window.startGame = async function() {
   currentQIndex=0;
   await update(ref(db,`games/${gameCode}`),{status:'playing',currentQuestion:0});
-  showScreen('screen-host-game');
-  document.getElementById('host-game-code-display').textContent = gameCode;
-  loadHostQuestion(0); listenResponses(); listenScoreboard();
-}
-
-window.confirmCancelGame = async function() {
-  closeModal('modal-cancel-game');
-  clearInterval(timerInterval);
-  await update(ref(db,`games/${gameCode}`),{status:'cancelled'});
-  await set(ref(db,`games/${gameCode}`),null);
-  toast(lang==='es'?'Partida cancelada':'Game cancelled');
-  goToDashboard();
-}
-
-window.copyGameCode = function() {
-  const joinURL = `${window.location.origin}${window.location.pathname}?code=${gameCode}`;
-  navigator.clipboard?.writeText(joinURL).then(() => toast(t.copyLink)).catch(() => toast(`${lang==='es'?'Código':'Code'}: ${gameCode}`));
+  showScreen('screen-host-game'); loadHostQuestion(0); listenResponses(); listenScoreboard();
 }
 
 function loadHostQuestion(i) {
@@ -1667,9 +1338,6 @@ function loadHostQuestion(i) {
   else opts.innerHTML=['A','B','C','D'].map(k=>`<div class="option-host ${k}"><span class="option-key">${k}</span> ${q.options[k]}</div>`).join('');
   update(ref(db,`games/${gameCode}`),{currentQuestion:i,questionStartedAt:Date.now(),status:'playing'});
   set(ref(db,`games/${gameCode}/answers/${i}`),null);
-  // Reset Next button — disabled until all answer or timer ends
-  const nextBtn=document.getElementById('next-btn');
-  if(nextBtn) nextBtn.disabled=true;
   startHostTimer(q.time||20);
 }
 
@@ -1689,19 +1357,6 @@ function listenResponses() {
     const all=snap.val()||{};
     const count=Object.keys(all[currentQIndex]||{}).length;
     s('host-resp-count',t.responses(count));
-    // Check if all players have answered
-    get(ref(db,`games/${gameCode}/players`)).then(playersSnap=>{
-      const totalPlayers=Object.keys(playersSnap.val()||{}).length;
-      if(totalPlayers>0 && count>=totalPlayers) {
-        // Everyone answered — auto-reveal and enable Next
-        if(document.getElementById('answer-reveal').style.display==='none'||
-           document.getElementById('answer-reveal').style.display==='') {
-          revealAnswer();
-        }
-        const nextBtn=document.getElementById('next-btn');
-        if(nextBtn) nextBtn.disabled=false;
-      }
-    });
   });
   unsubscribers.push(unsub);
 }
@@ -1731,9 +1386,6 @@ window.revealAnswer = function() {
   const correctLabel=q.type==='truefalse'?(q.correct==='true'?t.trueCorrect:t.falseCorrect):`${q.correct}: ${q.options[q.correct]}`;
   const el=document.getElementById('answer-reveal');
   el.textContent=t.correctAnswer(correctLabel); el.style.display='block';
-  // Enable Next button whenever answer is revealed (timer end or all answered)
-  const nextBtn=document.getElementById('next-btn');
-  if(nextBtn) nextBtn.disabled=false;
   scorePlayersForCurrentQuestion();
 }
 
@@ -1770,17 +1422,11 @@ async function endGame() {
   const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
   // Save to history
   if(currentUser) {
-    const histRef = push(ref(db,`users/${currentUser.uid}/gameHistory`));
-    await set(histRef, {
-      projectName: currentProjectName||'Juego',
-      projectId:   currentProjectId||null,
-      gameCode:    gameCode,
-      playedAt:    Date.now(),
-      questionCount: questions.length,
-      players: Object.fromEntries(Object.values(players).map(p=>[p.name,{name:p.name,score:p.score||0}]))
+    await push(ref(db,`users/${currentUser.uid}/gameHistory`),{
+      projectName:currentProjectName||'Juego',
+      playedAt:Date.now(), questionCount:questions.length,
+      players:Object.fromEntries(Object.values(players).map(p=>[p.name,{name:p.name,score:p.score||0}]))
     });
-    // Clean up the live game node — no longer needed after history is saved
-    await set(ref(db,`games/${gameCode}`), null);
   }
   showScreen('screen-final');
   const winner=sorted[0]?.[1];
@@ -1805,60 +1451,14 @@ window.joinGame = async function() {
   if(!gameSnap.exists()){toast(t.codeNotFound);return;}
   const game=gameSnap.val();
   if(game.status==='finished'){toast(t.gameFinished);return;}
+  if(game.lang&&game.lang!==lang) setLang(game.lang);
   gameCode=code; playerName=name; questions=game.questions||[];
-
-  // ── REJOIN LOGIC (3-layer fallback) ───────────────────
-  // Layer 1: localStorage — same device, same browser
-  const savedKey = `nia_player_${code}`;
-  const saved = localStorage.getItem(savedKey);
-  if (saved) {
-    try {
-      const { pid } = JSON.parse(saved);
-      const existingSnap = await get(ref(db, `games/${code}/players/${pid}`));
-      if (existingSnap.exists()) {
-        return _rejoinAs(code, pid, name, existingSnap.val().score||0);
-      }
-    } catch(e) {}
-  }
-
-  // Layer 2: search Firebase by name — works across devices/browsers
-  const playersSnap = await get(ref(db, `games/${code}/players`));
-  if (playersSnap.exists()) {
-    const players = playersSnap.val();
-    const match = Object.entries(players).find(
-      ([, p]) => p.name.trim().toLowerCase() === name.trim().toLowerCase()
-    );
-    if (match) {
-      const [pid, pdata] = match;
-      // Save to localStorage so next rejoin is instant
-      localStorage.setItem(savedKey, JSON.stringify({ pid, pname: name }));
-      return _rejoinAs(code, pid, name, pdata.score||0);
-    }
-  }
-
-  // Layer 3: truly new player
-  const playerRef = push(ref(db, `games/${gameCode}/players`));
-  playerId = playerRef.key;
-  playerScore = 0;
-  await set(playerRef, { name, score:0, joinedAt:Date.now() });
-  localStorage.setItem(savedKey, JSON.stringify({ pid: playerId, pname: name }));
-  _enterWaitScreen(name);
-}
-
-async function _rejoinAs(code, pid, name, score) {
-  playerId = pid;
-  playerScore = score;
-  await update(ref(db, `games/${code}/players/${pid}`), { name, reconnectedAt: Date.now() });
-  toast(lang==='es'
-    ? `👋 ¡Bienvenido de vuelta, ${name}! (${score} pts)`
-    : `👋 Welcome back, ${name}! (${score} pts)`, 3500);
-  _enterWaitScreen(name);
-}
-
-function _enterWaitScreen(name) {
+  const playerRef=push(ref(db,`games/${gameCode}/players`));
+  playerId=playerRef.key;
+  await set(playerRef,{name,score:0,joinedAt:Date.now()});
   showScreen('screen-player-wait');
-  s('player-wait-name', t.waitGreet(name));
-  s('wait-text', t.waitText);
+  s('player-wait-name',t.waitGreet(name));
+  s('wait-text',t.waitText);
   listenGameState(); listenPlayerCount();
 }
 
@@ -1877,30 +1477,10 @@ function listenGameState() {
       const qi=game.currentQuestion;
       if(qi!==undefined&&qi!==currentQIndex){
         currentQIndex=qi; playerAnswered=false;
-        // Check if player already answered this question (rejoin case)
-        get(ref(db,`games/${gameCode}/answers/${qi}/${playerId}`)).then(aSnap=>{
-          if(aSnap.exists()) {
-            // Already answered — show waiting state
-            playerAnswered=true;
-            loadPlayerQuestion(qi,game.questionStartedAt);
-            // Disable buttons after a tick
-            setTimeout(()=>{
-              document.querySelectorAll('.answer-btn,.tf-btn').forEach(b=>b.disabled=true);
-              const resultEl=document.getElementById('player-result');
-              if(resultEl) { resultEl.style.display='block'; resultEl.innerHTML=`<div class="result-badge timeout">${lang==='es'?'✓ Ya respondiste esta pregunta':'✓ Already answered'}</div>`; }
-            },100);
-          } else {
-            loadPlayerQuestion(qi,game.questionStartedAt);
-          }
-        });
+        loadPlayerQuestion(qi,game.questionStartedAt);
       }
     }
     if(game.status==='finished') showPlayerFinal(game);
-    if(game.status==='cancelled') {
-      clearInterval(timerInterval);
-      toast(lang==='es'?'⚠️ El host canceló la partida':'⚠️ The host cancelled the game', 4000);
-      setTimeout(()=>showScreen('screen-player-join'), 2000);
-    }
   });
   unsubscribers.push(unsub);
 }
@@ -1910,7 +1490,6 @@ function loadPlayerQuestion(i,startedAt) {
   showScreen('screen-player-answer');
   s('player-q-counter',t.qCounterPlayer(i+1,questions.length));
   s('player-q-text',q.text);
-  s('player-score-live',t.pts(playerScore));
   document.getElementById('player-result').style.display='none';
   const area=document.getElementById('player-answer-area');
   if(q.type==='truefalse') {
@@ -2026,63 +1605,12 @@ function initDragDrop() {
 }
 
 // ── AUTO ROUTE ────────────────────────────────────────
-try {
-  const params=new URLSearchParams(window.location.search);
-  if(params.get('code')) {
-    showScreen('screen-player-join');
-    document.getElementById('player-code-input').value=params.get('code').toUpperCase();
-  }
-  applyTranslations();
-} catch(e) {
-  console.error('Init error:', e);
-  // Fallback: make sure something is visible
-  const screens = document.querySelectorAll('.screen');
-  let anyActive = false;
-  screens.forEach(s => { if(s.classList.contains('active')) anyActive = true; });
-  if (!anyActive) showScreen('screen-landing');
+const params=new URLSearchParams(window.location.search);
+if(params.get('code')) {
+  showScreen('screen-player-join');
+  document.getElementById('player-code-input').value=params.get('code').toUpperCase();
 }
-</script>
-
-<!-- ══ CANCEL GAME MODAL (outside all screens for proper z-index) ══ -->
-<div class="modal-overlay" id="modal-cancel-game">
-  <div class="modal" style="max-width:360px;text-align:center;">
-    <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
-    <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
-    <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
-    <div style="display:flex;gap:10px;">
-      <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('modal-cancel-game').classList.remove('open')" id="btn-keep-playing">No, seguir jugando</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// Sync routing — runs after DOM is ready, before Firebase resolves
-(function() {
-  try {
-    var params = new URLSearchParams(window.location.search);
-    var code = params.get('code');
-    if (code) {
-      var screens = document.querySelectorAll('.screen');
-      screens.forEach(function(s) { s.classList.remove('active'); });
-      var joinScreen = document.getElementById('screen-player-join');
-      if (joinScreen) {
-        joinScreen.classList.add('active');
-        var codeInput = document.getElementById('player-code-input');
-        if (codeInput) codeInput.value = code.toUpperCase();
-      }
-    }
-    // Safety net — if nothing is active, show landing
-    var anyActive = false;
-    document.querySelectorAll('.screen').forEach(function(s) {
-      if (s.classList.contains('active')) anyActive = true;
-    });
-    if (!anyActive) {
-      var landing = document.getElementById('screen-landing');
-      if (landing) landing.classList.add('active');
-    }
-  } catch(e) { console.error('Routing error:', e); }
-})();
+applyTranslations();
 </script>
 </body>
 </html>
