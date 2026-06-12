@@ -521,13 +521,62 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
   </div>
   <div class="builder-body">
-    <!-- AI SECTION (hidden, available for future) -->
-    <div style="display:none;">
-      <textarea id="raw-data"></textarea>
-      <select id="num-questions"><option value="10" selected>10</option></select>
-      <select id="q-type-gen"><option value="mixed" id="opt-mixed">Mixto</option><option value="multiple" id="opt-multiple">Solo A-D</option><option value="truefalse" id="opt-tf">Solo V/F</option></select>
-      <select id="q-difficulty"><option value="medium" selected id="opt-medium">Medio</option></select>
-      <div id="gen-status"></div><div id="step-indicator"><div id="step-1"></div><div id="step-2"></div><div id="step-3"></div></div>
+    <!-- AI SECTION -->
+    <div class="ai-generate-section ai-card">
+      <h3 id="ai-section-title" style="display:flex;align-items:center;gap:8px;">✨ Generar con IA <span style="font-size:0.68rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Gemini</span></h3>
+      <p class="muted" style="margin-bottom:4px;font-size:0.8rem;line-height:1.5;" id="ai-section-desc">Pega las respuestas de tus participantes en texto libre. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
+      <label id="raw-data-label">Datos de los participantes</label>
+      <textarea id="raw-data" style="min-height:130px;" placeholder="Ejemplo:&#10;&#10;Juan: 24 años, mascota: Winnie (perro)&#10;&#10;Denise:&#10;Something funny you've done?&#10;- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER&#10;- I found my dog in a shelter&#10;- I ran a half marathon&#10;&#10;Lucía: 25 años, trabaja en Google, le gusta el sushi"></textarea>
+      <div style="margin-top:12px;">
+        <div class="gen-options-title" id="gen-options-title">Opciones de generación</div>
+        <div class="gen-options-row">
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-num">Número de preguntas</span>
+              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-num">Cuántas preguntas quieres que la IA genere. Más datos = más variedad.</div></div>
+            </div>
+            <select id="num-questions" style="width:100%;">
+              <option value="5">5 preguntas</option>
+              <option value="10" selected>10 preguntas</option>
+              <option value="15">15 preguntas</option>
+              <option value="20">20 preguntas</option>
+            </select>
+          </div>
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-type">Tipo de pregunta</span>
+              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-type"><strong>Mixto:</strong> A/B/C/D + V/F.<br><br><strong>Solo A-D:</strong> 4 opciones.<br><br><strong>Solo V/F:</strong> más rápidas.</div></div>
+            </div>
+            <select id="q-type-gen" style="width:100%;">
+              <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
+              <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
+              <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
+            </select>
+          </div>
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-diff">Dificultad</span>
+              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-diff"><strong>Fácil:</strong> distractores distintos.<br><br><strong>Medio:</strong> plausibles.<br><br><strong>Difícil:</strong> muy similares.</div></div>
+            </div>
+            <select id="q-difficulty" style="width:100%;">
+              <option value="easy">Fácil</option>
+              <option value="medium" selected id="opt-medium">Medio</option>
+              <option value="hard">Difícil</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn" style="width:auto;">✨ Generar</button>
+        <div id="gen-status" style="font-size:0.8rem;color:var(--muted);"></div>
+      </div>
+      <div class="step-indicator" id="step-indicator" style="display:none;">
+        <div class="step" id="step-1">1. Leyendo datos</div>
+        <span style="color:var(--border);">›</span>
+        <div class="step" id="step-2">2. Generando</div>
+        <span style="color:var(--border);">›</span>
+        <div class="step" id="step-3">3. Revisando</div>
+      </div>
     </div>
 
     <!-- QUESTIONS LIST -->
@@ -1456,6 +1505,7 @@ window.cancelEdit = function() { editingIndex=-1; renderQuestionsList(); }
 
 // ── AI GENERATE ───────────────────────────────────────
 window.generateQuestions = async function() {
+  const WORKER_URL = 'https://broken-fire-ccaf.desidente.workers.dev';
   const rawData = document.getElementById('raw-data').value.trim();
   if(!rawData){toast('⚠️ '+(lang==='es'?'Pega los datos primero':'Paste the data first'));return;}
   const numQ   = document.getElementById('num-questions').value;
@@ -1509,13 +1559,15 @@ ${rawData}`;
   try {
     setStep(1); await new Promise(r=>setTimeout(r,500));
     setStep(2);
-    const res = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2048,
-        messages:[{role:"user",content:prompt}]})
+    const res = await fetch(WORKER_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
+      })
     });
     const data = await res.json();
-    const text = data.content?.find(b=>b.type==='text')?.text||'';
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     setStep(3); await new Promise(r=>setTimeout(r,300));
     const clean = text.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
