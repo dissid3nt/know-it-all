@@ -508,7 +508,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     </div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveProject()" id="btn-save-project">Guardar y lanzar</button>
-      <button class="btn btn-secondary" onclick="closeModal('modal-save-project')" id="btn-cancel-save">Cancelar</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-save-project').classList.remove('open')" id="btn-cancel-save">Cancelar</button>
     </div>
   </div>
 </div>
@@ -566,7 +566,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 <!-- ══ INSTRUCTIONS FLYOUT ══ -->
 <div class="modal-overlay" id="modal-instructions">
   <div class="modal" style="max-width:480px;position:relative;">
-    <button onclick="closeModal('modal-instructions');launchGame()" style="position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">✕</button>
+    <button onclick="document.getElementById('modal-instructions').classList.remove('open');launchGame()" style="position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">✕</button>
     <div style="font-size:2.5rem;margin-bottom:10px;text-align:center;">🎯</div>
     <h2 id="instr-title" style="text-align:center;margin-bottom:4px;">¡Todo listo para jugar!</h2>
     <p class="muted" id="instr-subtitle" style="text-align:center;margin-bottom:24px;font-size:0.85rem;"></p>
@@ -600,7 +600,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         </div>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="closeModal('modal-instructions');launchGame()" id="btn-start-now">🚀 ¡Empezar ahora!</button>
+    <button class="btn btn-primary" onclick="document.getElementById('modal-instructions').classList.remove('open');launchGame()" id="btn-start-now">🚀 ¡Empezar ahora!</button>
   </div>
 </div>
 
@@ -613,7 +613,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <span class="chip" id="host-game-code-chip" title="Código para unirse" style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);cursor:pointer;" onclick="copyGameCode()">🔗 <span id="host-game-code-display">----</span></span>
       <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 resp</span></span>
-      <button class="btn btn-sm" onclick="openModal('modal-cancel-game')" id="btn-cancel-game" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,var(--border));padding:5px 12px;font-size:0.78rem;">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
+      <button class="btn btn-sm" onclick="document.getElementById('modal-cancel-game').classList.add('open')" id="btn-cancel-game" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,var(--border));padding:5px 12px;font-size:0.78rem;">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
     </div>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
@@ -1992,7 +1992,7 @@ try {
     <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
-      <button class="btn btn-secondary" onclick="closeModal('modal-cancel-game')" id="btn-keep-playing">No, seguir jugando</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-cancel-game').classList.remove('open')" id="btn-keep-playing">No, seguir jugando</button>
     </div>
   </div>
 </div>
