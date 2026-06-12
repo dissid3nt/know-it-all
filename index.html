@@ -123,6 +123,8 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .btn{padding:12px 24px;border:none;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;width:100%;}
 .btn-primary{background:var(--accent);color:white;}
 .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-primary:disabled{background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:not-allowed;transform:none;opacity:1;}
+.btn-primary:disabled:hover{background:var(--surface2);transform:none;filter:none;}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
 .btn-secondary:hover{border-color:var(--accent);}
 .btn-green{background:var(--green);color:white;}
@@ -603,20 +605,20 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 </div>
 
 <!-- ══ CANCEL GAME FLYOUT ══ -->
-<div class="modal-overlay" id="modal-cancel-game">
-  <div class="modal" style="max-width:360px;text-align:center;">
-    <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
-    <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
-    <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
-    <div style="display:flex;gap:10px;">
-      <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
-      <button class="btn btn-secondary" onclick="closeModal('modal-cancel-game')" id="btn-keep-playing">No, seguir jugando</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══ HOST GAME ══ -->
 <div id="screen-host-game" class="screen">
+  <!-- Cancel confirmation flyout (inside screen so z-index works) -->
+  <div class="modal-overlay" id="modal-cancel-game">
+    <div class="modal" style="max-width:360px;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
+      <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
+      <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
+        <button class="btn btn-secondary" onclick="closeModal('modal-cancel-game')" id="btn-keep-playing">No, seguir jugando</button>
+      </div>
+    </div>
+  </div>
   <div class="host-header">
     <span class="muted" id="host-q-counter">Pregunta 1/10</span>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -640,7 +642,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
     <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn" disabled>Siguiente →</button>
   </div>
-</div>
+
 
 <!-- ══ HOST FINAL ══ -->
 <div id="screen-final" class="screen">
@@ -806,6 +808,10 @@ const T = {
     btnEditName:'Editar',
     backBtn:'←',
     dcJoinTitle:'Unirse a sala', dcJoinDesc:'Entra a la partida de otro host con un código',
+    btnEditName:'Editar',
+    nameUpdated:'✅ Nombre actualizado',
+    copyLink:'🔗 Link copiado!',
+    optMixedFull:'Mixto (A-D + V/F)', optMultipleFull:'Solo opción múltiple', optTFFull:'Solo V/F', optMedium:'Medio',
     cancelGameTitle:'¿Cancelar partida?',
     cancelGameDesc:'Se terminará el juego para todos los jugadores y no se guardará el resultado.',
     cancelGameConfirm:'Sí, cancelar',
@@ -908,6 +914,10 @@ const T = {
     btnEditName:'Edit',
     backBtn:'←',
     dcJoinTitle:'Join a game', dcJoinDesc:'Enter another host\'s game with a code',
+    btnEditName:'Edit',
+    nameUpdated:'✅ Name updated',
+    copyLink:'🔗 Link copied!',
+    optMixedFull:'Mixed (A-D + T/F)', optMultipleFull:'Multiple choice only', optTFFull:'True/False only', optMedium:'Medium',
     cancelGameTitle:'Cancel game?',
     cancelGameDesc:'The game will end for all players and results will not be saved.',
     cancelGameConfirm:'Yes, cancel',
@@ -999,6 +1009,10 @@ function applyTranslations() {
   s('btn-save-project', t.btnSaveProject); s('btn-cancel-save', t.btnCancelSave);
   s('builder-title', t.builderTitle); s('btn-create-room', t.btnCreateRoom);
   s('btn-add-manual', t.addManual);
+  s('dc-join-title', t.dcJoinTitle); s('dc-join-desc', t.dcJoinDesc);
+  s('btn-edit-name', t.btnEditName);
+  s('opt-mixed', t.optMixedFull); s('opt-multiple', t.optMultipleFull); s('opt-tf', t.optTFFull);
+  s('opt-medium', t.optMedium);
   s('lobby-title', t.lobbyTitle); s('live-label', t.liveLabel); s('code-label', t.codeLabel);
   s('qr-hint', t.qrHint); s('btn-edit-q', t.editQBtn);
   s('start-game-btn', t.startGame); s('scoreboard-label', t.scoreboardLabel);
@@ -1260,7 +1274,7 @@ window.editDisplayName = async function() {
     await updateProfile(currentUser, { displayName: newName.trim() });
     s('settings-name-val', newName.trim());
     s('dash-user-name', newName.trim());
-    toast('✅ Nombre actualizado');
+    toast(t.nameUpdated);
   }
 }
 
@@ -1540,7 +1554,7 @@ window.confirmCancelGame = async function() {
 
 window.copyGameCode = function() {
   const joinURL = `${window.location.origin}${window.location.pathname}?code=${gameCode}`;
-  navigator.clipboard?.writeText(joinURL).then(() => toast('🔗 Link copiado!')).catch(() => toast(`Código: ${gameCode}`));
+  navigator.clipboard?.writeText(joinURL).then(() => toast(t.copyLink)).catch(() => toast(`${lang==='es'?'Código':'Code'}: ${gameCode}`));
 }
 
 function loadHostQuestion(i) {
@@ -1693,45 +1707,60 @@ window.joinGame = async function() {
   if(!gameSnap.exists()){toast(t.codeNotFound);return;}
   const game=gameSnap.val();
   if(game.status==='finished'){toast(t.gameFinished);return;}
-  // Respect player's own language choice
   gameCode=code; playerName=name; questions=game.questions||[];
 
-  // ── REJOIN: check if this device played this game before ──
+  // ── REJOIN LOGIC (3-layer fallback) ───────────────────
+  // Layer 1: localStorage — same device, same browser
   const savedKey = `nia_player_${code}`;
   const saved = localStorage.getItem(savedKey);
   if (saved) {
     try {
-      const { pid, pname } = JSON.parse(saved);
-      // Verify the player still exists in Firebase
+      const { pid } = JSON.parse(saved);
       const existingSnap = await get(ref(db, `games/${code}/players/${pid}`));
       if (existingSnap.exists()) {
-        // Rejoin — reuse existing playerId and score
-        playerId = pid;
-        const existingScore = existingSnap.val().score || 0;
-        playerScore = existingScore;
-        // Update name in case it changed, mark as reconnected
-        await update(ref(db, `games/${code}/players/${pid}`), { name, reconnectedAt: Date.now() });
-        toast(lang==='es' ? `👋 ¡Bienvenido de vuelta, ${name}! (${existingScore} pts)` : `👋 Welcome back, ${name}! (${existingScore} pts)`);
-        showScreen('screen-player-wait');
-        s('player-wait-name', t.waitGreet(name));
-        s('wait-text', t.waitText);
-        listenGameState(); listenPlayerCount();
-        return;
+        return _rejoinAs(code, pid, name, existingSnap.val().score||0);
       }
-    } catch(e) { /* ignore, create new player below */ }
+    } catch(e) {}
   }
 
-  // ── NEW PLAYER ──
-  const playerRef=push(ref(db,`games/${gameCode}/players`));
-  playerId=playerRef.key;
-  await set(playerRef,{name,score:0,joinedAt:Date.now()});
+  // Layer 2: search Firebase by name — works across devices/browsers
+  const playersSnap = await get(ref(db, `games/${code}/players`));
+  if (playersSnap.exists()) {
+    const players = playersSnap.val();
+    const match = Object.entries(players).find(
+      ([, p]) => p.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    if (match) {
+      const [pid, pdata] = match;
+      // Save to localStorage so next rejoin is instant
+      localStorage.setItem(savedKey, JSON.stringify({ pid, pname: name }));
+      return _rejoinAs(code, pid, name, pdata.score||0);
+    }
+  }
 
-  // Save to localStorage for rejoin
+  // Layer 3: truly new player
+  const playerRef = push(ref(db, `games/${gameCode}/players`));
+  playerId = playerRef.key;
+  playerScore = 0;
+  await set(playerRef, { name, score:0, joinedAt:Date.now() });
   localStorage.setItem(savedKey, JSON.stringify({ pid: playerId, pname: name }));
+  _enterWaitScreen(name);
+}
 
+async function _rejoinAs(code, pid, name, score) {
+  playerId = pid;
+  playerScore = score;
+  await update(ref(db, `games/${code}/players/${pid}`), { name, reconnectedAt: Date.now() });
+  toast(lang==='es'
+    ? `👋 ¡Bienvenido de vuelta, ${name}! (${score} pts)`
+    : `👋 Welcome back, ${name}! (${score} pts)`, 3500);
+  _enterWaitScreen(name);
+}
+
+function _enterWaitScreen(name) {
   showScreen('screen-player-wait');
-  s('player-wait-name',t.waitGreet(name));
-  s('wait-text',t.waitText);
+  s('player-wait-name', t.waitGreet(name));
+  s('wait-text', t.waitText);
   listenGameState(); listenPlayerCount();
 }
 
