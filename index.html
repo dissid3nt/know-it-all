@@ -225,6 +225,36 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 #toast.show{opacity:1;}
 .spin{animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── BUILDER ENHANCEMENTS ── */
+.ai-card{border-color:color-mix(in srgb,var(--accent) 40%,var(--border))!important;background:color-mix(in srgb,var(--accent) 4%,var(--surface))!important;}
+.gen-options-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px;}
+.gen-option-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px;}
+.gen-option-label{font-size:0.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;display:flex;align-items:center;gap:5px;}
+.tooltip-wrap{position:relative;display:inline-flex;}
+.tooltip-icon{width:15px;height:15px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:0.6rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;}
+.tooltip-wrap:hover .tooltip-box{display:block;}
+.tooltip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:0.76rem;color:var(--text);width:210px;line-height:1.5;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.5);text-transform:none;letter-spacing:0;font-weight:400;}
+.tooltip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border);}
+.step-indicator{display:flex;gap:6px;align-items:center;font-size:0.76rem;color:var(--muted);flex-wrap:wrap;}
+.step{padding:3px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);font-size:0.7rem;transition:all 0.3s;}
+.step.active{background:color-mix(in srgb,var(--accent) 20%,var(--surface2));border-color:var(--accent);color:var(--accent2);}
+.step.done{background:color-mix(in srgb,var(--green) 15%,var(--surface2));border-color:var(--green);color:var(--green);}
+.spinner-inline{width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* inline question editor */
+.question-item.expanded{border-color:var(--accent2);background:var(--surface2);}
+.q-expand-icon{color:var(--muted);font-size:0.75rem;transition:transform 0.2s;margin-left:4px;}
+.question-item.expanded .q-expand-icon{transform:rotate(180deg);}
+.q-editor-inline{display:none;padding:12px 16px 16px;border-top:1px solid var(--border);}
+.question-item.expanded .q-editor-inline{display:flex;flex-direction:column;gap:10px;}
+.option-edit-row{display:flex;align-items:center;gap:8px;}
+.option-letter-badge{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);width:16px;flex-shrink:0;}
+.correct-radio{accent-color:var(--green);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.q-preview-correct{font-size:0.72rem;color:var(--green);margin-top:3px;}
+.add-q-dashed{border:2px dashed var(--border);background:transparent;border-radius:12px;padding:12px;width:100%;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.add-q-dashed:hover{border-color:var(--accent);color:var(--accent2);}
+.gen-options-title{font-size:0.82rem;font-weight:600;color:var(--muted);margin-bottom:2px;}
 </style>
 </head>
 <body>
@@ -409,31 +439,86 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
   </div>
   <div class="builder-body">
-    <div class="ai-generate-section">
-      <h3 id="ai-section-title">✨ Generar con IA</h3>
-      <p class="muted" style="margin-bottom:10px;font-size:0.8rem;" id="ai-section-desc">Pega los datos de tus participantes y la IA transforma esos datos en preguntas de trivia.</p>
-      <label id="raw-data-label">Datos crudos</label>
-      <textarea id="raw-data" placeholder="Escribe o pega aquí los datos..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-        <select id="num-questions" style="width:auto;">
-          <option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option>
-        </select>
-        <select id="q-type-gen" style="width:auto;">
-          <option value="mixed" id="opt-mixed">Mixto</option>
-          <option value="multiple" id="opt-multiple">Solo A-D</option>
-          <option value="truefalse" id="opt-tf">Solo V/F</option>
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn">✨ Generar</button>
+    <!-- AI SECTION -->
+    <div class="ai-generate-section ai-card">
+      <h3 id="ai-section-title" style="display:flex;align-items:center;gap:8px;">✨ Generar con IA <span style="font-size:0.68rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Claude AI</span></h3>
+      <p class="muted" style="margin-bottom:4px;font-size:0.8rem;line-height:1.5;" id="ai-section-desc">Pega las respuestas de tus participantes en texto libre. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
+      <label id="raw-data-label">Datos de los participantes</label>
+      <textarea id="raw-data" style="min-height:130px;" placeholder="Ejemplo:&#10;&#10;Juan: 24 años, mascota: Winnie (perro)&#10;&#10;Denise:&#10;Something funny you've done?&#10;- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER&#10;- I found my dog in a shelter&#10;- I ran a half marathon&#10;&#10;Lucía: 25 años, trabaja en Google, le gusta el sushi"></textarea>
+
+      <!-- Options row with titles + tooltips -->
+      <div style="margin-top:12px;">
+        <div class="gen-options-title" id="gen-options-title">Opciones de generación</div>
+        <div class="gen-options-row">
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-num">Número de preguntas</span>
+              <div class="tooltip-wrap">
+                <div class="tooltip-icon">?</div>
+                <div class="tooltip-box" id="tooltip-num">Cuántas preguntas quieres que la IA genere. Más datos = más variedad. Si tienes pocos datos, elige un número menor.</div>
+              </div>
+            </div>
+            <select id="num-questions" style="width:100%;">
+              <option value="5">5 preguntas</option>
+              <option value="10" selected>10 preguntas</option>
+              <option value="15">15 preguntas</option>
+              <option value="20">20 preguntas</option>
+            </select>
+          </div>
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-type">Tipo de pregunta</span>
+              <div class="tooltip-wrap">
+                <div class="tooltip-icon">?</div>
+                <div class="tooltip-box" id="tooltip-type"><strong>Mixto:</strong> combina A/B/C/D con Verdadero/Falso.<br><br><strong>Solo A-D:</strong> todas con 4 opciones.<br><br><strong>Solo V/F:</strong> más fáciles y rápidas.</div>
+              </div>
+            </div>
+            <select id="q-type-gen" style="width:100%;">
+              <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
+              <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
+              <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
+            </select>
+          </div>
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-diff">Dificultad</span>
+              <div class="tooltip-wrap">
+                <div class="tooltip-icon">?</div>
+                <div class="tooltip-box" id="tooltip-diff"><strong>Fácil:</strong> distractores claramente distintos.<br><br><strong>Medio:</strong> plausibles pero distinguibles.<br><br><strong>Difícil:</strong> opciones muy similares — solo quien conoce bien a la persona acertará.</div>
+              </div>
+            </div>
+            <select id="q-difficulty" style="width:100%;">
+              <option value="easy" id="opt-easy">Fácil</option>
+              <option value="medium" selected id="opt-medium">Medio</option>
+              <option value="hard" id="opt-hard">Difícil</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div id="gen-status" style="margin-top:8px;font-size:0.8rem;color:var(--muted);"></div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn" style="width:auto;">✨ Generar</button>
+        <div id="gen-status" style="font-size:0.8rem;color:var(--muted);"></div>
+      </div>
+      <div class="step-indicator" id="step-indicator" style="display:none;">
+        <div class="step" id="step-1">1. Leyendo datos</div>
+        <span style="color:var(--border);">›</span>
+        <div class="step" id="step-2">2. Generando</div>
+        <span style="color:var(--border);">›</span>
+        <div class="step" id="step-3">3. Revisando</div>
+      </div>
     </div>
+
+    <!-- QUESTIONS LIST -->
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <span class="muted" id="q-count-label">0 preguntas</span>
       <button class="btn btn-secondary btn-sm" onclick="addManualQuestion()" id="btn-add-manual">+ Agregar manual</button>
     </div>
     <div class="questions-list" id="questions-list"></div>
+
+    <!-- legacy modal editor kept for manual add fallback -->
     <div id="manual-editor" class="card" style="display:none;">
-      <h3 style="margin-bottom:14px;font-size:1rem;" id="editor-title">✏️ Editar pregunta</h3>
+      <h3 style="margin-bottom:14px;font-size:1rem;" id="editor-title">✏️ Nueva pregunta</h3>
       <label id="label-question">Pregunta</label>
       <input type="text" id="edit-q-text" style="margin-bottom:12px;">
       <div id="edit-options-area"></div>
@@ -1070,15 +1155,108 @@ window.renderQuestionsList = function() {
   const list = document.getElementById('questions-list');
   s('q-count-label', t.qCountLabel(questions.length));
   list.innerHTML = '';
+  const tfTrue  = lang==='es'?'Verdadero':'True';
+  const tfFalse = lang==='es'?'Falso':'False';
   questions.forEach((q,i) => {
+    const isExp = editingIndex===i;
+    const correctLabel = q.type==='truefalse'
+      ? (q.correct==='true'?tfTrue:tfFalse)
+      : `${q.correct}: ${q.options?.[q.correct]||''}`;
+    const optionsHTML = q.type==='truefalse' ? `
+      <div style="display:flex;gap:16px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:5px;text-transform:none;font-size:0.88rem;cursor:pointer;">
+          <input type="radio" name="c${i}" value="true" ${q.correct==='true'?'checked':''} class="correct-radio" onchange="setCorrectInline(${i},'true')"> ✓ ${tfTrue}
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;text-transform:none;font-size:0.88rem;cursor:pointer;">
+          <input type="radio" name="c${i}" value="false" ${q.correct==='false'?'checked':''} class="correct-radio" onchange="setCorrectInline(${i},'false')"> ✗ ${tfFalse}
+        </label>
+      </div>` :
+      ['A','B','C','D'].map(k=>`
+        <div class="option-edit-row">
+          <span class="option-letter-badge">${k}</span>
+          <input type="text" value="${(q.options?.[k]||'').replace(/"/g,'&quot;')}" oninput="updateOptionInline(${i},'${k}',this.value)" style="flex:1;padding:8px 10px;font-size:0.88rem;">
+          <label style="display:flex;align-items:center;gap:3px;text-transform:none;font-size:0.75rem;color:var(--muted);cursor:pointer;white-space:nowrap;">
+            <input type="radio" name="c${i}" value="${k}" ${q.correct===k?'checked':''} class="correct-radio" onchange="setCorrectInline(${i},'${k}')"> ✓
+          </label>
+        </div>`).join('');
+
     const div = document.createElement('div');
-    div.className = 'question-item'+(editingIndex===i?' active':'');
-    div.innerHTML = `<span class="q-num">${String(i+1).padStart(2,'0')}</span>
-      <span class="q-text">${q.text}</span>
-      <span class="q-badge">${q.type==='truefalse'?'T/F':'A-D'}</span>`;
-    div.onclick = () => openEditor(i);
+    div.className = 'question-item'+(isExp?' expanded':'');
+    div.innerHTML = `
+      <div class="q-header" onclick="toggleExpandInline(${i})" style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;cursor:pointer;">
+        <span class="q-num">${String(i+1).padStart(2,'0')}</span>
+        <div style="flex:1;">
+          <div class="q-text">${q.text}</div>
+          <div class="q-preview-correct">✓ ${correctLabel}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">
+          <span class="q-badge">${q.type==='truefalse'?'V/F':'A-D'}</span>
+          <span class="q-badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);">${q.time||20}s</span>
+          <span class="q-expand-icon">▾</span>
+        </div>
+      </div>
+      <div class="q-editor-inline">
+        <div class="form-group">
+          <label style="font-size:0.7rem;">${lang==='es'?'PREGUNTA':'QUESTION'}</label>
+          <input type="text" value="${q.text.replace(/"/g,'&quot;')}" oninput="updateQTextInline(${i},this.value)" style="font-size:0.9rem;padding:9px 12px;">
+        </div>
+        <div class="form-group">
+          <label style="font-size:0.7rem;">${lang==='es'?'OPCIONES (marca la correcta)':'OPTIONS (mark correct)'}</label>
+          ${optionsHTML}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="margin:0;font-size:0.7rem;">${lang==='es'?'TIPO':'TYPE'}</label>
+            <select onchange="updateTypeInline(${i},this.value)" style="width:auto;padding:6px 10px;font-size:0.82rem;">
+              <option value="multiple" ${q.type==='multiple'?'selected':''}>A-D</option>
+              <option value="truefalse" ${q.type==='truefalse'?'selected':''}>V/F</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="margin:0;font-size:0.7rem;">${lang==='es'?'TIEMPO':'TIME'}</label>
+            <input type="number" value="${q.time||20}" min="5" max="60" oninput="updateTimeInline(${i},this.value)" style="width:70px;padding:6px 10px;font-size:0.82rem;">
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="toggleExpandInline(${i})" style="margin-left:auto;">${lang==='es'?'✓ Listo':'✓ Done'}</button>
+          <button class="btn btn-sm" style="background:color-mix(in srgb,var(--red) 12%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 25%,var(--border));" onclick="deleteInline(${i})">🗑</button>
+          <button class="btn btn-secondary btn-sm" onclick="moveInline(${i},-1)" ${i===0?'disabled':''}>↑</button>
+          <button class="btn btn-secondary btn-sm" onclick="moveInline(${i},1)" ${i===questions.length-1?'disabled':''}>↓</button>
+        </div>
+      </div>`;
     list.appendChild(div);
   });
+  // add-manual dashed button at bottom of list
+  if(questions.length > 0) {
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-q-dashed';
+    addBtn.innerHTML = '+ '+(lang==='es'?'Agregar pregunta manual':'Add manual question');
+    addBtn.onclick = addManualQuestion;
+    list.appendChild(addBtn);
+  }
+}
+
+// Inline editor helpers
+window.toggleExpandInline = function(i) { editingIndex = editingIndex===i ? -1 : i; renderQuestionsList(); }
+window.updateQTextInline   = function(i,v){ questions[i].text=v; }
+window.updateOptionInline  = function(i,k,v){ if(!questions[i].options) questions[i].options={}; questions[i].options[k]=v; }
+window.setCorrectInline    = function(i,v){ questions[i].correct=v; }
+window.updateTimeInline    = function(i,v){ questions[i].time=parseInt(v)||20; }
+window.updateTypeInline    = function(i,v){
+  questions[i].type=v;
+  const tft=lang==='es'?'Verdadero':'True', tff=lang==='es'?'Falso':'False';
+  if(v==='truefalse'){ questions[i].options={true:tft,false:tff}; questions[i].correct='true'; }
+  else if(!questions[i].options?.A){ questions[i].options={A:'',B:'',C:'',D:''}; questions[i].correct='A'; }
+  renderQuestionsList();
+}
+window.deleteInline = function(i){
+  questions.splice(i,1);
+  if(editingIndex>=questions.length) editingIndex=-1;
+  renderQuestionsList();
+}
+window.moveInline = function(i,dir){
+  const j=i+dir; if(j<0||j>=questions.length) return;
+  [questions[i],questions[j]]=[questions[j],questions[i]];
+  if(editingIndex===i) editingIndex=j; else if(editingIndex===j) editingIndex=i;
+  renderQuestionsList();
 }
 
 window.addManualQuestion = function() {
@@ -1141,28 +1319,80 @@ window.cancelEdit = function() {
 window.generateQuestions = async function() {
   const rawData = document.getElementById('raw-data').value.trim();
   if(!rawData){toast('⚠️ '+(lang==='es'?'Pega los datos primero':'Paste the data first'));return;}
-  const numQ = document.getElementById('num-questions').value;
-  const qType = document.getElementById('q-type-gen').value;
-  const btn = document.getElementById('gen-btn');
+  const numQ   = document.getElementById('num-questions').value;
+  const qType  = document.getElementById('q-type-gen').value;
+  const diff   = document.getElementById('q-difficulty')?.value || 'medium';
+  const btn    = document.getElementById('gen-btn');
   const status = document.getElementById('gen-status');
-  btn.disabled=true; btn.textContent=t.genGenerating;
-  status.textContent=t.genPrompt(numQ);
+  const stepEl = document.getElementById('step-indicator');
+
+  const typeInstr = {
+    mixed:    lang==='es'?'una mezcla de preguntas de opción múltiple (A/B/C/D) y Verdadero/Falso':'a mix of multiple choice (A/B/C/D) and True/False',
+    multiple: lang==='es'?'todas de opción múltiple con 4 opciones (A/B/C/D)':'all multiple choice with 4 options (A/B/C/D)',
+    truefalse:lang==='es'?'todas de Verdadero/Falso':'all True/False'
+  }[qType];
+  const diffInstr = {
+    easy:  lang==='es'?'Distractores claramente distintos de la correcta (fácil).':'Distractors clearly different from correct answer (easy).',
+    medium:lang==='es'?'Distractores plausibles pero distinguibles (medio).':'Distractors plausible but distinguishable (medium).',
+    hard:  lang==='es'?'Distractores muy similares a la correcta, difícil distinguir (difícil).':'Distractors very similar to correct answer, hard to distinguish (hard).'
+  }[diff];
+  const langInstr = lang==='es'?'Genera todas las preguntas y opciones en ESPAÑOL.':'Generate all questions and options in ENGLISH.';
+  const tfTrue  = lang==='es'?'Verdadero':'True';
+  const tfFalse = lang==='es'?'Falso':'False';
+
+  const prompt = `You are an expert trivia question designer for a Kahoot-style party game called "Know It All". Create fun, engaging trivia questions about real people from free-form data.
+
+RULES:
+1. ${langInstr}
+2. Create exactly ${numQ} questions as ${typeInstr}.
+3. ${diffInstr}
+4. CAPS detection: items in ALL CAPS = CORRECT answer. Lowercase items = distractors.
+5. Numeric data (ages, counts): ask about specific people OR who has a specific value.
+6. Free-form stories: extract the key fact, build a question around it.
+7. Use OTHER people's real data as distractors when possible — makes the game trickier.
+8. Vary formats: "Who...?", "How many...?", "What did X do...?", "True or False: X...".
+9. Keep questions concise and fun.
+
+OUTPUT: ONLY a valid JSON array, no markdown, no explanation:
+[{"text":"...","type":"multiple","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","time":20},{"text":"...","type":"truefalse","options":{"true":"${tfTrue}","false":"${tfFalse}"},"correct":"true","time":15}]
+
+PARTICIPANT DATA:
+${rawData}`;
+
+  btn.disabled=true; btn.innerHTML='<span class="spinner-inline"></span> '+(lang==='es'?'Generando...':'Generating...');
+  status.innerHTML=''; stepEl.style.display='flex';
+
+  const setStep = n => [1,2,3].forEach(i=>{
+    const el=document.getElementById('step-'+i);
+    if(el) el.className='step'+(i<n?' done':i===n?' active':'');
+  });
+
   try {
+    setStep(1); await new Promise(r=>setTimeout(r,500));
+    setStep(2);
     const res = await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:1000,
-        messages:[{role:"user",content:t.aiPrompt(numQ,t.typeInstr[qType],rawData)}]})
+      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2048,
+        messages:[{role:"user",content:prompt}]})
     });
     const data = await res.json();
-    const text = data.content.find(b=>b.type==='text')?.text||'';
+    const text = data.content?.find(b=>b.type==='text')?.text||'';
+    setStep(3); await new Promise(r=>setTimeout(r,300));
     const clean = text.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
+    if(!Array.isArray(parsed)||parsed.length===0) throw new Error('No questions returned');
     questions=[...questions,...parsed];
     renderQuestionsList();
-    status.textContent=t.genDone(parsed.length);
+    status.innerHTML=`<span style="color:var(--green)">${t.genDone(parsed.length)}</span>`;
     toast(t.genToast(parsed.length));
-  } catch(e) { status.textContent=t.genError; console.error(e); }
-  btn.disabled=false; btn.textContent=t.genBtn;
+    document.getElementById('questions-list').scrollIntoView({behavior:'smooth'});
+  } catch(e) {
+    status.innerHTML=`<span style="color:var(--red)">${t.genError}</span>`;
+    console.error(e);
+    setStep(0);
+  }
+  btn.disabled=false; btn.innerHTML='✨ '+(lang==='es'?'Generar':'Generate');
+  setTimeout(()=>{if(stepEl) stepEl.style.display='none';},2500);
 }
 
 // ── LOBBY ─────────────────────────────────────────────
