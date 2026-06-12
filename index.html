@@ -3,6 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Safety net: if module JS fails, always show at least the landing screen
+window.addEventListener('error', function(e) {
+  var screens = document.querySelectorAll('.screen');
+  var anyActive = false;
+  screens.forEach(function(s) { if(s.classList.contains('active')) anyActive = true; });
+  if (!anyActive && screens.length > 0) {
+    screens[0].classList.add('active');
+  }
+});
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237C3AED'/><rect x='18' y='16' width='64' height='50' rx='14' fill='white'/><polygon points='28,66 10,88 46,66' fill='white'/><text x='50' y='58' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'>?</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237C3AED'/><rect x='18' y='16' width='64' height='50' rx='14' fill='white'/><polygon points='28,66 10,88 46,66' fill='white'/><text x='50' y='58' font-family='Arial,sans-serif' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'>?</text></svg>">
 <meta name="theme-color" content="#7C3AED">
@@ -702,6 +713,25 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-play-again-p">Volver</button>
 </div>
 
+<script>
+// Run immediately before module loads — handle routing synchronously
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get('code');
+  if (code) {
+    // Show player join immediately, don't wait for Firebase
+    var screens = document.querySelectorAll('.screen');
+    screens.forEach(function(s) { s.classList.remove('active'); });
+    var joinScreen = document.getElementById('screen-player-join');
+    if (joinScreen) {
+      joinScreen.classList.add('active');
+      var codeInput = document.getElementById('player-code-input');
+      if (codeInput) codeInput.value = code.toUpperCase();
+    }
+  }
+})();
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, update, push }
@@ -1074,30 +1104,36 @@ window.signOut = async function() {
 }
 
 onAuthStateChanged(auth, user => {
-  currentUser = user;
+  try {
+    currentUser = user;
 
-  // If URL has ?code=, always go to player join — don't redirect to dashboard
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('code')) {
-    showScreen('screen-player-join');
-    document.getElementById('player-code-input').value = urlParams.get('code').toUpperCase();
-    // Pre-fill name if logged in
-    if (user) {
-      const name = user.displayName || user.email?.split('@')[0] || '';
-      document.getElementById('player-name-input').value = name;
+    // If URL has ?code=, always go to player join — never redirect to dashboard
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('code')) {
+      showScreen('screen-player-join');
+      document.getElementById('player-code-input').value = urlParams.get('code').toUpperCase();
+      if (user) {
+        const name = user.displayName || user.email?.split('@')[0] || '';
+        document.getElementById('player-name-input').value = name;
+      }
+      return;
     }
-    return;
-  }
 
-  if (user) {
-    // Load user settings
-    get(ref(db, `users/${user.uid}/settings`)).then(snap => {
-      const prefs = snap.val() || {};
-      if (prefs.lang) setLang(prefs.lang);
-      if (prefs.defaultTimer) document.getElementById('default-timer').value = prefs.defaultTimer;
-    });
-    loadDashboard();
-    showScreen('screen-dashboard');
+    if (user) {
+      get(ref(db, `users/${user.uid}/settings`)).then(snap => {
+        const prefs = snap.val() || {};
+        if (prefs.lang) setLang(prefs.lang);
+        if (prefs.defaultTimer) {
+          const timerEl = document.getElementById('default-timer');
+          if (timerEl) timerEl.value = prefs.defaultTimer;
+        }
+      }).catch(e => console.warn('Settings load failed:', e));
+      loadDashboard();
+      showScreen('screen-dashboard');
+    }
+  } catch(e) {
+    console.error('Auth state error:', e);
+    showScreen('screen-landing');
   }
 });
 
@@ -1942,14 +1978,21 @@ function initDragDrop() {
 }
 
 // ── AUTO ROUTE ────────────────────────────────────────
-// Note: onAuthStateChanged above handles ?code= routing authoritatively.
-// This is a fast first-paint so mobile doesn't show a blank screen.
-const params=new URLSearchParams(window.location.search);
-if(params.get('code')) {
-  showScreen('screen-player-join');
-  document.getElementById('player-code-input').value=params.get('code').toUpperCase();
+try {
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('code')) {
+    showScreen('screen-player-join');
+    document.getElementById('player-code-input').value=params.get('code').toUpperCase();
+  }
+  applyTranslations();
+} catch(e) {
+  console.error('Init error:', e);
+  // Fallback: make sure something is visible
+  const screens = document.querySelectorAll('.screen');
+  let anyActive = false;
+  screens.forEach(s => { if(s.classList.contains('active')) anyActive = true; });
+  if (!anyActive) showScreen('screen-landing');
 }
-applyTranslations();
 </script>
 </body>
 </html>
