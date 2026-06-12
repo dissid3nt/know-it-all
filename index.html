@@ -1188,7 +1188,7 @@ window.loadProjects = async function() {
         <div class="project-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">▶ Lanzar</button>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">${lang==='es'?'▶ Lanzar':'▶ Launch'}</button>
         <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();deleteProject('${id}')">🗑</button>
       </div>
     </div>`).join('');
