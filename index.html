@@ -467,13 +467,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     </div>
     <div class="questions-list" id="questions-list"></div>
 
-    <!-- legacy editor stubs (hidden) -->
-    <div id="manual-editor" style="display:none;">
-      <input type="text" id="edit-q-text"><div id="edit-options-area"></div>
-      <select id="edit-correct"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
-      <select id="edit-type"><option value="multiple" id="edit-opt-multiple">Múltiple</option><option value="truefalse" id="edit-opt-tf">V/F</option></select>
-      <input type="number" id="edit-time" value="20">
-    </div>
   </div>
 </div>
 
@@ -847,7 +840,6 @@ function applyTranslations() {
   s('connected-label', t.connected); s('btn-play-again-p', t.playAgain);
   p('project-name-input', t.saveProjectPlaceholder);
   s('q-count-label', t.qCountLabel(questions.length));
-  if(questions.length > 0) renderQuestionsList();
   if (currentUser) {
     const name = currentUser.displayName || currentUser.email?.split('@')[0] || 'Host';
     s('dash-greeting', t.greeting(name));
@@ -940,9 +932,9 @@ window.loadDashboard = async function() {
 }
 
 window.newProject = function() {
-  questions = []; currentProjectId = null; currentProjectName = '';
+  questions = []; currentProjectId = null; currentProjectName = ''; editingIndex = -1;
   document.getElementById('questions-list').innerHTML = '';
-  document.getElementById('manual-editor').style.display = 'none';
+  editingIndex = -1;
   document.getElementById('gen-status').textContent = '';
   document.getElementById('raw-data').value = '';
   renderQuestionsList();
@@ -1094,7 +1086,6 @@ window.goToDashboard = function() {
 window.renderQuestionsList = function() {
   const list = document.getElementById('questions-list');
   s('q-count-label', t.qCountLabel(questions.length));
-  if(questions.length > 0) renderQuestionsList();
   list.innerHTML = '';
   const tfTrue  = lang==='es'?'Verdadero':'True';
   const tfFalse = lang==='es'?'Falso':'False';
@@ -1216,8 +1207,8 @@ window.addManualQuestion = function() {
 
 // Legacy stubs — kept so JS references don't break but do nothing visible
 function openEditor(i) { editingIndex=i; renderQuestionsList(); }
-window.updateEditorType = function() {}
-window.saveEditedQuestion = function() {}
+window.updateEditorType = function() { /* legacy removed */ }
+window.saveEditedQuestion = function() { /* legacy removed */ }
 window.deleteEditedQuestion = function() { if(editingIndex>=0){questions.splice(editingIndex,1);} editingIndex=-1; renderQuestionsList(); }
 window.cancelEdit = function() { editingIndex=-1; renderQuestionsList(); }
 
