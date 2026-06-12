@@ -5,126 +5,232 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Know It All 🎯</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
-  :root {
-    --bg:#0D0D1A;--surface:#16162A;--surface2:#1E1E38;--accent:#7C3AED;--accent2:#A855F7;
-    --gold:#F59E0B;--green:#10B981;--red:#EF4444;--blue:#3B82F6;--text:#F1F0FF;
-    --muted:#8B8AA8;--border:#2A2A4A;--A:#7C3AED;--B:#0EA5E9;--C:#10B981;--D:#F59E0B;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-  .screen{display:none;min-height:100vh;padding:20px;}
-  .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;}
-  #screen-landing{background:radial-gradient(ellipse at 50% 0%,#2D1B69 0%,var(--bg) 70%);text-align:center;gap:24px;}
-  .logo{font-family:'Space Mono',monospace;font-size:clamp(2rem,8vw,4rem);font-weight:700;letter-spacing:-2px;}
-  .logo span{color:var(--accent2);}
-  .tagline{color:var(--muted);font-size:1rem;}
-  .lang-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-  .lang-btn{padding:10px 20px;border:none;background:var(--surface2);color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
-  .lang-btn.active{background:var(--accent);color:white;}
-  .lang-btn:hover:not(.active){background:var(--surface);color:var(--text);}
-  .btn-group{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;}
-  .btn{padding:14px 28px;border:none;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;width:100%;}
-  .btn-primary{background:var(--accent);color:white;}
-  .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
-  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-  .btn-secondary:hover{border-color:var(--accent);}
-  .btn-green{background:var(--green);color:white;}
-  .btn-green:hover{filter:brightness(1.1);}
-  .btn-sm{padding:10px 20px;font-size:0.875rem;width:auto;}
-  input,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:1rem;padding:12px 16px;width:100%;outline:none;transition:border-color 0.2s;}
-  input:focus,textarea:focus{border-color:var(--accent2);}
-  textarea{resize:vertical;min-height:120px;}
-  label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.05em;}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:500px;}
-  .card h2{font-size:1.25rem;margin-bottom:16px;}
-  #screen-host-lobby{gap:20px;justify-content:flex-start;padding-top:40px;}
-  .game-code-display{background:var(--surface);border-radius:16px;padding:20px 32px;text-align:center;border:2px solid var(--accent);}
-  .game-code-display .label-sm{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
-  .game-code-big{font-family:'Space Mono',monospace;font-size:3rem;font-weight:700;color:var(--accent2);letter-spacing:8px;}
-  .qr-container{background:white;border-radius:12px;padding:12px;display:inline-block;}
-  .players-grid{display:flex;flex-wrap:wrap;gap:8px;}
-  .player-chip{background:var(--surface2);border-radius:20px;padding:6px 14px;font-size:0.875rem;border:1px solid var(--border);animation:popIn 0.3s ease;}
-  @keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
-  .player-count{font-size:0.85rem;color:var(--muted);margin-bottom:8px;}
-  #screen-question-builder{gap:20px;justify-content:flex-start;padding-top:30px;}
-  .questions-list{width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px;}
-  .question-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:border-color 0.2s;}
-  .question-item:hover{border-color:var(--accent);}
-  .question-item.active{border-color:var(--accent2);background:var(--surface2);}
-  .q-num{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);min-width:24px;}
-  .q-text{font-size:0.9rem;flex:1;}
-  .q-badge{font-size:0.7rem;padding:2px 8px;border-radius:20px;background:var(--accent);color:white;white-space:nowrap;}
-  .ai-generate-section{background:var(--surface2);border-radius:12px;padding:16px;width:100%;max-width:600px;border:1px dashed var(--border);}
-  .ai-generate-section h3{font-size:0.9rem;color:var(--accent2);margin-bottom:10px;}
-  #screen-host-game{justify-content:flex-start;padding-top:20px;gap:16px;}
-  .host-header{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:700px;}
-  .progress-bar-wrap{background:var(--surface2);border-radius:4px;height:6px;width:100%;max-width:700px;}
-  .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.3s;}
-  .q-display{background:var(--surface);border-radius:20px;padding:28px;width:100%;max-width:700px;text-align:center;}
-  .q-display .q-text-big{font-size:clamp(1.1rem,3vw,1.5rem);font-weight:600;line-height:1.4;margin-bottom:20px;}
-  .timer-circle{width:64px;height:64px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;margin:0 auto 16px;transition:background 0.5s;}
-  .timer-circle.urgent{background:var(--red);animation:pulse 0.5s infinite;}
-  @keyframes pulse{50%{transform:scale(1.1)}}
-  .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
-  .option-host{padding:14px;border-radius:12px;font-size:0.9rem;font-weight:500;display:flex;align-items:center;gap:10px;}
-  .option-host.A{background:color-mix(in srgb,var(--A) 20%,var(--surface));border:1px solid var(--A);}
-  .option-host.B{background:color-mix(in srgb,var(--B) 20%,var(--surface));border:1px solid var(--B);}
-  .option-host.C{background:color-mix(in srgb,var(--C) 20%,var(--surface));border:1px solid var(--C);}
-  .option-host.D{background:color-mix(in srgb,var(--D) 20%,var(--surface));border:1px solid var(--D);}
-  .option-key{font-family:'Space Mono',monospace;font-size:0.75rem;opacity:0.7;}
-  .answer-reveal{font-size:0.85rem;color:var(--green);padding:8px 16px;background:color-mix(in srgb,var(--green) 15%,var(--surface));border-radius:8px;margin-top:10px;display:none;}
-  .scoreboard{width:100%;max-width:700px;}
-  .score-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border-radius:12px;margin-bottom:8px;transition:all 0.4s;}
-  .score-rank{font-family:'Space Mono',monospace;font-size:0.85rem;color:var(--muted);min-width:28px;}
-  .score-rank.gold{color:var(--gold);font-weight:700;}
-  .score-name{flex:1;font-weight:500;}
-  .score-pts{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);}
-  .score-bar-bg{flex:2;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;}
-  .score-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.6s ease;}
-  #screen-player-join{gap:20px;text-align:center;}
-  #screen-player-wait{text-align:center;gap:20px;}
-  .pulse-ring{width:80px;height:80px;border-radius:50%;background:color-mix(in srgb,var(--accent) 20%,transparent);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;animation:ringPulse 2s infinite;font-size:2rem;}
-  @keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 40%,transparent)}50%{box-shadow:0 0 0 20px transparent}}
-  #screen-player-answer{gap:16px;justify-content:flex-start;padding-top:30px;}
-  .player-q-text{font-size:clamp(1rem,3.5vw,1.3rem);font-weight:600;text-align:center;line-height:1.5;max-width:500px;}
-  .player-timer{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;}
-  .player-timer.urgent{color:var(--red);}
-  .answer-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:500px;}
-  .answer-btn{padding:20px 12px;border:none;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:6px;color:white;}
-  .answer-btn .opt-letter{font-family:'Space Mono',monospace;font-size:0.75rem;opacity:0.8;}
-  .answer-btn.A{background:var(--A);}.answer-btn.B{background:var(--B);}.answer-btn.C{background:var(--C);}.answer-btn.D{background:var(--D);}
-  .answer-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;}
-  .answer-btn:not(:disabled):hover{transform:scale(1.03);filter:brightness(1.1);}
-  .answer-btn.selected{outline:4px solid white;transform:scale(1.03);}
-  .result-badge{padding:16px 24px;border-radius:14px;text-align:center;font-weight:600;font-size:1.1rem;width:100%;max-width:500px;}
-  .result-badge.correct{background:color-mix(in srgb,var(--green) 20%,var(--surface));border:2px solid var(--green);color:var(--green);}
-  .result-badge.wrong{background:color-mix(in srgb,var(--red) 20%,var(--surface));border:2px solid var(--red);color:var(--red);}
-  .result-badge.timeout{background:var(--surface2);border:2px solid var(--muted);color:var(--muted);}
-  .player-score-display{font-family:'Space Mono',monospace;font-size:1.5rem;color:var(--accent2);}
-  #screen-final{text-align:center;gap:24px;background:radial-gradient(ellipse at 50% 0%,#1a0d40 0%,var(--bg) 70%);}
-  .trophy{font-size:4rem;}.winner-name{font-size:2rem;font-weight:700;color:var(--gold);}
-  #screen-player-final{text-align:center;gap:20px;}
-  .section-title{font-size:1.5rem;font-weight:700;}
-  .muted{color:var(--muted);font-size:0.875rem;}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:0.8rem;}
-  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1s infinite;}
-  @keyframes blink{50%{opacity:0}}
-  .loading-dots::after{content:'';animation:dots 1.2s infinite;}
-  @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
-  .tf-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:500px;}
-  .tf-btn{padding:24px;border:none;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;color:white;transition:all 0.15s;}
-  .tf-btn.true{background:var(--green);}.tf-btn.false{background:var(--red);}
-  .tf-btn:disabled{opacity:0.4;cursor:not-allowed;}
-  .tf-btn:not(:disabled):hover{transform:scale(1.03);}
-  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:0.875rem;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;}
-  #toast.show{opacity:1;}
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#0D0D1A;--surface:#16162A;--surface2:#1E1E38;--accent:#7C3AED;--accent2:#A855F7;
+  --gold:#F59E0B;--green:#10B981;--red:#EF4444;--blue:#3B82F6;--text:#F1F0FF;
+  --muted:#8B8AA8;--border:#2A2A4A;--A:#7C3AED;--B:#0EA5E9;--C:#10B981;--D:#F59E0B;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.screen{display:none;min-height:100vh;padding:20px;}
+.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+/* ── AUTH / LANDING ── */
+#screen-landing{background:radial-gradient(ellipse at 50% 0%,#2D1B69 0%,var(--bg) 70%);text-align:center;gap:20px;}
+.logo{font-family:'Space Mono',monospace;font-size:clamp(2rem,8vw,4rem);font-weight:700;letter-spacing:-2px;}
+.logo span{color:var(--accent2);}
+.tagline{color:var(--muted);font-size:1rem;}
+.lang-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.lang-btn{padding:10px 20px;border:none;background:var(--surface2);color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.lang-btn.active{background:var(--accent);color:white;}
+.lang-btn:hover:not(.active){background:var(--surface);color:var(--text);}
+.auth-tabs{display:flex;gap:0;background:var(--surface2);border-radius:10px;padding:4px;width:100%;max-width:340px;}
+.auth-tab{flex:1;padding:8px;border:none;background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.2s;}
+.auth-tab.active{background:var(--accent);color:white;}
+.auth-form{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px;}
+.auth-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:0.8rem;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;background:white;color:#1a1a1a;border:none;border-radius:12px;padding:12px 20px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;width:100%;}
+.btn-google:hover{background:#f0f0f0;transform:translateY(-1px);}
+.btn-google svg{flex-shrink:0;}
+.btn-player-entry{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;width:100%;max-width:340px;transition:all 0.2s;}
+.btn-player-entry:hover{border-color:var(--accent);}
+.auth-error{color:var(--red);font-size:0.82rem;text-align:center;min-height:16px;}
+
+/* ── DASHBOARD ── */
+#screen-dashboard{justify-content:flex-start;padding-top:0;gap:0;}
+.dash-header{width:100%;background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.dash-header-left{display:flex;align-items:center;gap:12px;}
+.dash-logo{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;}
+.dash-logo span{color:var(--accent2);}
+.user-info{display:flex;align-items:center;gap:10px;}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;overflow:hidden;}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+.user-name{font-size:0.9rem;font-weight:500;}
+.dash-body{width:100%;max-width:900px;padding:32px 20px;margin:0 auto;}
+.dash-welcome{margin-bottom:32px;}
+.dash-welcome h1{font-size:1.8rem;font-weight:700;margin-bottom:4px;}
+.dash-welcome p{color:var(--muted);}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:40px;}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 24px;cursor:pointer;transition:all 0.25s;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;}
+.dash-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.25s;}
+.dash-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 32px rgba(124,58,237,0.2);}
+.dash-card:hover::before{opacity:1;}
+.dash-card-icon{font-size:2.2rem;line-height:1;}
+.dash-card-title{font-size:1rem;font-weight:700;}
+.dash-card-desc{font-size:0.8rem;color:var(--muted);line-height:1.4;}
+.dash-card.new::before{background:linear-gradient(135deg,rgba(124,58,237,0.08),transparent);}
+.dash-card.open::before{background:linear-gradient(135deg,rgba(14,165,233,0.08),transparent);}
+.dash-card.results::before{background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent);}
+.dash-card.settings::before{background:linear-gradient(135deg,rgba(16,185,129,0.08),transparent);}
+.dash-recent{margin-top:8px;}
+.dash-recent h2{font-size:1rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
+.project-row{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;}
+.project-row:hover{border-color:var(--accent);background:var(--surface2);}
+.project-icon{font-size:1.4rem;}
+.project-info{flex:1;}
+.project-name{font-weight:600;font-size:0.95rem;}
+.project-meta{font-size:0.75rem;color:var(--muted);margin-top:2px;}
+.project-arrow{color:var(--muted);font-size:1.2rem;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:12px;}
+
+/* ── PROJECTS / OPEN ── */
+#screen-projects{justify-content:flex-start;padding-top:0;gap:0;}
+.page-header{width:100%;background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+.page-header h1{font-size:1.2rem;font-weight:700;flex:1;}
+.page-body{width:100%;max-width:700px;padding:24px 20px;margin:0 auto;}
+
+/* ── RESULTS ── */
+#screen-results{justify-content:flex-start;padding-top:0;gap:0;}
+.result-game-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;cursor:pointer;transition:all 0.2s;}
+.result-game-card:hover{border-color:var(--accent);}
+.result-game-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.result-game-name{font-weight:700;font-size:1rem;}
+.result-game-date{font-size:0.75rem;color:var(--muted);}
+.result-stats{display:flex;gap:16px;}
+.result-stat{text-align:center;}
+.result-stat .num{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent2);}
+.result-stat .lbl{font-size:0.7rem;color:var(--muted);}
+.result-detail{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
+.result-detail.open{display:block;}
+
+/* ── SETTINGS ── */
+#screen-settings{justify-content:flex-start;padding-top:0;gap:0;}
+.settings-section{margin-bottom:28px;}
+.settings-section h3{font-size:0.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;}
+.settings-row-label{font-size:0.95rem;font-weight:500;}
+.settings-row-sub{font-size:0.8rem;color:var(--muted);margin-top:2px;}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;position:relative;transition:background 0.2s;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:2px;left:2px;transition:left 0.2s;}
+.toggle.on::after{left:22px;}
+.danger-zone{background:color-mix(in srgb,var(--red) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--red) 30%,var(--border));}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;display:none;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;}
+.modal h2{margin-bottom:20px;font-size:1.2rem;}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+
+/* ── BUTTONS / INPUTS ── */
+.btn{padding:12px 24px;border:none;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;width:100%;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--accent);}
+.btn-green{background:var(--green);color:white;}
+.btn-green:hover{filter:brightness(1.1);}
+.btn-red{background:var(--red);color:white;}
+.btn-sm{padding:8px 16px;font-size:0.85rem;width:auto;}
+input,textarea,select{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:1rem;padding:12px 16px;width:100%;outline:none;transition:border-color 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent2);}
+textarea{resize:vertical;min-height:120px;}
+label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.05em;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+
+/* ── QUESTION BUILDER ── */
+#screen-question-builder{justify-content:flex-start;padding-top:0;gap:0;}
+.questions-list{width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px;}
+.question-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:border-color 0.2s;}
+.question-item:hover{border-color:var(--accent);}
+.question-item.active{border-color:var(--accent2);background:var(--surface2);}
+.q-num{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);min-width:24px;}
+.q-text{font-size:0.9rem;flex:1;}
+.q-badge{font-size:0.7rem;padding:2px 8px;border-radius:20px;background:var(--accent);color:white;white-space:nowrap;}
+.ai-generate-section{background:var(--surface2);border-radius:12px;padding:16px;width:100%;max-width:600px;border:1px dashed var(--border);}
+.ai-generate-section h3{font-size:0.9rem;color:var(--accent2);margin-bottom:10px;}
+.builder-body{width:100%;max-width:620px;padding:20px;display:flex;flex-direction:column;gap:16px;margin:0 auto;}
+
+/* ── HOST LOBBY ── */
+#screen-host-lobby{gap:20px;justify-content:flex-start;padding-top:40px;}
+.game-code-display{background:var(--surface);border-radius:16px;padding:20px 32px;text-align:center;border:2px solid var(--accent);}
+.game-code-display .label-sm{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+.game-code-big{font-family:'Space Mono',monospace;font-size:3rem;font-weight:700;color:var(--accent2);letter-spacing:8px;}
+.qr-container{background:white;border-radius:12px;padding:12px;display:inline-block;}
+.players-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.player-chip{background:var(--surface2);border-radius:20px;padding:6px 14px;font-size:0.875rem;border:1px solid var(--border);animation:popIn 0.3s ease;}
+@keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+.player-count{font-size:0.85rem;color:var(--muted);margin-bottom:8px;}
+
+/* ── HOST GAME ── */
+#screen-host-game{justify-content:flex-start;padding-top:20px;gap:16px;}
+.host-header{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:700px;}
+.progress-bar-wrap{background:var(--surface2);border-radius:4px;height:6px;width:100%;max-width:700px;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.3s;}
+.q-display{background:var(--surface);border-radius:20px;padding:28px;width:100%;max-width:700px;text-align:center;}
+.q-display .q-text-big{font-size:clamp(1.1rem,3vw,1.5rem);font-weight:600;line-height:1.4;margin-bottom:20px;}
+.timer-circle{width:64px;height:64px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;margin:0 auto 16px;transition:background 0.5s;}
+.timer-circle.urgent{background:var(--red);animation:pulse 0.5s infinite;}
+@keyframes pulse{50%{transform:scale(1.1)}}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.option-host{padding:14px;border-radius:12px;font-size:0.9rem;font-weight:500;display:flex;align-items:center;gap:10px;}
+.option-host.A{background:color-mix(in srgb,var(--A) 20%,var(--surface));border:1px solid var(--A);}
+.option-host.B{background:color-mix(in srgb,var(--B) 20%,var(--surface));border:1px solid var(--B);}
+.option-host.C{background:color-mix(in srgb,var(--C) 20%,var(--surface));border:1px solid var(--C);}
+.option-host.D{background:color-mix(in srgb,var(--D) 20%,var(--surface));border:1px solid var(--D);}
+.option-key{font-family:'Space Mono',monospace;font-size:0.75rem;opacity:0.7;}
+.answer-reveal{font-size:0.85rem;color:var(--green);padding:8px 16px;background:color-mix(in srgb,var(--green) 15%,var(--surface));border-radius:8px;margin-top:10px;display:none;}
+.scoreboard{width:100%;max-width:700px;}
+.score-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border-radius:12px;margin-bottom:8px;}
+.score-rank{font-family:'Space Mono',monospace;font-size:0.85rem;color:var(--muted);min-width:28px;}
+.score-rank.gold{color:var(--gold);font-weight:700;}
+.score-name{flex:1;font-weight:500;}
+.score-pts{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);}
+.score-bar-bg{flex:2;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;}
+.score-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.6s ease;}
+
+/* ── PLAYER SCREENS ── */
+#screen-player-join{gap:20px;text-align:center;}
+#screen-player-wait{text-align:center;gap:20px;}
+.pulse-ring{width:80px;height:80px;border-radius:50%;background:color-mix(in srgb,var(--accent) 20%,transparent);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;animation:ringPulse 2s infinite;font-size:2rem;}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 40%,transparent)}50%{box-shadow:0 0 0 20px transparent}}
+#screen-player-answer{gap:16px;justify-content:flex-start;padding-top:30px;}
+.player-q-text{font-size:clamp(1rem,3.5vw,1.3rem);font-weight:600;text-align:center;line-height:1.5;max-width:500px;}
+.player-timer{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;}
+.player-timer.urgent{color:var(--red);}
+.answer-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:500px;}
+.answer-btn{padding:20px 12px;border:none;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:6px;color:white;}
+.answer-btn .opt-letter{font-family:'Space Mono',monospace;font-size:0.75rem;opacity:0.8;}
+.answer-btn.A{background:var(--A);}.answer-btn.B{background:var(--B);}.answer-btn.C{background:var(--C);}.answer-btn.D{background:var(--D);}
+.answer-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;}
+.answer-btn:not(:disabled):hover{transform:scale(1.03);filter:brightness(1.1);}
+.answer-btn.selected{outline:4px solid white;transform:scale(1.03);}
+.result-badge{padding:16px 24px;border-radius:14px;text-align:center;font-weight:600;font-size:1.1rem;width:100%;max-width:500px;}
+.result-badge.correct{background:color-mix(in srgb,var(--green) 20%,var(--surface));border:2px solid var(--green);color:var(--green);}
+.result-badge.wrong{background:color-mix(in srgb,var(--red) 20%,var(--surface));border:2px solid var(--red);color:var(--red);}
+.result-badge.timeout{background:var(--surface2);border:2px solid var(--muted);color:var(--muted);}
+.player-score-display{font-family:'Space Mono',monospace;font-size:1.5rem;color:var(--accent2);}
+#screen-final{text-align:center;gap:24px;background:radial-gradient(ellipse at 50% 0%,#1a0d40 0%,var(--bg) 70%);}
+.trophy{font-size:4rem;}.winner-name{font-size:2rem;font-weight:700;color:var(--gold);}
+#screen-player-final{text-align:center;gap:20px;}
+.tf-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:500px;}
+.tf-btn{padding:24px;border:none;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;cursor:pointer;color:white;transition:all 0.15s;}
+.tf-btn.true{background:var(--green);}.tf-btn.false{background:var(--red);}
+.tf-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.tf-btn:not(:disabled):hover{transform:scale(1.03);}
+
+/* ── MISC ── */
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:0.8rem;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1s infinite;}
+@keyframes blink{50%{opacity:0}}
+.loading-dots::after{content:'';animation:dots 1.2s infinite;}
+@keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
+.section-title{font-size:1.5rem;font-weight:700;}
+.muted{color:var(--muted);font-size:0.875rem;}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:0.875rem;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;}
+.spin{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div id="toast"></div>
 
-<!-- LANDING -->
+<!-- ══ LANDING / AUTH ══ -->
 <div id="screen-landing" class="screen active">
   <div class="logo">Know It <span>All</span></div>
   <p class="tagline" id="landing-tagline">¿Cuánto sabes de quienes te rodean?</p>
@@ -132,70 +238,228 @@
     <button class="lang-btn active" onclick="setLang('es')" id="lang-es">🇨🇴 Español</button>
     <button class="lang-btn" onclick="setLang('en')" id="lang-en">🇺🇸 English</button>
   </div>
-  <div class="btn-group">
-    <button class="btn btn-primary" onclick="showHostSetup()" id="btn-host">🎮 Soy el Host</button>
-    <button class="btn btn-secondary" onclick="showPlayerJoin()" id="btn-player">👤 Soy Jugador</button>
+  <!-- Auth tabs -->
+  <div class="auth-tabs" id="auth-tabs">
+    <button class="auth-tab active" onclick="switchAuthTab('login')" id="tab-login">Iniciar sesión</button>
+    <button class="auth-tab" onclick="switchAuthTab('register')" id="tab-register">Registrarse</button>
+  </div>
+  <!-- Login form -->
+  <div class="auth-form" id="auth-login-form">
+    <input type="email" id="login-email" placeholder="correo@email.com">
+    <input type="password" id="login-password" placeholder="Contraseña">
+    <button class="btn btn-primary" onclick="loginEmail()" id="btn-login-email">Iniciar sesión</button>
+    <div class="auth-divider" id="auth-div-or">o</div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      <span id="btn-google-text">Continuar con Google</span>
+    </button>
+    <div class="auth-error" id="login-error"></div>
+  </div>
+  <!-- Register form -->
+  <div class="auth-form" id="auth-register-form" style="display:none;">
+    <input type="text" id="reg-name" placeholder="Tu nombre">
+    <input type="email" id="reg-email" placeholder="correo@email.com">
+    <input type="password" id="reg-password" placeholder="Contraseña (min 6 caracteres)">
+    <button class="btn btn-primary" onclick="registerEmail()" id="btn-register">Crear cuenta</button>
+    <div class="auth-divider">o</div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Continuar con Google
+    </button>
+    <div class="auth-error" id="register-error"></div>
+  </div>
+  <button class="btn-player-entry" onclick="showPlayerJoin()" id="btn-player-entry">👤 Soy jugador — unirme a una partida</button>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="screen-dashboard" class="screen" style="justify-content:flex-start;padding:0;">
+  <div class="dash-header">
+    <div class="dash-header-left">
+      <div class="dash-logo">Know It <span>All</span></div>
+      <div class="lang-toggle" style="transform:scale(0.85);transform-origin:left;">
+        <button class="lang-btn active" onclick="setLang('es')" id="dash-lang-es">🇨🇴</button>
+        <button class="lang-btn" onclick="setLang('en')" id="dash-lang-en">🇺🇸</button>
+      </div>
+    </div>
+    <div class="user-info">
+      <div class="user-avatar" id="dash-avatar">?</div>
+      <span class="user-name" id="dash-user-name">Usuario</span>
+      <button class="btn btn-secondary btn-sm" onclick="signOut()" id="btn-signout">Salir</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="dash-welcome">
+      <h1 id="dash-greeting">¡Hola! 👋</h1>
+      <p class="muted" id="dash-subtitle">¿Qué quieres hacer hoy?</p>
+    </div>
+    <div class="dash-grid">
+      <div class="dash-card new" onclick="newProject()">
+        <div class="dash-card-icon">✨</div>
+        <div class="dash-card-title" id="dc-new-title">Nuevo proyecto</div>
+        <div class="dash-card-desc" id="dc-new-desc">Crea un nuevo juego con preguntas propias o generadas por IA</div>
+      </div>
+      <div class="dash-card open" onclick="showScreen('screen-projects');loadProjects();">
+        <div class="dash-card-icon">📂</div>
+        <div class="dash-card-title" id="dc-open-title">Abrir proyecto</div>
+        <div class="dash-card-desc" id="dc-open-desc">Continúa o lanza un proyecto guardado</div>
+      </div>
+      <div class="dash-card results" onclick="showScreen('screen-results');loadResults();">
+        <div class="dash-card-icon">📊</div>
+        <div class="dash-card-title" id="dc-results-title">Resultados</div>
+        <div class="dash-card-desc" id="dc-results-desc">Revisa el historial y puntajes de juegos anteriores</div>
+      </div>
+      <div class="dash-card settings" onclick="showScreen('screen-settings');loadSettings();">
+        <div class="dash-card-icon">⚙️</div>
+        <div class="dash-card-title" id="dc-settings-title">Ajustes</div>
+        <div class="dash-card-desc" id="dc-settings-desc">Personaliza tu cuenta y preferencias</div>
+      </div>
+    </div>
+    <div class="dash-recent">
+      <h2 id="dash-recent-title">PROYECTOS RECIENTES</h2>
+      <div id="dash-recent-list"><div class="empty-state"><div class="empty-icon">🗂️</div><p id="dash-no-projects">Aún no tienes proyectos. ¡Crea uno!</p></div></div>
+    </div>
   </div>
 </div>
 
-<!-- QUESTION BUILDER -->
-<div id="screen-question-builder" class="screen">
-  <div style="width:100%;max-width:600px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-    <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-back-builder">← Volver</button>
-    <h1 class="section-title" style="flex:1" id="builder-title">Tus Preguntas</h1>
-    <button class="btn btn-primary btn-sm" onclick="goToLobby()" id="btn-create-room">Crear sala →</button>
+<!-- ══ PROJECTS ══ -->
+<div id="screen-projects" class="screen" style="justify-content:flex-start;padding:0;">
+  <div class="page-header">
+    <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-dashboard');loadDashboard();">←</button>
+    <h1 id="projects-title">Mis Proyectos</h1>
+    <button class="btn btn-primary btn-sm" onclick="newProject()" id="btn-new-project">+ Nuevo</button>
   </div>
-  <div class="ai-generate-section">
-    <h3 id="ai-section-title">✨ Generar con IA</h3>
-    <p class="muted" style="margin-bottom:10px;font-size:0.8rem;" id="ai-section-desc">Pega los datos de tus participantes y la IA transforma esos datos en preguntas de trivia.</p>
-    <label id="raw-data-label">Datos crudos (ej: "Juan tiene 34 años, mascota: Winnie")</label>
-    <textarea id="raw-data" placeholder="Escribe o pega aquí los datos de los participantes..."></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-      <select id="num-questions" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:inherit;width:auto;">
-        <option value="5">5</option><option value="10" selected>10</option>
-        <option value="15">15</option><option value="20">20</option>
-      </select>
-      <select id="q-type-gen" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:inherit;width:auto;">
-        <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
-        <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
-        <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
-      </select>
-      <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn">✨ Generar</button>
+  <div class="page-body">
+    <div id="projects-list"></div>
+  </div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div id="screen-results" class="screen" style="justify-content:flex-start;padding:0;">
+  <div class="page-header">
+    <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-dashboard');loadDashboard();">←</button>
+    <h1 id="results-title">Resultados de Juegos</h1>
+  </div>
+  <div class="page-body">
+    <div id="results-list"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div id="screen-settings" class="screen" style="justify-content:flex-start;padding:0;">
+  <div class="page-header">
+    <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-dashboard');">←</button>
+    <h1 id="settings-title">Ajustes</h1>
+  </div>
+  <div class="page-body">
+    <div class="settings-section">
+      <h3 id="settings-account-title">CUENTA</h3>
+      <div class="settings-row">
+        <div><div class="settings-row-label" id="settings-name-label">Nombre</div><div class="settings-row-sub" id="settings-name-val">—</div></div>
+        <button class="btn btn-secondary btn-sm" onclick="editDisplayName()" id="btn-edit-name">Editar</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label" id="settings-email-label">Email</div><div class="settings-row-sub" id="settings-email-val">—</div></div>
+      </div>
     </div>
-    <div id="gen-status" style="margin-top:8px;font-size:0.8rem;color:var(--muted);"></div>
-  </div>
-  <div style="width:100%;max-width:600px;display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
-    <span class="muted" id="q-count-label">0 preguntas</span>
-    <button class="btn btn-secondary btn-sm" onclick="addManualQuestion()" id="btn-add-manual">+ Agregar manual</button>
-  </div>
-  <div class="questions-list" id="questions-list"></div>
-  <div id="manual-editor" class="card" style="display:none;max-width:600px;">
-    <h3 style="margin-bottom:14px;font-size:1rem;" id="editor-title">✏️ Editar pregunta</h3>
-    <label id="label-question">Pregunta</label>
-    <input type="text" id="edit-q-text" placeholder="¿Cuántos años tiene...?" style="margin-bottom:12px;">
-    <div id="edit-options-area"></div>
-    <label style="margin-top:12px;" id="label-correct">Respuesta correcta</label>
-    <select id="edit-correct" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-family:inherit;width:100%;margin-bottom:12px;">
-      <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
-    </select>
-    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
-      <label style="margin:0;" id="label-type">Tipo:</label>
-      <select id="edit-type" onchange="updateEditorType()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:inherit;width:auto;">
-        <option value="multiple" id="edit-opt-multiple">Opción múltiple</option>
-        <option value="truefalse" id="edit-opt-tf">Verdadero / Falso</option>
-      </select>
+    <div class="settings-section">
+      <h3 id="settings-prefs-title">PREFERENCIAS</h3>
+      <div class="settings-row">
+        <div><div class="settings-row-label" id="settings-lang-label">Idioma por defecto</div></div>
+        <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('es');saveSettings();" id="set-lang-es">🇨🇴 ES</button>
+          <button class="lang-btn" onclick="setLang('en');saveSettings();" id="set-lang-en">🇺🇸 EN</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label" id="settings-timer-label">Tiempo por defecto (seg)</div></div>
+        <input type="number" id="default-timer" value="20" min="5" max="60" style="width:80px;text-align:center;">
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" id="btn-save-settings" style="margin-top:8px;">Guardar preferencias</button>
     </div>
-    <label id="label-time">Tiempo (segundos)</label>
-    <input type="number" id="edit-time" value="20" min="5" max="60" style="margin-bottom:14px;width:100px;">
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary btn-sm" onclick="saveEditedQuestion()" id="btn-save">Guardar</button>
-      <button class="btn btn-secondary btn-sm" onclick="cancelEdit()" id="btn-cancel">Cancelar</button>
-      <button class="btn btn-sm" style="background:var(--surface2);color:var(--red);margin-left:auto;" onclick="deleteEditedQuestion()" id="btn-delete">Eliminar</button>
+    <div class="settings-section">
+      <h3 style="color:var(--red);">ZONA DE PELIGRO</h3>
+      <div class="settings-row danger-zone">
+        <div><div class="settings-row-label">Cerrar sesión</div><div class="settings-row-sub" id="settings-signout-desc">Salir de tu cuenta en este dispositivo</div></div>
+        <button class="btn btn-sm btn-red" onclick="signOut()" id="btn-signout2">Salir</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- HOST LOBBY -->
+<!-- ══ SAVE PROJECT MODAL ══ -->
+<div class="modal-overlay" id="modal-save-project">
+  <div class="modal">
+    <h2 id="modal-save-title">💾 Guardar proyecto</h2>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label id="modal-proj-name-label">Nombre del proyecto</label>
+      <input type="text" id="project-name-input" placeholder="Ej: Trivia de amigos 2026">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveProject()" id="btn-save-project">Guardar y lanzar</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-save-project')" id="btn-cancel-save">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUESTION BUILDER ══ -->
+<div id="screen-question-builder" class="screen" style="justify-content:flex-start;padding:0;">
+  <div class="page-header">
+    <button class="btn btn-secondary btn-sm" onclick="goBackFromBuilder()" id="btn-back-builder">←</button>
+    <h1 style="flex:1;" id="builder-title">Tus Preguntas</h1>
+    <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
+  </div>
+  <div class="builder-body">
+    <div class="ai-generate-section">
+      <h3 id="ai-section-title">✨ Generar con IA</h3>
+      <p class="muted" style="margin-bottom:10px;font-size:0.8rem;" id="ai-section-desc">Pega los datos de tus participantes y la IA transforma esos datos en preguntas de trivia.</p>
+      <label id="raw-data-label">Datos crudos</label>
+      <textarea id="raw-data" placeholder="Escribe o pega aquí los datos..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <select id="num-questions" style="width:auto;">
+          <option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option>
+        </select>
+        <select id="q-type-gen" style="width:auto;">
+          <option value="mixed" id="opt-mixed">Mixto</option>
+          <option value="multiple" id="opt-multiple">Solo A-D</option>
+          <option value="truefalse" id="opt-tf">Solo V/F</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn">✨ Generar</button>
+      </div>
+      <div id="gen-status" style="margin-top:8px;font-size:0.8rem;color:var(--muted);"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span class="muted" id="q-count-label">0 preguntas</span>
+      <button class="btn btn-secondary btn-sm" onclick="addManualQuestion()" id="btn-add-manual">+ Agregar manual</button>
+    </div>
+    <div class="questions-list" id="questions-list"></div>
+    <div id="manual-editor" class="card" style="display:none;">
+      <h3 style="margin-bottom:14px;font-size:1rem;" id="editor-title">✏️ Editar pregunta</h3>
+      <label id="label-question">Pregunta</label>
+      <input type="text" id="edit-q-text" style="margin-bottom:12px;">
+      <div id="edit-options-area"></div>
+      <label style="margin-top:12px;" id="label-correct">Respuesta correcta</label>
+      <select id="edit-correct" style="margin-bottom:12px;">
+        <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+      </select>
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+        <label style="margin:0;" id="label-type">Tipo:</label>
+        <select id="edit-type" onchange="updateEditorType()" style="width:auto;">
+          <option value="multiple" id="edit-opt-multiple">Opción múltiple</option>
+          <option value="truefalse" id="edit-opt-tf">Verdadero / Falso</option>
+        </select>
+      </div>
+      <label id="label-time">Tiempo (seg)</label>
+      <input type="number" id="edit-time" value="20" min="5" max="60" style="margin-bottom:14px;width:100px;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="saveEditedQuestion()" id="btn-save">Guardar</button>
+        <button class="btn btn-secondary btn-sm" onclick="cancelEdit()" id="btn-cancel">Cancelar</button>
+        <button class="btn btn-sm" style="background:var(--surface2);color:var(--red);margin-left:auto;" onclick="deleteEditedQuestion()" id="btn-delete">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOST LOBBY ══ -->
 <div id="screen-host-lobby" class="screen">
   <div style="width:100%;max-width:500px;display:flex;justify-content:space-between;align-items:center;">
     <h1 class="section-title" id="lobby-title">Sala de espera</h1>
@@ -213,16 +477,16 @@
     <div class="players-grid" id="players-grid"></div>
   </div>
   <div style="width:100%;max-width:500px;display:flex;gap:10px;">
-    <button class="btn btn-secondary" style="flex:1" onclick="showScreen('screen-question-builder')" id="btn-edit-q">← Editar preguntas</button>
-    <button class="btn btn-primary" style="flex:1" id="start-game-btn" onclick="startGame()" disabled>Empezar juego →</button>
+    <button class="btn btn-secondary" style="flex:1" onclick="showScreen('screen-question-builder')" id="btn-edit-q">← Editar</button>
+    <button class="btn btn-primary" style="flex:1" id="start-game-btn" onclick="startGame()" disabled>Empezar →</button>
   </div>
 </div>
 
-<!-- HOST GAME -->
+<!-- ══ HOST GAME ══ -->
 <div id="screen-host-game" class="screen">
   <div class="host-header">
     <span class="muted" id="host-q-counter">Pregunta 1/10</span>
-    <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 respuestas</span></span>
+    <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 resp</span></span>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
   <div class="q-display">
@@ -236,21 +500,21 @@
     <div id="host-scoreboard" class="scoreboard"></div>
   </div>
   <div style="display:flex;gap:10px;width:100%;max-width:700px;">
-    <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar respuesta</button>
+    <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
     <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn">Siguiente →</button>
   </div>
 </div>
 
-<!-- FINAL HOST -->
+<!-- ══ HOST FINAL ══ -->
 <div id="screen-final" class="screen">
-  <div class="trophy">🏆</div>
+  <div style="font-size:4rem;">🏆</div>
   <h1 class="section-title" id="final-title">¡Juego terminado!</h1>
   <div id="winner-display"></div>
   <div class="scoreboard" id="final-scoreboard"></div>
-  <button class="btn btn-primary" style="max-width:300px;" onclick="resetGame()" id="btn-play-again">Jugar de nuevo</button>
+  <button class="btn btn-primary" style="max-width:300px;" onclick="goToDashboard()" id="btn-play-again">Volver al inicio</button>
 </div>
 
-<!-- PLAYER JOIN -->
+<!-- ══ PLAYER JOIN ══ -->
 <div id="screen-player-join" class="screen">
   <div class="logo" style="font-size:2rem;">Know It <span>All</span></div>
   <div class="card" style="text-align:left;">
@@ -258,22 +522,22 @@
     <label id="label-code">Código del juego</label>
     <input type="text" id="player-code-input" placeholder="Ej: ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2rem;text-align:center;margin-bottom:12px;" oninput="this.value=this.value.toUpperCase()">
     <label id="label-name">Tu nombre</label>
-    <input type="text" id="player-name-input" maxlength="20" style="margin-bottom:16px;" id="player-name-input">
+    <input type="text" id="player-name-input" maxlength="20" style="margin-bottom:16px;">
     <button class="btn btn-green" onclick="joinGame()" id="btn-join">Entrar al juego 🎯</button>
   </div>
   <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-back-join">← Volver</button>
 </div>
 
-<!-- PLAYER WAIT -->
+<!-- ══ PLAYER WAIT ══ -->
 <div id="screen-player-wait" class="screen">
   <div class="pulse-ring">🎯</div>
   <h2 id="player-wait-name" style="font-size:1.5rem;font-weight:700;">¡Listo!</h2>
-  <p class="muted" id="wait-text">Esperando que el host empiece el juego<span class="loading-dots"></span></p>
+  <p class="muted" id="wait-text">Esperando que el host empiece<span class="loading-dots"></span></p>
   <div class="chip"><div class="status-dot"></div> <span id="connected-label">Conectado</span></div>
   <div id="wait-player-count" class="muted" style="font-size:0.8rem;"></div>
 </div>
 
-<!-- PLAYER ANSWER -->
+<!-- ══ PLAYER ANSWER ══ -->
 <div id="screen-player-answer" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:500px;">
     <span class="muted" id="player-q-counter">Pregunta 1</span>
@@ -285,20 +549,25 @@
   <div id="player-result" style="display:none;width:100%;max-width:500px;"></div>
 </div>
 
-<!-- PLAYER FINAL -->
+<!-- ══ PLAYER FINAL ══ -->
 <div id="screen-player-final" class="screen">
   <div id="player-final-emoji" style="font-size:4rem;">🎉</div>
   <h1 class="section-title" id="player-final-title">¡Juego terminado!</h1>
   <div id="player-final-score" class="player-score-display" style="font-size:2.5rem;"></div>
   <div class="muted" id="player-final-rank"></div>
   <div class="scoreboard" id="player-final-scoreboard" style="max-width:400px;"></div>
-  <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-play-again-p">Jugar de nuevo</button>
+  <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-play-again-p">Volver</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, update, push }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,
+  signOut as fbSignOut, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCDrY26n8_yf2H6WYWcRiehZPzUxFH4cAM",
@@ -311,237 +580,522 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 // ── TRANSLATIONS ──────────────────────────────────────────
 const T = {
-  es: {
-    tagline: '¿Cuánto sabes de quienes te rodean?',
-    btnHost: '🎮 Soy el Host', btnPlayer: '👤 Soy Jugador',
-    backBtn: '← Volver', builderTitle: 'Tus Preguntas', createRoom: 'Crear sala →',
-    aiTitle: '✨ Generar con IA',
-    aiDesc: 'Pega los datos de tus participantes y la IA transforma esos datos en preguntas de trivia.',
-    rawDataLabel: 'Datos crudos (ej: "Juan tiene 34 años, mascota: Winnie")',
-    rawDataPlaceholder: 'Escribe o pega aquí los datos de los participantes...',
-    optMixed: 'Mixto (A-D + V/F)', optMultiple: 'Solo opción múltiple', optTF: 'Solo Verdadero/Falso',
-    genBtn: '✨ Generar', genGenerating: '⏳ Generando...',
-    genPrompt: (n) => `La IA está creando ${n} preguntas...`,
-    genDone: (n) => `✅ ${n} preguntas generadas. Revísalas abajo.`,
-    genError: '❌ Error al generar. Intenta de nuevo.',
-    genToast: (n) => `✅ ${n} preguntas listas!`,
-    qCountLabel: (n) => n + ' pregunta' + (n !== 1 ? 's' : ''),
-    addManual: '+ Agregar manual',
-    editorTitle: '✏️ Editar pregunta', labelQuestion: 'Pregunta',
-    editPlaceholder: '¿Cuántos años tiene...?',
-    labelCorrect: 'Respuesta correcta', labelType: 'Tipo:', labelTime: 'Tiempo (segundos)',
-    editOptMultiple: 'Opción múltiple', editOptTF: 'Verdadero / Falso',
-    btnSave: 'Guardar', btnCancel: 'Cancelar', btnDelete: 'Eliminar',
-    noQuestions: '⚠️ Agrega al menos una pregunta',
-    lobbyTitle: 'Sala de espera', liveLabel: 'En vivo', codeLabel: 'Código del juego',
-    qrHint: 'o escanea el QR 👇', waitingPlayers: 'Esperando jugadores...',
-    playerConnected: (n) => `${n} jugador${n!==1?'es':''} conectado${n!==1?'s':''}`,
-    editQBtn: '← Editar preguntas', startGame: 'Empezar juego →',
-    scoreboardLabel: 'MARCADOR EN VIVO',
-    qCounter: (i, total) => `Pregunta ${i}/${total}`,
-    responses: (n) => `${n} respuesta${n!==1?'s':''}`,
-    revealBtn: '👁 Revelar respuesta', nextBtn: 'Siguiente →',
-    correctAnswer: (label) => `✅ Respuesta correcta: ${label}`,
-    finalTitle: '¡Juego terminado!', playAgain: 'Jugar de nuevo',
-    joinTitle: 'Unirse al juego', labelCode: 'Código del juego',
-    codePlaceholder: 'Ej: ABC123', labelNameField: 'Tu nombre',
-    namePlaceholder: '¿Cómo te llamas?', joinBtn: 'Entrar al juego 🎯',
-    codeNotFound: '❌ Código no encontrado', gameFinished: '❌ Este juego ya terminó',
-    enterCode: '⚠️ Ingresa el código', enterName: '⚠️ Ingresa tu nombre',
-    waitGreet: (name) => `¡Hola, ${name}! 👋`,
-    waitText: 'Esperando que el host empiece el juego',
-    connected: 'Conectado',
-    waitCount: (n) => `${n} jugador${n!==1?'es':''} en la sala`,
-    qCounterPlayer: (i, total) => `Pregunta ${i}/${total}`,
-    trueLabel: '✓ Verdadero', falseLabel: '✗ Falso',
-    correct: '✅ ¡Correcto! Esperando puntos...',
-    wrong: (label) => `❌ Incorrecto — Era: ${label}`,
-    timeout: '⏱ Tiempo agotado',
-    pts: (n) => `${n} pts`,
-    rankLabel: (r, total) => `Puesto #${r} de ${total}`,
-    won: '🏆 ¡Ganaste!', great: '🎉 ¡Excelente!', goodGame: '¡Buen juego!',
-    aiSystemPrompt: (n, typeInstr, data) =>
-      `Eres el creador de un juego de trivia estilo Kahoot en español sobre personas reales.\n\nDatos de los participantes:\n${data}\n\nTu tarea: Crea exactamente ${n} preguntas de trivia ${typeInstr} basadas en esos datos. Las preguntas deben ser divertidas, tipo "¿Quién de estas personas tiene X?" o "¿Cuántos años tiene Y?". Los distractores deben ser plausibles pero distintos de la respuesta correcta.\n\nResponde SOLO con JSON válido, sin markdown, sin texto extra. Formato exacto:\n[\n  {\n    "text": "¿Pregunta aquí?",\n    "type": "multiple",\n    "options": {"A": "opción A", "B": "opción B", "C": "opción C", "D": "opción D"},\n    "correct": "B",\n    "time": 20\n  },\n  {\n    "text": "¿Es verdad que...?",\n    "type": "truefalse",\n    "options": {"true": "Verdadero", "false": "Falso"},\n    "correct": "true",\n    "time": 15\n  }\n]`,
-    typeInstr: { mixed: 'mezcla de opción múltiple (A/B/C/D) y Verdadero/Falso', multiple: 'todas de opción múltiple (4 opciones A/B/C/D)', truefalse: 'todas de Verdadero/Falso' },
-    newQuestion: 'Nueva pregunta',
-    defaultOpts: { A: 'Opción A', B: 'Opción B', C: 'Opción C', D: 'Opción D' },
-    tfTrue: 'Verdadero', tfFalse: 'Falso',
-    trueCorrect: 'Verdadero', falseCorrect: 'Falso',
+  es:{
+    tagline:'¿Cuánto sabes de quienes te rodean?',
+    tabLogin:'Iniciar sesión', tabRegister:'Registrarse',
+    btnLoginEmail:'Iniciar sesión', btnRegister:'Crear cuenta',
+    btnGoogle:'Continuar con Google', btnPlayerEntry:'👤 Soy jugador — unirme a una partida',
+    greeting: n => `¡Hola, ${n}! 👋`, dashSubtitle:'¿Qué quieres hacer hoy?',
+    dcNewTitle:'Nuevo proyecto', dcNewDesc:'Crea un nuevo juego con preguntas propias o generadas por IA',
+    dcOpenTitle:'Abrir proyecto', dcOpenDesc:'Continúa o lanza un proyecto guardado',
+    dcResultsTitle:'Resultados', dcResultsDesc:'Revisa el historial y puntajes de juegos anteriores',
+    dcSettingsTitle:'Ajustes', dcSettingsDesc:'Personaliza tu cuenta y preferencias',
+    dashRecentTitle:'PROYECTOS RECIENTES', dashNoProjects:'Aún no tienes proyectos. ¡Crea uno!',
+    projectsTitle:'Mis Proyectos', btnNewProject:'+ Nuevo',
+    resultsTitle:'Resultados de Juegos',
+    settingsTitle:'Ajustes', settingsAccountTitle:'CUENTA',
+    settingsNameLabel:'Nombre', settingsEmailLabel:'Email',
+    settingsPrefsTitle:'PREFERENCIAS', settingsLangLabel:'Idioma',
+    settingsTimerLabel:'Tiempo por defecto (seg)',
+    btnSaveSettings:'Guardar preferencias',
+    settingsSignoutDesc:'Salir de tu cuenta en este dispositivo',
+    btnSignout:'Salir', btnSignout2:'Salir',
+    modalSaveTitle:'💾 Guardar proyecto',
+    modalProjNameLabel:'Nombre del proyecto',
+    btnSaveProject:'Guardar y lanzar', btnCancelSave:'Cancelar',
+    builderTitle:'Tus Preguntas', btnCreateRoom:'Guardar y lanzar →',
+    aiTitle:'✨ Generar con IA',
+    aiDesc:'Pega los datos de tus participantes y la IA transforma esos datos en preguntas de trivia.',
+    rawDataLabel:'Datos crudos (ej: "Juan tiene 34 años, mascota: Winnie")',
+    rawDataPlaceholder:'Escribe o pega aquí los datos de los participantes...',
+    optMixed:'Mixto (A-D + V/F)', optMultiple:'Solo opción múltiple', optTF:'Solo Verdadero/Falso',
+    genBtn:'✨ Generar', genGenerating:'⏳ Generando...',
+    genPrompt: n => `La IA está creando ${n} preguntas...`,
+    genDone: n => `✅ ${n} preguntas generadas. Revísalas abajo.`,
+    genError:'❌ Error al generar. Intenta de nuevo.',
+    genToast: n => `✅ ${n} preguntas listas!`,
+    qCountLabel: n => n+' pregunta'+(n!==1?'s':''),
+    addManual:'+ Agregar manual',
+    editorTitle:'✏️ Editar pregunta', labelQuestion:'Pregunta', editPlaceholder:'¿Cuántos años tiene...?',
+    labelCorrect:'Respuesta correcta', labelType:'Tipo:', labelTime:'Tiempo (seg)',
+    editOptMultiple:'Opción múltiple', editOptTF:'Verdadero / Falso',
+    btnSave:'Guardar', btnCancel:'Cancelar', btnDelete:'Eliminar',
+    noQuestions:'⚠️ Agrega al menos una pregunta',
+    lobbyTitle:'Sala de espera', liveLabel:'En vivo', codeLabel:'Código del juego',
+    qrHint:'o escanea el QR 👇', waitingPlayers:'Esperando jugadores...',
+    playerConnected: n => `${n} jugador${n!==1?'es':''} conectado${n!==1?'s':''}`,
+    editQBtn:'← Editar', startGame:'Empezar →',
+    scoreboardLabel:'MARCADOR EN VIVO',
+    qCounter: (i,t) => `Pregunta ${i}/${t}`,
+    responses: n => `${n} resp`,
+    revealBtn:'👁 Revelar', nextBtn:'Siguiente →',
+    correctAnswer: l => `✅ Correcta: ${l}`,
+    finalTitle:'¡Juego terminado!', playAgain:'Volver al inicio',
+    joinTitle:'Unirse al juego', labelCode:'Código del juego',
+    codePlaceholder:'Ej: ABC123', labelNameField:'Tu nombre',
+    namePlaceholder:'¿Cómo te llamas?', joinBtn:'Entrar al juego 🎯',
+    codeNotFound:'❌ Código no encontrado', gameFinished:'❌ Este juego ya terminó',
+    enterCode:'⚠️ Ingresa el código', enterName:'⚠️ Ingresa tu nombre',
+    waitGreet: n => `¡Hola, ${n}! 👋`,
+    waitText:'Esperando que el host empiece', connected:'Conectado',
+    waitCount: n => `${n} jugador${n!==1?'es':''} en la sala`,
+    qCounterPlayer: (i,total) => `Pregunta ${i}/${total}`,
+    trueLabel:'✓ Verdadero', falseLabel:'✗ Falso',
+    correct:'✅ ¡Correcto! Esperando puntos...',
+    wrong: l => `❌ Incorrecto — Era: ${l}`,
+    timeout:'⏱ Tiempo agotado',
+    pts: n => `${n} pts`,
+    rankLabel: (r,total) => `Puesto #${r} de ${total}`,
+    won:'🏆 ¡Ganaste!', great:'🎉 ¡Excelente!', goodGame:'¡Buen juego!',
+    typeInstr:{ mixed:'mezcla de opción múltiple (A/B/C/D) y Verdadero/Falso', multiple:'todas de opción múltiple (4 opciones A/B/C/D)', truefalse:'todas de Verdadero/Falso' },
+    newQuestion:'Nueva pregunta',
+    defaultOpts:{ A:'Opción A', B:'Opción B', C:'Opción C', D:'Opción D' },
+    tfTrue:'Verdadero', tfFalse:'Falso', trueCorrect:'Verdadero', falseCorrect:'Falso',
+    aiPrompt: (n, typeInstr, data) =>
+      `Eres el creador de un juego de trivia estilo Kahoot en español sobre personas reales.\n\nDatos:\n${data}\n\nCrea exactamente ${n} preguntas ${typeInstr}. Preguntas divertidas tipo "¿Quién tiene X?" o "¿Cuántos años tiene Y?". Distractores plausibles pero distintos.\n\nSOLO JSON válido, sin markdown:\n[{"text":"...","type":"multiple","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"B","time":20},{"text":"...","type":"truefalse","options":{"true":"Verdadero","false":"Falso"},"correct":"true","time":15}]`,
+    noResults:'No hay resultados aún. ¡Juega tu primer partido!',
+    players:'jugadores', questions:'preguntas', winner:'Ganador',
+    saveSuccess:'✅ Proyecto guardado', saveProjectPlaceholder:'Ej: Trivia de amigos 2026',
+    editNamePrompt:'Nuevo nombre para mostrar:',
+    settingsSaved:'✅ Preferencias guardadas',
+    btnEditName:'Editar',
+    backBtn:'←',
   },
-  en: {
-    tagline: 'How well do you know the people around you?',
-    btnHost: '🎮 I\'m the Host', btnPlayer: '👤 I\'m a Player',
-    backBtn: '← Back', builderTitle: 'Your Questions', createRoom: 'Create room →',
-    aiTitle: '✨ Generate with AI',
-    aiDesc: 'Paste your participants\' data and AI will turn it into trivia questions.',
-    rawDataLabel: 'Raw data (e.g. "John is 34, pet: Winnie, fav color: blue")',
-    rawDataPlaceholder: 'Type or paste participant data here...',
-    optMixed: 'Mixed (A-D + T/F)', optMultiple: 'Multiple choice only', optTF: 'True/False only',
-    genBtn: '✨ Generate', genGenerating: '⏳ Generating...',
-    genPrompt: (n) => `AI is creating ${n} questions...`,
-    genDone: (n) => `✅ ${n} questions generated. Review below.`,
-    genError: '❌ Generation failed. Please try again.',
-    genToast: (n) => `✅ ${n} questions ready!`,
-    qCountLabel: (n) => n + ' question' + (n !== 1 ? 's' : ''),
-    addManual: '+ Add manually',
-    editorTitle: '✏️ Edit question', labelQuestion: 'Question',
-    editPlaceholder: 'How old is...?',
-    labelCorrect: 'Correct answer', labelType: 'Type:', labelTime: 'Time (seconds)',
-    editOptMultiple: 'Multiple choice', editOptTF: 'True / False',
-    btnSave: 'Save', btnCancel: 'Cancel', btnDelete: 'Delete',
-    noQuestions: '⚠️ Add at least one question',
-    lobbyTitle: 'Waiting room', liveLabel: 'Live', codeLabel: 'Game code',
-    qrHint: 'or scan the QR 👇', waitingPlayers: 'Waiting for players...',
-    playerConnected: (n) => `${n} player${n!==1?'s':''} connected`,
-    editQBtn: '← Edit questions', startGame: 'Start game →',
-    scoreboardLabel: 'LIVE SCOREBOARD',
-    qCounter: (i, total) => `Question ${i}/${total}`,
-    responses: (n) => `${n} answer${n!==1?'s':''}`,
-    revealBtn: '👁 Reveal answer', nextBtn: 'Next →',
-    correctAnswer: (label) => `✅ Correct answer: ${label}`,
-    finalTitle: 'Game over!', playAgain: 'Play again',
-    joinTitle: 'Join the game', labelCode: 'Game code',
-    codePlaceholder: 'E.g. ABC123', labelNameField: 'Your name',
-    namePlaceholder: 'What\'s your name?', joinBtn: 'Join game 🎯',
-    codeNotFound: '❌ Code not found', gameFinished: '❌ This game has ended',
-    enterCode: '⚠️ Enter the game code', enterName: '⚠️ Enter your name',
-    waitGreet: (name) => `Hey, ${name}! 👋`,
-    waitText: 'Waiting for the host to start the game',
-    connected: 'Connected',
-    waitCount: (n) => `${n} player${n!==1?'s':''} in the room`,
-    qCounterPlayer: (i, total) => `Question ${i}/${total}`,
-    trueLabel: '✓ True', falseLabel: '✗ False',
-    correct: '✅ Correct! Waiting for points...',
-    wrong: (label) => `❌ Wrong — It was: ${label}`,
-    timeout: '⏱ Time\'s up!',
-    pts: (n) => `${n} pts`,
-    rankLabel: (r, total) => `Rank #${r} of ${total}`,
-    won: '🏆 You won!', great: '🎉 Excellent!', goodGame: 'Good game!',
-    aiSystemPrompt: (n, typeInstr, data) =>
-      `You are creating a Kahoot-style trivia game in English about real people.\n\nParticipant data:\n${data}\n\nYour task: Create exactly ${n} trivia questions ${typeInstr} based on this data. Questions should be fun, like "Who among these people has a pet named X?" or "How old is Y?". Wrong answers (distractors) should be plausible but clearly different from the correct answer.\n\nReply ONLY with valid JSON, no markdown, no extra text. Exact format:\n[\n  {\n    "text": "Question here?",\n    "type": "multiple",\n    "options": {"A": "option A", "B": "option B", "C": "option C", "D": "option D"},\n    "correct": "B",\n    "time": 20\n  },\n  {\n    "text": "Is it true that...?",\n    "type": "truefalse",\n    "options": {"true": "True", "false": "False"},\n    "correct": "true",\n    "time": 15\n  }\n]`,
-    typeInstr: { mixed: 'a mix of multiple choice (A/B/C/D) and True/False', multiple: 'all multiple choice (4 options A/B/C/D)', truefalse: 'all True/False' },
-    newQuestion: 'New question',
-    defaultOpts: { A: 'Option A', B: 'Option B', C: 'Option C', D: 'Option D' },
-    tfTrue: 'True', tfFalse: 'False',
-    trueCorrect: 'True', falseCorrect: 'False',
+  en:{
+    tagline:'How well do you know the people around you?',
+    tabLogin:'Sign in', tabRegister:'Sign up',
+    btnLoginEmail:'Sign in', btnRegister:'Create account',
+    btnGoogle:'Continue with Google', btnPlayerEntry:'👤 I\'m a player — join a game',
+    greeting: n => `Hey, ${n}! 👋`, dashSubtitle:'What do you want to do today?',
+    dcNewTitle:'New project', dcNewDesc:'Create a new game with your own or AI-generated questions',
+    dcOpenTitle:'Open project', dcOpenDesc:'Continue or launch a saved project',
+    dcResultsTitle:'Results', dcResultsDesc:'Review history and scores from past games',
+    dcSettingsTitle:'Settings', dcSettingsDesc:'Customize your account and preferences',
+    dashRecentTitle:'RECENT PROJECTS', dashNoProjects:'No projects yet. Create one!',
+    projectsTitle:'My Projects', btnNewProject:'+ New',
+    resultsTitle:'Game Results',
+    settingsTitle:'Settings', settingsAccountTitle:'ACCOUNT',
+    settingsNameLabel:'Name', settingsEmailLabel:'Email',
+    settingsPrefsTitle:'PREFERENCES', settingsLangLabel:'Language',
+    settingsTimerLabel:'Default time (sec)',
+    btnSaveSettings:'Save preferences',
+    settingsSignoutDesc:'Sign out of your account on this device',
+    btnSignout:'Sign out', btnSignout2:'Sign out',
+    modalSaveTitle:'💾 Save project',
+    modalProjNameLabel:'Project name',
+    btnSaveProject:'Save and launch', btnCancelSave:'Cancel',
+    builderTitle:'Your Questions', btnCreateRoom:'Save and launch →',
+    aiTitle:'✨ Generate with AI',
+    aiDesc:'Paste your participants\' data and AI will turn it into trivia questions.',
+    rawDataLabel:'Raw data (e.g. "John is 34, pet: Winnie")',
+    rawDataPlaceholder:'Type or paste participant data here...',
+    optMixed:'Mixed (A-D + T/F)', optMultiple:'Multiple choice only', optTF:'True/False only',
+    genBtn:'✨ Generate', genGenerating:'⏳ Generating...',
+    genPrompt: n => `AI is creating ${n} questions...`,
+    genDone: n => `✅ ${n} questions generated. Review below.`,
+    genError:'❌ Generation failed. Try again.',
+    genToast: n => `✅ ${n} questions ready!`,
+    qCountLabel: n => n+' question'+(n!==1?'s':''),
+    addManual:'+ Add manually',
+    editorTitle:'✏️ Edit question', labelQuestion:'Question', editPlaceholder:'How old is...?',
+    labelCorrect:'Correct answer', labelType:'Type:', labelTime:'Time (sec)',
+    editOptMultiple:'Multiple choice', editOptTF:'True / False',
+    btnSave:'Save', btnCancel:'Cancel', btnDelete:'Delete',
+    noQuestions:'⚠️ Add at least one question',
+    lobbyTitle:'Waiting room', liveLabel:'Live', codeLabel:'Game code',
+    qrHint:'or scan the QR 👇', waitingPlayers:'Waiting for players...',
+    playerConnected: n => `${n} player${n!==1?'s':''} connected`,
+    editQBtn:'← Edit', startGame:'Start →',
+    scoreboardLabel:'LIVE SCOREBOARD',
+    qCounter: (i,total) => `Question ${i}/${total}`,
+    responses: n => `${n} ans`,
+    revealBtn:'👁 Reveal', nextBtn:'Next →',
+    correctAnswer: l => `✅ Correct: ${l}`,
+    finalTitle:'Game over!', playAgain:'Back to home',
+    joinTitle:'Join the game', labelCode:'Game code',
+    codePlaceholder:'E.g. ABC123', labelNameField:'Your name',
+    namePlaceholder:'What\'s your name?', joinBtn:'Join game 🎯',
+    codeNotFound:'❌ Code not found', gameFinished:'❌ This game has ended',
+    enterCode:'⚠️ Enter the game code', enterName:'⚠️ Enter your name',
+    waitGreet: n => `Hey, ${n}! 👋`,
+    waitText:'Waiting for the host to start', connected:'Connected',
+    waitCount: n => `${n} player${n!==1?'s':''} in the room`,
+    qCounterPlayer: (i,total) => `Question ${i}/${total}`,
+    trueLabel:'✓ True', falseLabel:'✗ False',
+    correct:'✅ Correct! Waiting for points...',
+    wrong: l => `❌ Wrong — It was: ${l}`,
+    timeout:'⏱ Time\'s up!',
+    pts: n => `${n} pts`,
+    rankLabel: (r,total) => `Rank #${r} of ${total}`,
+    won:'🏆 You won!', great:'🎉 Excellent!', goodGame:'Good game!',
+    typeInstr:{ mixed:'a mix of multiple choice (A/B/C/D) and True/False', multiple:'all multiple choice (4 options A/B/C/D)', truefalse:'all True/False' },
+    newQuestion:'New question',
+    defaultOpts:{ A:'Option A', B:'Option B', C:'Option C', D:'Option D' },
+    tfTrue:'True', tfFalse:'False', trueCorrect:'True', falseCorrect:'False',
+    aiPrompt: (n, typeInstr, data) =>
+      `You are creating a Kahoot-style trivia game in English about real people.\n\nData:\n${data}\n\nCreate exactly ${n} trivia questions ${typeInstr}. Fun questions like "Who has X?" or "How old is Y?". Plausible but distinct distractors.\n\nONLY valid JSON, no markdown:\n[{"text":"...","type":"multiple","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"B","time":20},{"text":"...","type":"truefalse","options":{"true":"True","false":"False"},"correct":"true","time":15}]`,
+    noResults:'No results yet. Play your first game!',
+    players:'players', questions:'questions', winner:'Winner',
+    saveSuccess:'✅ Project saved', saveProjectPlaceholder:'E.g. Friends trivia 2026',
+    editNamePrompt:'New display name:',
+    settingsSaved:'✅ Preferences saved',
+    btnEditName:'Edit',
+    backBtn:'←',
   }
 };
 
-let lang = 'es';
-let t = T.es;
+let lang = 'es', t = T.es;
+let currentUser = null;
+let questions = [], gameCode = null, currentProjectId = null, currentProjectName = '';
+let isHost = false, playerName = null, playerId = null;
+let currentQIndex = -1, timerInterval = null, timeLeft = 20;
+let playerAnswered = false, playerScore = 0, editingIndex = -1;
+let unsubscribers = [];
 
+// ── HELPERS ────────────────────────────────────────────
+window.showScreen = function(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function toast(msg, dur=2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+
+// ── LANGUAGE ──────────────────────────────────────────
 window.setLang = function(l) {
-  lang = l;
-  t = T[l];
-  document.getElementById('lang-es').classList.toggle('active', l==='es');
-  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  lang = l; t = T[l];
+  ['lang-es','lang-en','dash-lang-es','dash-lang-en','set-lang-es','set-lang-en'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', id.endsWith(l));
+  });
   applyTranslations();
 }
-
+function s(id, text) { const el=document.getElementById(id); if(el) el.textContent=text; }
+function p(id, text) { const el=document.getElementById(id); if(el) el.placeholder=text; }
 function applyTranslations() {
-  const s = (id, text) => { const el = document.getElementById(id); if(el) el.textContent = text; };
-  const v = (id, text) => { const el = document.getElementById(id); if(el) el.value = text; };
-  const p = (id, text) => { const el = document.getElementById(id); if(el) el.placeholder = text; };
-
   s('landing-tagline', t.tagline);
-  s('btn-host', t.btnHost); s('btn-player', t.btnPlayer);
-  s('btn-back-builder', t.backBtn); s('builder-title', t.builderTitle); s('btn-create-room', t.createRoom);
+  s('tab-login', t.tabLogin); s('tab-register', t.tabRegister);
+  s('btn-login-email', t.btnLoginEmail); s('btn-register', t.btnRegister);
+  s('btn-google-text', t.btnGoogle); s('btn-player-entry', t.btnPlayerEntry);
+  s('dash-subtitle', t.dashSubtitle);
+  s('dc-new-title', t.dcNewTitle); s('dc-new-desc', t.dcNewDesc);
+  s('dc-open-title', t.dcOpenTitle); s('dc-open-desc', t.dcOpenDesc);
+  s('dc-results-title', t.dcResultsTitle); s('dc-results-desc', t.dcResultsDesc);
+  s('dc-settings-title', t.dcSettingsTitle); s('dc-settings-desc', t.dcSettingsDesc);
+  s('dash-recent-title', t.dashRecentTitle); s('dash-no-projects', t.dashNoProjects);
+  s('projects-title', t.projectsTitle); s('btn-new-project', t.btnNewProject);
+  s('results-title', t.resultsTitle);
+  s('settings-title', t.settingsTitle); s('settings-account-title', t.settingsAccountTitle);
+  s('settings-name-label', t.settingsNameLabel); s('settings-email-label', t.settingsEmailLabel);
+  s('settings-prefs-title', t.settingsPrefsTitle); s('settings-lang-label', t.settingsLangLabel);
+  s('settings-timer-label', t.settingsTimerLabel); s('btn-save-settings', t.btnSaveSettings);
+  s('settings-signout-desc', t.settingsSignoutDesc);
+  s('btn-signout', t.btnSignout); s('btn-signout2', t.btnSignout2);
+  s('modal-save-title', t.modalSaveTitle); s('modal-proj-name-label', t.modalProjNameLabel);
+  s('btn-save-project', t.btnSaveProject); s('btn-cancel-save', t.btnCancelSave);
+  s('builder-title', t.builderTitle); s('btn-create-room', t.btnCreateRoom);
   s('ai-section-title', t.aiTitle); s('ai-section-desc', t.aiDesc);
   s('raw-data-label', t.rawDataLabel); p('raw-data', t.rawDataPlaceholder);
   s('opt-mixed', t.optMixed); s('opt-multiple', t.optMultiple); s('opt-tf', t.optTF);
-  s('gen-btn', t.genBtn);
-  s('btn-add-manual', t.addManual);
+  s('gen-btn', t.genBtn); s('btn-add-manual', t.addManual);
   s('editor-title', t.editorTitle); s('label-question', t.labelQuestion);
   p('edit-q-text', t.editPlaceholder);
   s('label-correct', t.labelCorrect); s('label-type', t.labelType); s('label-time', t.labelTime);
   s('edit-opt-multiple', t.editOptMultiple); s('edit-opt-tf', t.editOptTF);
   s('btn-save', t.btnSave); s('btn-cancel', t.btnCancel); s('btn-delete', t.btnDelete);
   s('lobby-title', t.lobbyTitle); s('live-label', t.liveLabel); s('code-label', t.codeLabel);
-  s('qr-hint', t.qrHint);
-  s('btn-edit-q', t.editQBtn); s('start-game-btn', t.startGame);
-  s('scoreboard-label', t.scoreboardLabel);
+  s('qr-hint', t.qrHint); s('btn-edit-q', t.editQBtn);
+  s('start-game-btn', t.startGame); s('scoreboard-label', t.scoreboardLabel);
   s('reveal-btn', t.revealBtn); s('next-btn', t.nextBtn);
   s('final-title', t.finalTitle); s('btn-play-again', t.playAgain);
   s('join-title', t.joinTitle); s('label-code', t.labelCode);
-  p('player-code-input', t.codePlaceholder);
-  s('label-name', t.labelNameField); p('player-name-input', t.namePlaceholder);
-  s('btn-join', t.joinBtn); s('btn-back-join', t.backBtn);
-  s('wait-text', t.waitText); s('connected-label', t.connected);
-  s('btn-play-again-p', t.playAgain);
+  p('player-code-input', t.codePlaceholder); s('label-name', t.labelNameField);
+  p('player-name-input', t.namePlaceholder); s('btn-join', t.joinBtn);
+  s('btn-back-join', t.backBtn); s('wait-text', t.waitText);
+  s('connected-label', t.connected); s('btn-play-again-p', t.playAgain);
+  p('project-name-input', t.saveProjectPlaceholder);
   s('q-count-label', t.qCountLabel(questions.length));
+  if (currentUser) {
+    const name = currentUser.displayName || currentUser.email?.split('@')[0] || 'Host';
+    s('dash-greeting', t.greeting(name));
+  }
 }
 
-// ── STATE ──────────────────────────────────────────────
-let questions = [];
-let gameCode = null;
-let isHost = false;
-let playerName = null;
-let playerId = null;
-let currentQIndex = -1;
-let timerInterval = null;
-let timeLeft = 20;
-let playerAnswered = false;
-let playerScore = 0;
-let editingIndex = -1;
-let unsubscribers = [];
-
-window.showScreen = function(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// ── AUTH ──────────────────────────────────────────────
+window.switchAuthTab = function(tab) {
+  document.getElementById('auth-login-form').style.display = tab==='login' ? 'flex' : 'none';
+  document.getElementById('auth-register-form').style.display = tab==='register' ? 'flex' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+}
+window.loginEmail = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  document.getElementById('login-error').textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    document.getElementById('login-error').textContent = e.message.replace('Firebase: ','').replace(/\(.*\)/,'');
+  }
+}
+window.registerEmail = async function() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  document.getElementById('register-error').textContent = '';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    if (name) await updateProfile(cred.user, { displayName: name });
+  } catch(e) {
+    document.getElementById('register-error').textContent = e.message.replace('Firebase: ','').replace(/\(.*\)/,'');
+  }
+}
+window.loginGoogle = async function() {
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    document.getElementById('login-error').textContent = e.message.replace('Firebase: ','').replace(/\(.*\)/,'');
+  }
+}
+window.signOut = async function() {
+  await fbSignOut(auth);
+  showScreen('screen-landing');
 }
 
-function toast(msg, dur=2500) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), dur);
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  if (user) {
+    // Load user settings
+    get(ref(db, `users/${user.uid}/settings`)).then(snap => {
+      const prefs = snap.val() || {};
+      if (prefs.lang) setLang(prefs.lang);
+      if (prefs.defaultTimer) document.getElementById('default-timer').value = prefs.defaultTimer;
+    });
+    loadDashboard();
+    showScreen('screen-dashboard');
+  }
+});
+
+// ── DASHBOARD ────────────────────────────────────────
+window.loadDashboard = async function() {
+  if (!currentUser) return;
+  const name = currentUser.displayName || currentUser.email?.split('@')[0] || 'Host';
+  s('dash-greeting', t.greeting(name));
+  // Avatar
+  const av = document.getElementById('dash-avatar');
+  if (currentUser.photoURL) av.innerHTML = `<img src="${currentUser.photoURL}">`;
+  else av.textContent = name[0].toUpperCase();
+  s('dash-user-name', name);
+  // Recent projects
+  const snap = await get(ref(db, `users/${currentUser.uid}/projects`));
+  const list = document.getElementById('dash-recent-list');
+  if (!snap.exists()) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🗂️</div><p>${t.dashNoProjects}</p></div>`;
+    return;
+  }
+  const projects = Object.entries(snap.val()).sort((a,b) => (b[1].updatedAt||0)-(a[1].updatedAt||0)).slice(0,5);
+  list.innerHTML = projects.map(([id, p]) => `
+    <div class="project-row" onclick="openProject('${id}')">
+      <div class="project-icon">📋</div>
+      <div class="project-info">
+        <div class="project-name">${p.name||'Sin nombre'}</div>
+        <div class="project-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
+      </div>
+      <div class="project-arrow">›</div>
+    </div>`).join('');
 }
 
-window.showHostSetup = function() {
-  isHost = true; showScreen('screen-question-builder'); renderQuestionsList();
+window.newProject = function() {
+  questions = []; currentProjectId = null; currentProjectName = '';
+  document.getElementById('questions-list').innerHTML = '';
+  document.getElementById('manual-editor').style.display = 'none';
+  document.getElementById('gen-status').textContent = '';
+  document.getElementById('raw-data').value = '';
+  renderQuestionsList();
+  showScreen('screen-question-builder');
 }
 
-window.showPlayerJoin = function() {
-  isHost = false;
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  if (code) document.getElementById('player-code-input').value = code.toUpperCase();
-  showScreen('screen-player-join');
+window.goBackFromBuilder = function() {
+  if (currentUser) showScreen('screen-dashboard');
+  else showScreen('screen-landing');
 }
 
-// ── QUESTION BUILDER ───────────────────────────────────
+// ── PROJECTS ──────────────────────────────────────────
+window.loadProjects = async function() {
+  if (!currentUser) return;
+  const snap = await get(ref(db, `users/${currentUser.uid}/projects`));
+  const list = document.getElementById('projects-list');
+  if (!snap.exists()) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🗂️</div><p>${t.dashNoProjects}</p></div>`;
+    return;
+  }
+  const projects = Object.entries(snap.val()).sort((a,b) => (b[1].updatedAt||0)-(a[1].updatedAt||0));
+  list.innerHTML = projects.map(([id, p]) => `
+    <div class="project-row" onclick="openProject('${id}')">
+      <div class="project-icon">📋</div>
+      <div class="project-info">
+        <div class="project-name">${p.name||'Sin nombre'}</div>
+        <div class="project-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">▶ Lanzar</button>
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();deleteProject('${id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+window.openProject = async function(id) {
+  if (!currentUser) return;
+  const snap = await get(ref(db, `users/${currentUser.uid}/projects/${id}`));
+  if (!snap.exists()) return;
+  const proj = snap.val();
+  questions = proj.questions || [];
+  currentProjectId = id;
+  currentProjectName = proj.name || '';
+  renderQuestionsList();
+  showScreen('screen-question-builder');
+}
+
+window.deleteProject = async function(id) {
+  if (!currentUser || !confirm('¿Eliminar este proyecto?')) return;
+  await set(ref(db, `users/${currentUser.uid}/projects/${id}`), null);
+  loadProjects();
+}
+
+// ── SAVE PROJECT ──────────────────────────────────────
+window.openSaveModal = function() {
+  if (questions.length === 0) { toast(t.noQuestions); return; }
+  document.getElementById('project-name-input').value = currentProjectName;
+  openModal('modal-save-project');
+}
+
+window.saveProject = async function() {
+  const name = document.getElementById('project-name-input').value.trim() || 'Sin nombre';
+  currentProjectName = name;
+  if (!currentUser) { closeModal('modal-save-project'); goToLobby(); return; }
+  const projData = { name, questions, questionCount: questions.length, updatedAt: Date.now(), lang };
+  if (currentProjectId) {
+    await update(ref(db, `users/${currentUser.uid}/projects/${currentProjectId}`), projData);
+  } else {
+    const r = push(ref(db, `users/${currentUser.uid}/projects`));
+    currentProjectId = r.key;
+    await set(r, projData);
+  }
+  closeModal('modal-save-project');
+  toast(t.saveSuccess);
+  goToLobby();
+}
+
+// ── RESULTS ──────────────────────────────────────────
+window.loadResults = async function() {
+  if (!currentUser) return;
+  const snap = await get(ref(db, `users/${currentUser.uid}/gameHistory`));
+  const list = document.getElementById('results-list');
+  if (!snap.exists()) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p>${t.noResults}</p></div>`;
+    return;
+  }
+  const games = Object.entries(snap.val()).sort((a,b) => (b[1].playedAt||0)-(a[1].playedAt||0));
+  list.innerHTML = games.map(([id, g]) => {
+    const sorted = Object.values(g.players||{}).sort((a,b)=>(b.score||0)-(a.score||0));
+    const winner = sorted[0];
+    return `<div class="result-game-card" onclick="toggleResult('${id}')">
+      <div class="result-game-header">
+        <div class="result-game-name">📋 ${g.projectName||'Juego'}</div>
+        <div class="result-game-date">${new Date(g.playedAt||0).toLocaleDateString()}</div>
+      </div>
+      <div class="result-stats">
+        <div class="result-stat"><div class="num">${Object.keys(g.players||{}).length}</div><div class="lbl">${t.players}</div></div>
+        <div class="result-stat"><div class="num">${g.questionCount||0}</div><div class="lbl">${t.questions}</div></div>
+        ${winner ? `<div class="result-stat"><div class="num" style="color:var(--gold)">🏆 ${winner.name}</div><div class="lbl">${t.winner}</div></div>` : ''}
+      </div>
+      <div class="result-detail" id="detail-${id}">
+        ${sorted.map((p,i) => `<div class="score-row" style="margin-bottom:6px;">
+          <span class="score-rank ${i===0?'gold':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
+          <span class="score-name">${p.name}</span>
+          <span class="score-pts">${p.score||0}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleResult = function(id) {
+  const el = document.getElementById('detail-'+id);
+  if (el) el.classList.toggle('open');
+}
+
+// ── SETTINGS ──────────────────────────────────────────
+window.loadSettings = function() {
+  if (!currentUser) return;
+  s('settings-name-val', currentUser.displayName || '—');
+  s('settings-email-val', currentUser.email || '—');
+}
+
+window.saveSettings = async function() {
+  if (!currentUser) return;
+  const timer = document.getElementById('default-timer').value;
+  await update(ref(db, `users/${currentUser.uid}/settings`), { lang, defaultTimer: parseInt(timer)||20 });
+  toast(t.settingsSaved);
+}
+
+window.editDisplayName = async function() {
+  const newName = prompt(t.editNamePrompt, currentUser.displayName || '');
+  if (newName && newName.trim()) {
+    await updateProfile(currentUser, { displayName: newName.trim() });
+    s('settings-name-val', newName.trim());
+    s('dash-user-name', newName.trim());
+    toast('✅ Nombre actualizado');
+  }
+}
+
+window.goToDashboard = function() {
+  questions = []; currentQIndex = -1; gameCode = null;
+  unsubscribers.forEach(u=>u()); unsubscribers=[];
+  if (currentUser) { loadDashboard(); showScreen('screen-dashboard'); }
+  else showScreen('screen-landing');
+}
+
+// ── QUESTION BUILDER ─────────────────────────────────
 window.renderQuestionsList = function() {
   const list = document.getElementById('questions-list');
-  document.getElementById('q-count-label').textContent = t.qCountLabel(questions.length);
+  s('q-count-label', t.qCountLabel(questions.length));
   list.innerHTML = '';
-  questions.forEach((q, i) => {
+  questions.forEach((q,i) => {
     const div = document.createElement('div');
-    div.className = 'question-item' + (editingIndex === i ? ' active' : '');
+    div.className = 'question-item'+(editingIndex===i?' active':'');
     div.innerHTML = `<span class="q-num">${String(i+1).padStart(2,'0')}</span>
       <span class="q-text">${q.text}</span>
-      <span class="q-badge">${q.type === 'truefalse' ? 'T/F' : 'A-D'}</span>`;
+      <span class="q-badge">${q.type==='truefalse'?'T/F':'A-D'}</span>`;
     div.onclick = () => openEditor(i);
     list.appendChild(div);
   });
 }
 
 window.addManualQuestion = function() {
-  questions.push({ text: t.newQuestion, type: 'multiple', options: t.defaultOpts, correct: 'A', time: 20 });
-  openEditor(questions.length - 1); renderQuestionsList();
+  questions.push({text:t.newQuestion,type:'multiple',options:{...t.defaultOpts},correct:'A',time:20});
+  openEditor(questions.length-1); renderQuestionsList();
 }
 
 function openEditor(i) {
   editingIndex = i;
   const q = questions[i];
   document.getElementById('edit-q-text').value = q.text;
-  document.getElementById('edit-time').value = q.time || 20;
+  document.getElementById('edit-time').value = q.time||20;
   document.getElementById('edit-type').value = q.type;
   document.getElementById('edit-correct').value = q.correct;
   updateEditorType(q);
-  document.getElementById('manual-editor').style.display = 'block';
-  document.getElementById('manual-editor').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('manual-editor').style.display='block';
+  document.getElementById('manual-editor').scrollIntoView({behavior:'smooth'});
   renderQuestionsList();
 }
 
@@ -549,165 +1103,148 @@ window.updateEditorType = function(q) {
   const type = document.getElementById('edit-type').value;
   const area = document.getElementById('edit-options-area');
   const correctSel = document.getElementById('edit-correct');
-  if (type === 'truefalse') {
-    area.innerHTML = '';
-    correctSel.innerHTML = `<option value="true">${t.tfTrue}</option><option value="false">${t.tfFalse}</option>`;
-    if (q) correctSel.value = q.correct;
+  if (type==='truefalse') {
+    area.innerHTML='';
+    correctSel.innerHTML=`<option value="true">${t.tfTrue}</option><option value="false">${t.tfFalse}</option>`;
+    if(q) correctSel.value=q.correct;
   } else {
-    const opts = (q && q.options) ? q.options : t.defaultOpts;
-    area.innerHTML = ['A','B','C','D'].map(k => `
-      <label>${k}</label><input type="text" id="opt-${k}" value="${opts[k]||''}" placeholder="${lang==='es'?'Opción':'Option'} ${k}" style="margin-bottom:8px;">`).join('');
-    correctSel.innerHTML = '<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>';
-    if (q) correctSel.value = q.correct;
+    const opts=(q&&q.options)?q.options:{...t.defaultOpts};
+    area.innerHTML=['A','B','C','D'].map(k=>`<label>${k}</label><input type="text" id="opt-${k}" value="${opts[k]||''}" placeholder="${lang==='es'?'Opción':'Option'} ${k}" style="margin-bottom:8px;">`).join('');
+    correctSel.innerHTML='<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>';
+    if(q) correctSel.value=q.correct;
   }
 }
 
 window.saveEditedQuestion = function() {
-  if (editingIndex < 0) return;
+  if(editingIndex<0) return;
   const type = document.getElementById('edit-type').value;
   const q = {
-    text: document.getElementById('edit-q-text').value.trim() || t.newQuestion,
+    text: document.getElementById('edit-q-text').value.trim()||t.newQuestion,
     type, correct: document.getElementById('edit-correct').value,
-    time: parseInt(document.getElementById('edit-time').value) || 20
+    time: parseInt(document.getElementById('edit-time').value)||20
   };
-  if (type === 'multiple') {
-    q.options = { A: document.getElementById('opt-A').value, B: document.getElementById('opt-B').value, C: document.getElementById('opt-C').value, D: document.getElementById('opt-D').value };
-  } else {
-    q.options = { true: t.tfTrue, false: t.tfFalse };
-  }
-  questions[editingIndex] = q; cancelEdit(); renderQuestionsList();
+  if(type==='multiple') q.options={A:document.getElementById('opt-A').value,B:document.getElementById('opt-B').value,C:document.getElementById('opt-C').value,D:document.getElementById('opt-D').value};
+  else q.options={true:t.tfTrue,false:t.tfFalse};
+  questions[editingIndex]=q; cancelEdit(); renderQuestionsList();
 }
 
 window.deleteEditedQuestion = function() {
-  if (editingIndex >= 0) questions.splice(editingIndex, 1);
+  if(editingIndex>=0) questions.splice(editingIndex,1);
   cancelEdit(); renderQuestionsList();
 }
 
 window.cancelEdit = function() {
-  editingIndex = -1; document.getElementById('manual-editor').style.display = 'none'; renderQuestionsList();
+  editingIndex=-1; document.getElementById('manual-editor').style.display='none'; renderQuestionsList();
 }
 
-// ── AI GENERATE ────────────────────────────────────────
+// ── AI GENERATE ───────────────────────────────────────
 window.generateQuestions = async function() {
   const rawData = document.getElementById('raw-data').value.trim();
-  if (!rawData) { toast('⚠️ ' + (lang==='es'?'Pega los datos primero':'Paste the data first')); return; }
+  if(!rawData){toast('⚠️ '+(lang==='es'?'Pega los datos primero':'Paste the data first'));return;}
   const numQ = document.getElementById('num-questions').value;
   const qType = document.getElementById('q-type-gen').value;
   const btn = document.getElementById('gen-btn');
   const status = document.getElementById('gen-status');
-  btn.disabled = true; btn.textContent = t.genGenerating;
-  status.textContent = t.genPrompt(numQ);
-
-  const typeInstr = t.typeInstr[qType];
-  const prompt = t.aiSystemPrompt(numQ, typeInstr, rawData);
-
+  btn.disabled=true; btn.textContent=t.genGenerating;
+  status.textContent=t.genPrompt(numQ);
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 1000, messages: [{ role: "user", content: prompt }] })
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:1000,
+        messages:[{role:"user",content:t.aiPrompt(numQ,t.typeInstr[qType],rawData)}]})
     });
     const data = await res.json();
-    const text = data.content.find(b => b.type === 'text')?.text || '';
-    const clean = text.replace(/```json|```/g, '').trim();
+    const text = data.content.find(b=>b.type==='text')?.text||'';
+    const clean = text.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
-    questions = [...questions, ...parsed];
+    questions=[...questions,...parsed];
     renderQuestionsList();
-    status.textContent = t.genDone(parsed.length);
+    status.textContent=t.genDone(parsed.length);
     toast(t.genToast(parsed.length));
-  } catch(e) {
-    status.textContent = t.genError; console.error(e);
-  }
-  btn.disabled = false; btn.textContent = t.genBtn;
+  } catch(e) { status.textContent=t.genError; console.error(e); }
+  btn.disabled=false; btn.textContent=t.genBtn;
 }
 
-// ── LOBBY ──────────────────────────────────────────────
-window.goToLobby = async function() {
-  if (questions.length === 0) { toast(t.noQuestions); return; }
+// ── LOBBY ─────────────────────────────────────────────
+async function goToLobby() {
   gameCode = Math.random().toString(36).substring(2,8).toUpperCase();
-  await set(ref(db, `games/${gameCode}`), { status: 'lobby', currentQuestion: -1, questions, createdAt: Date.now(), lang });
+  await set(ref(db,`games/${gameCode}`),{status:'lobby',currentQuestion:-1,questions,createdAt:Date.now(),lang,projectName:currentProjectName});
   showScreen('screen-host-lobby');
-  document.getElementById('lobby-code').textContent = gameCode;
-  const joinURL = `${window.location.origin}${window.location.pathname}?code=${gameCode}`;
-  document.getElementById('join-url').textContent = joinURL;
-  generateQR(joinURL); listenPlayers();
+  document.getElementById('lobby-code').textContent=gameCode;
+  const joinURL=`${window.location.origin}${window.location.pathname}?code=${gameCode}`;
+  document.getElementById('join-url').textContent=joinURL;
+  document.getElementById('qr-container').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(joinURL)}&color=000000&bgcolor=ffffff" width="160" height="160" style="display:block;border-radius:4px;">`;
+  listenPlayers();
 }
-
-function generateQR(url) {
-  document.getElementById('qr-container').innerHTML =
-    `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}&color=000000&bgcolor=ffffff" width="160" height="160" style="display:block;border-radius:4px;">`;
-}
+window.goToLobby = goToLobby;
 
 function listenPlayers() {
-  const unsub = onValue(ref(db, `games/${gameCode}/players`), snap => {
-    const players = snap.val() || {};
-    const grid = document.getElementById('players-grid');
-    grid.innerHTML = '';
-    Object.values(players).forEach(p => {
-      const chip = document.createElement('div'); chip.className = 'player-chip'; chip.textContent = p.name; grid.appendChild(chip);
+  const unsub = onValue(ref(db,`games/${gameCode}/players`), snap => {
+    const players=snap.val()||{};
+    const grid=document.getElementById('players-grid');
+    grid.innerHTML='';
+    Object.values(players).forEach(p=>{
+      const chip=document.createElement('div'); chip.className='player-chip'; chip.textContent=p.name; grid.appendChild(chip);
     });
-    const count = Object.keys(players).length;
-    document.getElementById('player-count-label').textContent = count > 0 ? t.playerConnected(count) : t.waitingPlayers;
-    document.getElementById('start-game-btn').disabled = count === 0;
+    const count=Object.keys(players).length;
+    s('player-count-label', count>0?t.playerConnected(count):t.waitingPlayers);
+    document.getElementById('start-game-btn').disabled=count===0;
   });
   unsubscribers.push(unsub);
 }
 
 window.startGame = async function() {
-  currentQIndex = 0;
-  await update(ref(db, `games/${gameCode}`), { status: 'playing', currentQuestion: 0 });
+  currentQIndex=0;
+  await update(ref(db,`games/${gameCode}`),{status:'playing',currentQuestion:0});
   showScreen('screen-host-game'); loadHostQuestion(0); listenResponses(); listenScoreboard();
 }
 
 function loadHostQuestion(i) {
-  const q = questions[i]; if (!q) return;
-  document.getElementById('host-q-counter').textContent = t.qCounter(i+1, questions.length);
-  document.getElementById('progress-fill').style.width = `${((i+1)/questions.length)*100}%`;
-  document.getElementById('host-q-text').textContent = q.text;
-  document.getElementById('answer-reveal').style.display = 'none';
-  document.getElementById('host-resp-count').textContent = t.responses(0);
-  const opts = document.getElementById('host-options');
-  if (q.type === 'truefalse') {
-    opts.innerHTML = `<div class="option-host A"><span class="option-key">✓</span> ${t.tfTrue}</div><div class="option-host B"><span class="option-key">✗</span> ${t.tfFalse}</div>`;
-  } else {
-    opts.innerHTML = ['A','B','C','D'].map(k => `<div class="option-host ${k}"><span class="option-key">${k}</span> ${q.options[k]}</div>`).join('');
-  }
-  update(ref(db, `games/${gameCode}`), { currentQuestion: i, questionStartedAt: Date.now(), status: 'playing' });
-  set(ref(db, `games/${gameCode}/answers/${i}`), null);
-  startHostTimer(q.time || 20);
+  const q=questions[i]; if(!q) return;
+  s('host-q-counter', t.qCounter(i+1,questions.length));
+  document.getElementById('progress-fill').style.width=`${((i+1)/questions.length)*100}%`;
+  s('host-q-text', q.text);
+  document.getElementById('answer-reveal').style.display='none';
+  s('host-resp-count', t.responses(0));
+  const opts=document.getElementById('host-options');
+  if(q.type==='truefalse') opts.innerHTML=`<div class="option-host A"><span class="option-key">✓</span> ${t.tfTrue}</div><div class="option-host B"><span class="option-key">✗</span> ${t.tfFalse}</div>`;
+  else opts.innerHTML=['A','B','C','D'].map(k=>`<div class="option-host ${k}"><span class="option-key">${k}</span> ${q.options[k]}</div>`).join('');
+  update(ref(db,`games/${gameCode}`),{currentQuestion:i,questionStartedAt:Date.now(),status:'playing'});
+  set(ref(db,`games/${gameCode}/answers/${i}`),null);
+  startHostTimer(q.time||20);
 }
 
 function startHostTimer(seconds) {
-  clearInterval(timerInterval); timeLeft = seconds;
-  const el = document.getElementById('host-timer');
-  el.textContent = timeLeft; el.classList.remove('urgent');
-  timerInterval = setInterval(() => {
-    timeLeft--; el.textContent = timeLeft;
-    if (timeLeft <= 5) el.classList.add('urgent');
-    if (timeLeft <= 0) { clearInterval(timerInterval); revealAnswer(); }
-  }, 1000);
+  clearInterval(timerInterval); timeLeft=seconds;
+  const el=document.getElementById('host-timer');
+  el.textContent=timeLeft; el.classList.remove('urgent');
+  timerInterval=setInterval(()=>{
+    timeLeft--; el.textContent=timeLeft;
+    if(timeLeft<=5) el.classList.add('urgent');
+    if(timeLeft<=0){clearInterval(timerInterval);revealAnswer();}
+  },1000);
 }
 
 function listenResponses() {
-  const unsub = onValue(ref(db, `games/${gameCode}/answers`), snap => {
-    const all = snap.val() || {};
-    const count = Object.keys(all[currentQIndex] || {}).length;
-    document.getElementById('host-resp-count').textContent = t.responses(count);
+  const unsub=onValue(ref(db,`games/${gameCode}/answers`),snap=>{
+    const all=snap.val()||{};
+    const count=Object.keys(all[currentQIndex]||{}).length;
+    s('host-resp-count',t.responses(count));
   });
   unsubscribers.push(unsub);
 }
 
 function listenScoreboard() {
-  const unsub = onValue(ref(db, `games/${gameCode}/players`), snap => {
-    renderScoreboard(snap.val() || {}, 'host-scoreboard');
+  const unsub=onValue(ref(db,`games/${gameCode}/players`),snap=>{
+    renderScoreboard(snap.val()||{},'host-scoreboard');
   });
   unsubscribers.push(unsub);
 }
 
 function renderScoreboard(players, containerId) {
-  const sorted = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
-  const maxScore = sorted[0]?.[1]?.score || 1;
-  document.getElementById(containerId).innerHTML = sorted.map(([,p], i) => `
+  const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+  const maxScore=sorted[0]?.[1]?.score||1;
+  document.getElementById(containerId).innerHTML=sorted.map(([,p],i)=>`
     <div class="score-row">
       <span class="score-rank ${i===0?'gold':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
       <span class="score-name">${p.name}</span>
@@ -718,189 +1255,183 @@ function renderScoreboard(players, containerId) {
 
 window.revealAnswer = function() {
   clearInterval(timerInterval);
-  const q = questions[currentQIndex];
-  const correctLabel = q.type === 'truefalse'
-    ? (q.correct === 'true' ? t.trueCorrect : t.falseCorrect)
-    : `${q.correct}: ${q.options[q.correct]}`;
-  const el = document.getElementById('answer-reveal');
-  el.textContent = t.correctAnswer(correctLabel); el.style.display = 'block';
+  const q=questions[currentQIndex];
+  const correctLabel=q.type==='truefalse'?(q.correct==='true'?t.trueCorrect:t.falseCorrect):`${q.correct}: ${q.options[q.correct]}`;
+  const el=document.getElementById('answer-reveal');
+  el.textContent=t.correctAnswer(correctLabel); el.style.display='block';
   scorePlayersForCurrentQuestion();
 }
 
 async function scorePlayersForCurrentQuestion() {
-  const q = questions[currentQIndex];
-  const answersSnap = await get(ref(db, `games/${gameCode}/answers/${currentQIndex}`));
-  const answers = answersSnap.val() || {};
-  const startSnap = await get(ref(db, `games/${gameCode}/questionStartedAt`));
-  const startedAt = startSnap.val() || Date.now();
-  const totalTime = (q.time || 20) * 1000;
-  const playersSnap = await get(ref(db, `games/${gameCode}/players`));
-  const players = playersSnap.val() || {};
-  const updates = {};
-  Object.entries(answers).forEach(([pid, ans]) => {
-    if (ans.answer === q.correct) {
-      const elapsed = ans.timestamp - startedAt;
-      const points = 500 + Math.max(0, Math.floor((1 - elapsed/totalTime) * 500));
-      updates[`games/${gameCode}/players/${pid}/score`] = (players[pid]?.score || 0) + points;
+  const q=questions[currentQIndex];
+  const answersSnap=await get(ref(db,`games/${gameCode}/answers/${currentQIndex}`));
+  const answers=answersSnap.val()||{};
+  const startSnap=await get(ref(db,`games/${gameCode}/questionStartedAt`));
+  const startedAt=startSnap.val()||Date.now();
+  const totalTime=(q.time||20)*1000;
+  const playersSnap=await get(ref(db,`games/${gameCode}/players`));
+  const players=playersSnap.val()||{};
+  const updates={};
+  Object.entries(answers).forEach(([pid,ans])=>{
+    if(ans.answer===q.correct){
+      const elapsed=ans.timestamp-startedAt;
+      const points=500+Math.max(0,Math.floor((1-elapsed/totalTime)*500));
+      updates[`games/${gameCode}/players/${pid}/score`]=(players[pid]?.score||0)+points;
     }
   });
-  if (Object.keys(updates).length > 0) await update(ref(db), updates);
+  if(Object.keys(updates).length>0) await update(ref(db),updates);
 }
 
 window.nextQuestion = function() {
   currentQIndex++;
-  if (currentQIndex >= questions.length) endGame(); else loadHostQuestion(currentQIndex);
+  if(currentQIndex>=questions.length) endGame(); else loadHostQuestion(currentQIndex);
 }
 
 async function endGame() {
   clearInterval(timerInterval);
-  await update(ref(db, `games/${gameCode}`), { status: 'finished' });
-  const snap = await get(ref(db, `games/${gameCode}/players`));
-  const players = snap.val() || {};
-  const sorted = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
+  await update(ref(db,`games/${gameCode}`),{status:'finished'});
+  const snap=await get(ref(db,`games/${gameCode}/players`));
+  const players=snap.val()||{};
+  const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+  // Save to history
+  if(currentUser) {
+    await push(ref(db,`users/${currentUser.uid}/gameHistory`),{
+      projectName:currentProjectName||'Juego',
+      playedAt:Date.now(), questionCount:questions.length,
+      players:Object.fromEntries(Object.values(players).map(p=>[p.name,{name:p.name,score:p.score||0}]))
+    });
+  }
   showScreen('screen-final');
-  const winner = sorted[0]?.[1];
-  document.getElementById('winner-display').innerHTML = winner
-    ? `<div class="winner-name">${winner.name}</div><div class="muted">${winner.score} pts</div>` : '';
-  renderScoreboard(players, 'final-scoreboard');
+  const winner=sorted[0]?.[1];
+  document.getElementById('winner-display').innerHTML=winner?`<div class="winner-name">${winner.name}</div><div class="muted">${winner.score} pts</div>`:'';
+  renderScoreboard(players,'final-scoreboard');
 }
 
-window.resetGame = function() {
-  currentQIndex = -1; playerAnswered = false; playerScore = 0;
-  questions = []; gameCode = null;
-  unsubscribers.forEach(u => u()); unsubscribers = [];
-  showScreen('screen-landing');
+// ── PLAYER ────────────────────────────────────────────
+window.showPlayerJoin = function() {
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get('code');
+  if(code) document.getElementById('player-code-input').value=code.toUpperCase();
+  showScreen('screen-player-join');
 }
 
-// ── PLAYER ─────────────────────────────────────────────
 window.joinGame = async function() {
-  const code = document.getElementById('player-code-input').value.trim().toUpperCase();
-  const name = document.getElementById('player-name-input').value.trim();
-  if (!code || code.length < 4) { toast(t.enterCode); return; }
-  if (!name) { toast(t.enterName); return; }
-  const gameSnap = await get(ref(db, `games/${code}`));
-  if (!gameSnap.exists()) { toast(t.codeNotFound); return; }
-  const game = gameSnap.val();
-  if (game.status === 'finished') { toast(t.gameFinished); return; }
-  // Sync language with host's game language
-  if (game.lang && game.lang !== lang) { setLang(game.lang); }
-  gameCode = code; playerName = name; questions = game.questions || [];
-  const playerRef = push(ref(db, `games/${gameCode}/players`));
-  playerId = playerRef.key;
-  await set(playerRef, { name, score: 0, joinedAt: Date.now() });
+  const code=document.getElementById('player-code-input').value.trim().toUpperCase();
+  const name=document.getElementById('player-name-input').value.trim();
+  if(!code||code.length<4){toast(t.enterCode);return;}
+  if(!name){toast(t.enterName);return;}
+  const gameSnap=await get(ref(db,`games/${code}`));
+  if(!gameSnap.exists()){toast(t.codeNotFound);return;}
+  const game=gameSnap.val();
+  if(game.status==='finished'){toast(t.gameFinished);return;}
+  if(game.lang&&game.lang!==lang) setLang(game.lang);
+  gameCode=code; playerName=name; questions=game.questions||[];
+  const playerRef=push(ref(db,`games/${gameCode}/players`));
+  playerId=playerRef.key;
+  await set(playerRef,{name,score:0,joinedAt:Date.now()});
   showScreen('screen-player-wait');
-  document.getElementById('player-wait-name').textContent = t.waitGreet(name);
-  document.getElementById('wait-text').textContent = t.waitText;
+  s('player-wait-name',t.waitGreet(name));
+  s('wait-text',t.waitText);
   listenGameState(); listenPlayerCount();
 }
 
 function listenPlayerCount() {
-  const unsub = onValue(ref(db, `games/${gameCode}/players`), snap => {
-    const count = Object.keys(snap.val() || {}).length;
-    document.getElementById('wait-player-count').textContent = t.waitCount(count);
+  const unsub=onValue(ref(db,`games/${gameCode}/players`),snap=>{
+    const count=Object.keys(snap.val()||{}).length;
+    s('wait-player-count',t.waitCount(count));
   });
   unsubscribers.push(unsub);
 }
 
 function listenGameState() {
-  const unsub = onValue(ref(db, `games/${gameCode}`), snap => {
-    const game = snap.val(); if (!game) return;
-    if (game.status === 'playing') {
-      const qi = game.currentQuestion;
-      if (qi !== undefined && qi !== currentQIndex) {
-        currentQIndex = qi; playerAnswered = false;
-        loadPlayerQuestion(qi, game.questionStartedAt);
+  const unsub=onValue(ref(db,`games/${gameCode}`),snap=>{
+    const game=snap.val(); if(!game) return;
+    if(game.status==='playing'){
+      const qi=game.currentQuestion;
+      if(qi!==undefined&&qi!==currentQIndex){
+        currentQIndex=qi; playerAnswered=false;
+        loadPlayerQuestion(qi,game.questionStartedAt);
       }
     }
-    if (game.status === 'finished') showPlayerFinal(game);
+    if(game.status==='finished') showPlayerFinal(game);
   });
   unsubscribers.push(unsub);
 }
 
-function loadPlayerQuestion(i, startedAt) {
-  const q = questions[i]; if (!q) return;
+function loadPlayerQuestion(i,startedAt) {
+  const q=questions[i]; if(!q) return;
   showScreen('screen-player-answer');
-  document.getElementById('player-q-counter').textContent = t.qCounterPlayer(i+1, questions.length);
-  document.getElementById('player-q-text').textContent = q.text;
-  document.getElementById('player-result').style.display = 'none';
-  const area = document.getElementById('player-answer-area');
-  if (q.type === 'truefalse') {
-    area.innerHTML = `<div class="tf-btns">
-      <button class="tf-btn true" onclick="submitPlayerAnswer('true')">${t.trueLabel}</button>
-      <button class="tf-btn false" onclick="submitPlayerAnswer('false')">${t.falseLabel}</button>
-    </div>`;
+  s('player-q-counter',t.qCounterPlayer(i+1,questions.length));
+  s('player-q-text',q.text);
+  document.getElementById('player-result').style.display='none';
+  const area=document.getElementById('player-answer-area');
+  if(q.type==='truefalse') {
+    area.innerHTML=`<div class="tf-btns"><button class="tf-btn true" onclick="submitPlayerAnswer('true')">${t.trueLabel}</button><button class="tf-btn false" onclick="submitPlayerAnswer('false')">${t.falseLabel}</button></div>`;
   } else {
-    area.innerHTML = `<div class="answer-btns">${['A','B','C','D'].map(k => `
-      <button class="answer-btn ${k}" onclick="submitPlayerAnswer('${k}')">
-        <span class="opt-letter">${k}</span><span>${q.options[k]}</span>
-      </button>`).join('')}</div>`;
+    area.innerHTML=`<div class="answer-btns">${['A','B','C','D'].map(k=>`<button class="answer-btn ${k}" onclick="submitPlayerAnswer('${k}')"><span class="opt-letter">${k}</span><span>${q.options[k]}</span></button>`).join('')}</div>`;
   }
-  startPlayerTimer(q.time || 20);
+  startPlayerTimer(q.time||20);
 }
 
 function startPlayerTimer(seconds) {
-  clearInterval(timerInterval); timeLeft = seconds;
-  const el = document.getElementById('player-timer');
-  el.textContent = timeLeft; el.className = 'player-timer';
-  timerInterval = setInterval(() => {
-    timeLeft--; el.textContent = timeLeft;
-    if (timeLeft <= 5) el.className = 'player-timer urgent';
-    if (timeLeft <= 0) { clearInterval(timerInterval); if (!playerAnswered) timeoutAnswer(); }
-  }, 1000);
+  clearInterval(timerInterval); timeLeft=seconds;
+  const el=document.getElementById('player-timer');
+  el.textContent=timeLeft; el.className='player-timer';
+  timerInterval=setInterval(()=>{
+    timeLeft--; el.textContent=timeLeft;
+    if(timeLeft<=5) el.className='player-timer urgent';
+    if(timeLeft<=0){clearInterval(timerInterval);if(!playerAnswered)timeoutAnswer();}
+  },1000);
 }
 
 window.submitPlayerAnswer = async function(answer) {
-  if (playerAnswered) return;
-  playerAnswered = true; clearInterval(timerInterval);
-  await set(ref(db, `games/${gameCode}/answers/${currentQIndex}/${playerId}`), { answer, timestamp: Date.now() });
-  const q = questions[currentQIndex];
-  const correct = answer === q.correct;
-  document.querySelectorAll('.answer-btn, .tf-btn').forEach(b => b.disabled = true);
-  const resultEl = document.getElementById('player-result');
-  resultEl.style.display = 'block';
-  if (correct) {
-    resultEl.innerHTML = `<div class="result-badge correct">${t.correct}</div>`;
-  } else {
-    const correctLabel = q.type === 'truefalse'
-      ? (q.correct === 'true' ? t.trueCorrect : t.falseCorrect)
-      : `${q.correct}: ${q.options[q.correct]}`;
-    resultEl.innerHTML = `<div class="result-badge wrong">${t.wrong(correctLabel)}</div>`;
+  if(playerAnswered) return;
+  playerAnswered=true; clearInterval(timerInterval);
+  await set(ref(db,`games/${gameCode}/answers/${currentQIndex}/${playerId}`),{answer,timestamp:Date.now()});
+  const q=questions[currentQIndex];
+  const correct=answer===q.correct;
+  document.querySelectorAll('.answer-btn,.tf-btn').forEach(b=>b.disabled=true);
+  const resultEl=document.getElementById('player-result');
+  resultEl.style.display='block';
+  if(correct) resultEl.innerHTML=`<div class="result-badge correct">${t.correct}</div>`;
+  else {
+    const correctLabel=q.type==='truefalse'?(q.correct==='true'?t.trueCorrect:t.falseCorrect):`${q.correct}: ${q.options[q.correct]}`;
+    resultEl.innerHTML=`<div class="result-badge wrong">${t.wrong(correctLabel)}</div>`;
   }
-  const unsub = onValue(ref(db, `games/${gameCode}/players/${playerId}/score`), snap => {
-    const score = snap.val() || 0;
-    playerScore = score;
-    document.getElementById('player-score-live').textContent = t.pts(score);
+  const unsub=onValue(ref(db,`games/${gameCode}/players/${playerId}/score`),snap=>{
+    playerScore=snap.val()||0;
+    s('player-score-live',t.pts(playerScore));
     unsub();
   });
 }
 
 function timeoutAnswer() {
-  playerAnswered = true;
-  document.querySelectorAll('.answer-btn, .tf-btn').forEach(b => b.disabled = true);
-  const resultEl = document.getElementById('player-result');
-  resultEl.style.display = 'block';
-  resultEl.innerHTML = `<div class="result-badge timeout">${t.timeout}</div>`;
+  playerAnswered=true;
+  document.querySelectorAll('.answer-btn,.tf-btn').forEach(b=>b.disabled=true);
+  const resultEl=document.getElementById('player-result');
+  resultEl.style.display='block';
+  resultEl.innerHTML=`<div class="result-badge timeout">${t.timeout}</div>`;
 }
 
 function showPlayerFinal(game) {
   clearInterval(timerInterval);
-  const players = game.players || {};
-  const sorted = Object.entries(players).sort((a,b) => (b[1].score||0)-(a[1].score||0));
-  const myRank = sorted.findIndex(([id]) => id === playerId) + 1;
-  const myScore = players[playerId]?.score || 0;
+  const players=game.players||{};
+  const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+  const myRank=sorted.findIndex(([id])=>id===playerId)+1;
+  const myScore=players[playerId]?.score||0;
   showScreen('screen-player-final');
-  document.getElementById('player-final-score').textContent = t.pts(myScore);
-  document.getElementById('player-final-rank').textContent = t.rankLabel(myRank, sorted.length);
-  document.getElementById('player-final-title').textContent = myRank===1 ? t.won : myRank<=3 ? t.great : t.goodGame;
-  document.getElementById('player-final-emoji').textContent = myRank===1?'🏆':myRank<=3?'🥈':'🎮';
-  renderScoreboard(players, 'player-final-scoreboard');
+  s('player-final-score',t.pts(myScore));
+  s('player-final-rank',t.rankLabel(myRank,sorted.length));
+  s('player-final-title',myRank===1?t.won:myRank<=3?t.great:t.goodGame);
+  document.getElementById('player-final-emoji').textContent=myRank===1?'🏆':myRank<=3?'🥈':'🎮';
+  renderScoreboard(players,'player-final-scoreboard');
 }
 
-// ── AUTO ROUTE ─────────────────────────────────────────
-const params = new URLSearchParams(window.location.search);
-if (params.get('code')) {
+// ── AUTO ROUTE ────────────────────────────────────────
+const params=new URLSearchParams(window.location.search);
+if(params.get('code')) {
   showScreen('screen-player-join');
-  document.getElementById('player-code-input').value = params.get('code').toUpperCase();
+  document.getElementById('player-code-input').value=params.get('code').toUpperCase();
 }
 applyTranslations();
 </script>
