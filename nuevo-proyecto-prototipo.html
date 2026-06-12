@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuevo Proyecto — Know It All</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#0D0D1A;--surface:#16162A;--surface2:#1E1E38;--accent:#7C3AED;--accent2:#A855F7;
+  --gold:#F59E0B;--green:#10B981;--red:#EF4444;--blue:#3B82F6;--text:#F1F0FF;
+  --muted:#8B8AA8;--border:#2A2A4A;--A:#7C3AED;--B:#0EA5E9;--C:#10B981;--D:#F59E0B;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── PAGE LAYOUT ── */
+.page-header{width:100%;background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+.page-header h1{font-size:1.2rem;font-weight:700;flex:1;}
+.page-body{width:100%;max-width:720px;padding:28px 20px;margin:0 auto;display:flex;flex-direction:column;gap:24px;}
+.logo-sm{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text);}
+.logo-sm span{color:var(--accent2);}
+
+/* ── BUTTONS ── */
+.btn{padding:11px 22px;border:none;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--accent);}
+.btn-google{background:white;color:#1a1a1a;border:none;border-radius:12px;padding:11px 20px;font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all 0.2s;}
+.btn-google:hover{background:#f0f0f0;}
+.btn-sm{padding:7px 14px;font-size:0.82rem;}
+.btn-icon{padding:8px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.btn-icon:hover{border-color:var(--accent);}
+
+/* ── INPUTS ── */
+input,textarea,select{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:0.95rem;padding:11px 14px;width:100%;outline:none;transition:border-color 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent2);}
+textarea{resize:vertical;min-height:140px;line-height:1.6;}
+label{font-size:0.75rem;color:var(--muted);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+
+/* ── CARDS / SECTIONS ── */
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px;}
+.section-card.ai-card{border-color:color-mix(in srgb,var(--accent) 40%,var(--border));background:color-mix(in srgb,var(--accent) 4%,var(--surface));}
+.section-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+.section-desc{font-size:0.82rem;color:var(--muted);line-height:1.5;}
+
+/* ── GOOGLE AUTH BANNER ── */
+.google-auth-banner{background:color-mix(in srgb,var(--blue) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--blue) 40%,var(--border));border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.google-auth-banner .info{flex:1;min-width:200px;}
+.google-auth-banner .info p{font-size:0.85rem;color:var(--text);font-weight:500;}
+.google-auth-banner .info span{font-size:0.78rem;color:var(--muted);}
+
+/* ── GENERATION OPTIONS ── */
+.gen-options{display:flex;flex-direction:column;gap:14px;}
+.gen-options-row{display:flex;gap:16px;flex-wrap:wrap;}
+.gen-option-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:140px;}
+.gen-option-group .option-label{font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;display:flex;align-items:center;gap:6px;}
+.tooltip-wrap{position:relative;display:inline-flex;}
+.tooltip-icon{width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:0.65rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;}
+.tooltip-icon:hover + .tooltip-box,.tooltip-wrap:hover .tooltip-box{display:block;}
+.tooltip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:0.78rem;color:var(--text);width:220px;line-height:1.5;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.tooltip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--border);}
+
+/* ── STATUS / LOADING ── */
+.gen-status{font-size:0.82rem;color:var(--muted);display:flex;align-items:center;gap:8px;min-height:20px;}
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.step-indicator{display:flex;gap:6px;align-items:center;font-size:0.78rem;color:var(--muted);}
+.step{padding:3px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);font-size:0.72rem;}
+.step.active{background:color-mix(in srgb,var(--accent) 20%,var(--surface2));border-color:var(--accent);color:var(--accent2);}
+.step.done{background:color-mix(in srgb,var(--green) 15%,var(--surface2));border-color:var(--green);color:var(--green);}
+
+/* ── QUESTIONS LIST ── */
+.questions-section{display:flex;flex-direction:column;gap:12px;}
+.questions-header{display:flex;align-items:center;justify-content:space-between;}
+.q-count-badge{background:var(--accent);color:white;border-radius:20px;padding:3px 12px;font-size:0.78rem;font-weight:700;}
+.question-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.2s;}
+.question-item:hover{border-color:var(--accent);}
+.question-item.expanded{border-color:var(--accent2);}
+.q-header{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;cursor:pointer;}
+.q-num{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted);min-width:26px;margin-top:2px;}
+.q-preview{flex:1;}
+.q-preview-text{font-size:0.9rem;font-weight:500;line-height:1.4;}
+.q-preview-correct{font-size:0.75rem;color:var(--green);margin-top:4px;}
+.q-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.badge{font-size:0.68rem;padding:2px 8px;border-radius:20px;font-weight:600;}
+.badge-type{background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);border:1px solid color-mix(in srgb,var(--accent) 40%,var(--border));}
+.badge-time{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.q-expand-icon{color:var(--muted);font-size:0.8rem;transition:transform 0.2s;margin-top:2px;}
+.question-item.expanded .q-expand-icon{transform:rotate(180deg);}
+.q-editor{display:none;padding:0 16px 16px;border-top:1px solid var(--border);margin-top:0;}
+.question-item.expanded .q-editor{display:flex;flex-direction:column;gap:12px;padding-top:14px;}
+.options-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.option-edit-row{display:flex;align-items:center;gap:8px;}
+.option-letter{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--muted);width:18px;flex-shrink:0;}
+.correct-radio{accent-color:var(--green);width:16px;height:16px;cursor:pointer;flex-shrink:0;}
+.q-editor-actions{display:flex;gap:8px;margin-top:4px;}
+.add-q-btn{border:2px dashed var(--border);background:transparent;border-radius:14px;padding:14px;width:100%;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.add-q-btn:hover{border-color:var(--accent);color:var(--accent2);}
+
+/* ── LAUNCH BAR ── */
+.launch-bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.launch-bar-left{font-size:0.85rem;color:var(--muted);}
+.launch-bar-left strong{color:var(--text);}
+
+/* ── EMPTY STATE ── */
+.empty-questions{text-align:center;padding:40px 20px;color:var(--muted);border:2px dashed var(--border);border-radius:14px;}
+.empty-questions .icon{font-size:2.5rem;margin-bottom:10px;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:0.875rem;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);width:100%;}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- HEADER -->
+<div class="page-header">
+  <button class="btn btn-secondary btn-sm" onclick="history.back()">←</button>
+  <div class="logo-sm">Know It <span>All</span></div>
+  <h1>Nuevo Proyecto</h1>
+  <div id="auth-status" style="font-size:0.8rem;color:var(--muted);"></div>
+</div>
+
+<div class="page-body">
+
+  <!-- ── SECCIÓN 1: DATOS DE ENTRADA ── -->
+  <div class="section-card ai-card">
+    <div>
+      <div class="section-title">✨ Generar preguntas con IA <span style="font-size:0.72rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Gemini</span></div>
+      <p class="section-desc" style="margin-top:6px;">Pega las respuestas de tus participantes en texto libre. La IA entiende el contexto y genera preguntas de trivia automáticamente. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
+    </div>
+
+    <!-- Google auth banner (shown if not Google-authenticated) -->
+    <div class="google-auth-banner" id="google-auth-banner" style="display:none;">
+      <svg width="22" height="22" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      <div class="info">
+        <p>Generación con Gemini requiere tu cuenta Google</p>
+        <span>Conecta tu cuenta para habilitar la generación con IA</span>
+      </div>
+      <button class="btn-google btn-sm" onclick="connectGoogle()">
+        <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Conectar Google
+      </button>
+    </div>
+
+    <!-- Input area -->
+    <div class="form-group">
+      <label>Datos de los participantes</label>
+      <textarea id="raw-data" placeholder="Ejemplo:
+
+Juan: 24 años, mascota: Winnie (perro), color favorito: azul
+
+Denise:
+Something funny you've done?
+- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER
+- I found my dog in a shelter
+- I ran a half marathon
+
+Lucía: 25 años, trabaja en Google, le gusta el sushi
+
+Pedro: 30 años, ha viajado a 15 países, habla 3 idiomas"></textarea>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Generation options with titles + tooltips -->
+    <div class="gen-options">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--muted);">Opciones de generación</div>
+      <div class="gen-options-row">
+
+        <!-- Número de preguntas -->
+        <div class="gen-option-group">
+          <div class="option-label">
+            Número de preguntas
+            <div class="tooltip-wrap">
+              <div class="tooltip-icon">?</div>
+              <div class="tooltip-box">Cuántas preguntas quieres que la IA genere a partir de los datos. Más datos = más variedad posible. Si tienes pocos datos, elige un número menor para evitar repeticiones.</div>
+            </div>
+          </div>
+          <select id="num-questions">
+            <option value="5">5 preguntas</option>
+            <option value="10" selected>10 preguntas</option>
+            <option value="15">15 preguntas</option>
+            <option value="20">20 preguntas</option>
+          </select>
+        </div>
+
+        <!-- Tipo de pregunta -->
+        <div class="gen-option-group">
+          <div class="option-label">
+            Tipo de pregunta
+            <div class="tooltip-wrap">
+              <div class="tooltip-icon">?</div>
+              <div class="tooltip-box"><strong>Mixto:</strong> combina preguntas de 4 opciones (A/B/C/D) con preguntas de Verdadero/Falso.<br><br><strong>Solo A-D:</strong> todas las preguntas tendrán 4 opciones para elegir.<br><br><strong>Solo V/F:</strong> todas serán Verdadero o Falso — más fáciles y rápidas.</div>
+            </div>
+          </div>
+          <select id="q-type-gen">
+            <option value="mixed">Mixto (A-D + V/F)</option>
+            <option value="multiple">Solo opción múltiple (A-D)</option>
+            <option value="truefalse">Solo Verdadero / Falso</option>
+          </select>
+        </div>
+
+        <!-- Idioma de las preguntas -->
+        <div class="gen-option-group">
+          <div class="option-label">
+            Idioma de las preguntas
+            <div class="tooltip-wrap">
+              <div class="tooltip-icon">?</div>
+              <div class="tooltip-box">En qué idioma quieres que la IA redacte las preguntas y las opciones de respuesta. Los datos de entrada pueden estar en cualquier idioma.</div>
+            </div>
+          </div>
+          <select id="q-lang">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <!-- Dificultad -->
+        <div class="gen-option-group">
+          <div class="option-label">
+            Dificultad
+            <div class="tooltip-wrap">
+              <div class="tooltip-icon">?</div>
+              <div class="tooltip-box"><strong>Fácil:</strong> las opciones incorrectas son muy distintas de la correcta.<br><br><strong>Medio:</strong> los distractores son plausibles pero distinguibles.<br><br><strong>Difícil:</strong> todas las opciones suenan muy similares — solo quien conoce bien a la persona acertará.</div>
+            </div>
+          </div>
+          <select id="q-difficulty">
+            <option value="easy">Fácil</option>
+            <option value="medium" selected>Medio</option>
+            <option value="hard">Difícil</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Generate button + status -->
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="generateQuestions()" id="gen-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        Generar con Gemini
+      </button>
+      <div class="gen-status" id="gen-status"></div>
+    </div>
+
+    <!-- Step indicator (visible during generation) -->
+    <div class="step-indicator" id="step-indicator" style="display:none;">
+      <div class="step" id="step-1">1. Leyendo datos</div>
+      <div style="color:var(--border);">›</div>
+      <div class="step" id="step-2">2. Generando preguntas</div>
+      <div style="color:var(--border);">›</div>
+      <div class="step" id="step-3">3. Revisando calidad</div>
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN 2: PREGUNTAS GENERADAS ── -->
+  <div class="questions-section" id="questions-section" style="display:none;">
+    <div class="questions-header">
+      <div style="font-size:1rem;font-weight:700;">Preguntas generadas</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="q-count-badge" id="q-count-badge">0</span>
+        <button class="btn btn-secondary btn-sm" onclick="clearQuestions()">🗑 Limpiar</button>
+      </div>
+    </div>
+    <div id="questions-list"></div>
+    <button class="add-q-btn" onclick="addManualQuestion()">+ Agregar pregunta manual</button>
+  </div>
+
+</div>
+
+<!-- LAUNCH BAR (sticky bottom, shown when questions exist) -->
+<div class="launch-bar" id="launch-bar" style="display:none;">
+  <div class="launch-bar-left">
+    <strong id="launch-count">0 preguntas</strong> listas para jugar
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-secondary btn-sm" onclick="saveProject()">💾 Guardar</button>
+    <button class="btn btn-primary" onclick="launchGame()">🚀 Crear sala →</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────
+const GEMINI_API_KEY = 'AQ.Ab8RN6L-lnTNEyL16TjrHl7zBMtkSHF5v2Y_l0EYy_UrSM9mqw';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+// ── STATE ────────────────────────────────────────────
+let questions = [];
+let isGoogleAuthed = true; // In full app, check Firebase Auth provider
+let editingIndex = -1;
+
+// ── TOAST ────────────────────────────────────────────
+function toast(msg, dur=2800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ── GOOGLE AUTH (lazy) ────────────────────────────────
+function checkGoogleAuth() {
+  // In full app: check if currentUser.providerData includes Google
+  // For prototype: simulate with a flag
+  if (!isGoogleAuthed) {
+    document.getElementById('google-auth-banner').style.display = 'flex';
+    return false;
+  }
+  return true;
+}
+
+window.connectGoogle = function() {
+  // In full app: Firebase linkWithPopup(GoogleAuthProvider)
+  // Prototype: simulate success
+  isGoogleAuthed = true;
+  document.getElementById('google-auth-banner').style.display = 'none';
+  document.getElementById('auth-status').textContent = '✓ Google conectado';
+  toast('✅ Cuenta Google conectada');
+}
+
+// ── GENERATION ───────────────────────────────────────
+window.generateQuestions = async function() {
+  if (!checkGoogleAuth()) return;
+
+  const rawData = document.getElementById('raw-data').value.trim();
+  if (!rawData) { toast('⚠️ Pega los datos primero'); return; }
+
+  const numQ   = document.getElementById('num-questions').value;
+  const qType  = document.getElementById('q-type-gen').value;
+  const qLang  = document.getElementById('q-lang').value;
+  const diff   = document.getElementById('q-difficulty').value;
+
+  const typeInstr = {
+    mixed:     qLang === 'es' ? 'una mezcla de preguntas de opción múltiple (A/B/C/D) y Verdadero/Falso' : 'a mix of multiple choice (A/B/C/D) and True/False questions',
+    multiple:  qLang === 'es' ? 'todas de opción múltiple con 4 opciones (A/B/C/D)' : 'all multiple choice with 4 options (A/B/C/D)',
+    truefalse: qLang === 'es' ? 'todas de Verdadero/Falso' : 'all True/False'
+  }[qType];
+
+  const diffInstr = {
+    easy:   qLang === 'es' ? 'Los distractores deben ser claramente distintos de la respuesta correcta (dificultad fácil).' : 'Distractors should be clearly different from the correct answer (easy difficulty).',
+    medium: qLang === 'es' ? 'Los distractores deben ser plausibles pero distinguibles (dificultad media).' : 'Distractors should be plausible but distinguishable (medium difficulty).',
+    hard:   qLang === 'es' ? 'Los distractores deben ser muy similares a la respuesta correcta, difíciles de distinguir (dificultad alta).' : 'Distractors should be very similar to the correct answer, hard to distinguish (hard difficulty).'
+  }[diff];
+
+  const langInstr = qLang === 'es'
+    ? 'Genera todas las preguntas y opciones en ESPAÑOL.'
+    : 'Generate all questions and options in ENGLISH.';
+
+  const systemPrompt = `You are an expert trivia question designer for a Kahoot-style party game called "Know It All". Your job is to create fun, engaging trivia questions about real people based on free-form data provided by the host.
+
+RULES:
+1. ${langInstr}
+2. Create exactly ${numQ} questions in ${typeInstr}.
+3. ${diffInstr}
+4. CAPS detection: if the input has items in ALL CAPS, those are the CORRECT answers. Use them as the correct option and put the lowercase items as distractors.
+5. For numeric data (ages, years, counts): create questions asking about specific people, or asking WHO has a specific value.
+6. For free-form stories: extract the key fact and create a question about it.
+7. Make distractors from OTHER people's real data when possible — this makes the game more fun and tricky.
+8. Vary question formats: "Who...?", "How many...?", "What did X do...?", "Which of these is true about X?", "True or False: X...".
+9. Keep questions concise and fun. Avoid boring or overly formal phrasing.
+10. For True/False questions, make sure both true and false questions are included when using "mixed" type.
+
+OUTPUT FORMAT: Respond with ONLY a valid JSON array, no markdown, no explanation, no extra text. Exactly this structure:
+[
+  {
+    "text": "Question text here?",
+    "type": "multiple",
+    "options": {"A": "option A", "B": "option B", "C": "option C", "D": "option D"},
+    "correct": "A",
+    "time": 20
+  },
+  {
+    "text": "True or False: ...",
+    "type": "truefalse",
+    "options": {"true": "${qLang === 'es' ? 'Verdadero' : 'True'}", "false": "${qLang === 'es' ? 'Falso' : 'False'}"},
+    "correct": "true",
+    "time": 15
+  }
+]
+
+PARTICIPANT DATA:
+${rawData}`;
+
+  // UI: loading state
+  const btn = document.getElementById('gen-btn');
+  const statusEl = document.getElementById('gen-status');
+  const stepEl = document.getElementById('step-indicator');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner"></div> Generando...`;
+  stepEl.style.display = 'flex';
+  statusEl.innerHTML = '';
+
+  const setStep = (n) => {
+    [1,2,3].forEach(i => {
+      const el = document.getElementById(`step-${i}`);
+      el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    });
+  };
+
+  try {
+    setStep(1);
+    await delay(600);
+    setStep(2);
+
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: systemPrompt }] }],
+        generationConfig: {
+          temperature: 0.8,
+          maxOutputTokens: 2048,
+        }
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'API error');
+    }
+
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    setStep(3);
+    await delay(400);
+
+    // Parse JSON — strip possible markdown fences
+    const clean = rawText.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No questions returned');
+
+    questions = [...questions, ...parsed];
+    renderQuestions();
+    statusEl.innerHTML = `<span style="color:var(--green)">✅ ${parsed.length} preguntas generadas</span>`;
+    toast(`✅ ${parsed.length} preguntas listas para revisar`);
+    document.getElementById('questions-section').style.display = 'flex';
+    document.getElementById('questions-section').scrollIntoView({ behavior: 'smooth' });
+
+  } catch(e) {
+    console.error(e);
+    statusEl.innerHTML = `<span style="color:var(--red)">❌ ${e.message || 'Error al generar. Intenta de nuevo.'}</span>`;
+    setStep(0);
+    toast('❌ Error al generar preguntas');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> Generar con Gemini`;
+  setTimeout(() => { stepEl.style.display = 'none'; }, 2000);
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── RENDER QUESTIONS ──────────────────────────────────
+function renderQuestions() {
+  const list = document.getElementById('questions-list');
+  const badge = document.getElementById('q-count-badge');
+  const launchBar = document.getElementById('launch-bar');
+  const launchCount = document.getElementById('launch-count');
+  const qLang = document.getElementById('q-lang').value;
+
+  badge.textContent = questions.length;
+  launchCount.textContent = `${questions.length} pregunta${questions.length !== 1 ? 's' : ''}`;
+  launchBar.style.display = questions.length > 0 ? 'flex' : 'none';
+  document.getElementById('questions-section').style.display = questions.length > 0 ? 'flex' : 'none';
+
+  list.innerHTML = '';
+  questions.forEach((q, i) => {
+    const isExpanded = editingIndex === i;
+    const correctLabel = q.type === 'truefalse'
+      ? (q.correct === 'true' ? (qLang === 'es' ? 'Verdadero' : 'True') : (qLang === 'es' ? 'Falso' : 'False'))
+      : `${q.correct}: ${q.options?.[q.correct] || ''}`;
+
+    const optionsEditHTML = q.type === 'truefalse' ? `
+      <div style="display:flex;gap:16px;align-items:center;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:6px;text-transform:none;font-size:0.9rem;cursor:pointer;">
+          <input type="radio" name="correct-${i}" value="true" ${q.correct==='true'?'checked':''} class="correct-radio" onchange="setCorrect(${i},'true')">
+          ✓ ${qLang==='es'?'Verdadero':'True'}
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;text-transform:none;font-size:0.9rem;cursor:pointer;">
+          <input type="radio" name="correct-${i}" value="false" ${q.correct==='false'?'checked':''} class="correct-radio" onchange="setCorrect(${i},'false')">
+          ✗ ${qLang==='es'?'Falso':'False'}
+        </label>
+      </div>` : ['A','B','C','D'].map(k => `
+      <div class="option-edit-row">
+        <span class="option-letter">${k}</span>
+        <input type="text" value="${(q.options?.[k]||'').replace(/"/g,'&quot;')}" oninput="updateOption(${i},'${k}',this.value)" style="flex:1;">
+        <label style="display:flex;align-items:center;gap:4px;text-transform:none;font-size:0.78rem;color:var(--muted);cursor:pointer;white-space:nowrap;">
+          <input type="radio" name="correct-${i}" value="${k}" ${q.correct===k?'checked':''} class="correct-radio" onchange="setCorrect(${i},'${k}')">
+          ✓
+        </label>
+      </div>`).join('');
+
+    const div = document.createElement('div');
+    div.className = `question-item${isExpanded ? ' expanded' : ''}`;
+    div.innerHTML = `
+      <div class="q-header" onclick="toggleExpand(${i})">
+        <span class="q-num">${String(i+1).padStart(2,'0')}</span>
+        <div class="q-preview">
+          <div class="q-preview-text">${q.text}</div>
+          <div class="q-preview-correct">✓ ${correctLabel}</div>
+        </div>
+        <div class="q-badges">
+          <span class="badge badge-type">${q.type==='truefalse'?'V/F':'A-D'}</span>
+          <span class="badge badge-time">${q.time||20}s</span>
+        </div>
+        <span class="q-expand-icon">▾</span>
+      </div>
+      <div class="q-editor">
+        <div class="form-group">
+          <label>${qLang==='es'?'Pregunta':'Question'}</label>
+          <input type="text" value="${q.text.replace(/"/g,'&quot;')}" oninput="updateQText(${i},this.value)">
+        </div>
+        <div class="form-group">
+          <label>${qLang==='es'?'Opciones (marca la correcta)':'Options (mark the correct one)'}</label>
+          ${optionsEditHTML}
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="form-group" style="flex:1;">
+            <label>${qLang==='es'?'Tiempo (seg)':'Time (sec)'}</label>
+            <input type="number" value="${q.time||20}" min="5" max="60" oninput="updateTime(${i},this.value)" style="width:90px;">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>${qLang==='es'?'Tipo':'Type'}</label>
+            <select onchange="updateType(${i},this.value)">
+              <option value="multiple" ${q.type==='multiple'?'selected':''}>A-D</option>
+              <option value="truefalse" ${q.type==='truefalse'?'selected':''}>V/F</option>
+            </select>
+          </div>
+        </div>
+        <div class="q-editor-actions">
+          <button class="btn btn-secondary btn-sm" onclick="toggleExpand(${i})">
+            ${qLang==='es'?'✓ Listo':'✓ Done'}
+          </button>
+          <button class="btn btn-sm" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 30%,var(--border));" onclick="deleteQuestion(${i})">
+            🗑 ${qLang==='es'?'Eliminar':'Delete'}
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="moveQuestion(${i},-1)" ${i===0?'disabled':''}>↑</button>
+          <button class="btn btn-secondary btn-sm" onclick="moveQuestion(${i},1)" ${i===questions.length-1?'disabled':''}>↓</button>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+// ── QUESTION EDITING ─────────────────────────────────
+window.toggleExpand = function(i) {
+  editingIndex = editingIndex === i ? -1 : i;
+  renderQuestions();
+}
+window.updateQText  = function(i, v) { questions[i].text = v; updateLaunchBar(); }
+window.updateOption = function(i, k, v) { if (!questions[i].options) questions[i].options = {}; questions[i].options[k] = v; }
+window.setCorrect   = function(i, v) { questions[i].correct = v; renderQuestions(); }
+window.updateTime   = function(i, v) { questions[i].time = parseInt(v) || 20; }
+window.updateType   = function(i, v) {
+  questions[i].type = v;
+  if (v === 'truefalse') {
+    const qLang = document.getElementById('q-lang').value;
+    questions[i].options = { true: qLang==='es'?'Verdadero':'True', false: qLang==='es'?'Falso':'False' };
+    questions[i].correct = 'true';
+  } else {
+    if (!questions[i].options?.A) questions[i].options = { A:'', B:'', C:'', D:'' };
+    questions[i].correct = 'A';
+  }
+  renderQuestions();
+}
+window.deleteQuestion = function(i) {
+  questions.splice(i, 1);
+  if (editingIndex >= questions.length) editingIndex = -1;
+  renderQuestions();
+}
+window.moveQuestion = function(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= questions.length) return;
+  [questions[i], questions[j]] = [questions[j], questions[i]];
+  if (editingIndex === i) editingIndex = j;
+  else if (editingIndex === j) editingIndex = i;
+  renderQuestions();
+}
+
+window.addManualQuestion = function() {
+  const qLang = document.getElementById('q-lang').value;
+  questions.push({
+    text: qLang==='es' ? 'Nueva pregunta' : 'New question',
+    type: 'multiple',
+    options: qLang==='es'
+      ? { A:'Opción A', B:'Opción B', C:'Opción C', D:'Opción D' }
+      : { A:'Option A', B:'Option B', C:'Option C', D:'Option D' },
+    correct: 'A', time: 20
+  });
+  editingIndex = questions.length - 1;
+  renderQuestions();
+  setTimeout(() => document.getElementById('questions-list').lastElementChild?.scrollIntoView({ behavior:'smooth' }), 100);
+}
+
+window.clearQuestions = function() {
+  if (questions.length === 0) return;
+  if (!confirm('¿Eliminar todas las preguntas?')) return;
+  questions = []; editingIndex = -1;
+  renderQuestions();
+}
+
+function updateLaunchBar() {
+  document.getElementById('launch-count').textContent = `${questions.length} pregunta${questions.length !== 1 ? 's' : ''}`;
+}
+
+// ── LAUNCH / SAVE ─────────────────────────────────────
+window.saveProject = function() {
+  // Hook: in full app, call saveProject() from main app
+  toast('💾 En la app completa: guarda el proyecto en Firebase');
+}
+window.launchGame = function() {
+  // Hook: in full app, call goToLobby()
+  if (questions.length === 0) { toast('⚠️ Agrega preguntas primero'); return; }
+  toast(`🚀 En la app completa: lanzaría la sala con ${questions.length} preguntas`);
+}
+
+// ── INIT ──────────────────────────────────────────────
+// Simulate: show google banner if not Google-authed
+// In full app: check auth.currentUser.providerData
+const simulateNoGoogle = new URLSearchParams(location.search).get('noGoogle');
+if (simulateNoGoogle) {
+  isGoogleAuthed = false;
+  document.getElementById('google-auth-banner').style.display = 'flex';
+} else {
+  document.getElementById('auth-status').textContent = '✓ Google conectado';
+}
+</script>
+</body>
+</html>
