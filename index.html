@@ -642,7 +642,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
     <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn" disabled>Siguiente →</button>
   </div>
-
+</div><!-- /screen-host-game -->
 
 <!-- ══ HOST FINAL ══ -->
 <div id="screen-final" class="screen">
@@ -701,6 +701,25 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   <div class="scoreboard" id="player-final-scoreboard" style="max-width:400px;"></div>
   <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-play-again-p">Volver</button>
 </div>
+
+<script>
+// Critical navigation functions — defined before module loads
+// These work even if Firebase/module hasn't loaded yet
+function showPlayerJoin() {
+  var screens = document.querySelectorAll('.screen');
+  screens.forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('screen-player-join').classList.add('active');
+}
+function showScreen(id) {
+  var screens = document.querySelectorAll('.screen');
+  screens.forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+// These will be overridden by the module once it loads
+window.showPlayerJoin = showPlayerJoin;
+window.showScreen = showScreen;
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
