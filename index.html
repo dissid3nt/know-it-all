@@ -1075,6 +1075,20 @@ window.signOut = async function() {
 
 onAuthStateChanged(auth, user => {
   currentUser = user;
+
+  // If URL has ?code=, always go to player join — don't redirect to dashboard
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('code')) {
+    showScreen('screen-player-join');
+    document.getElementById('player-code-input').value = urlParams.get('code').toUpperCase();
+    // Pre-fill name if logged in
+    if (user) {
+      const name = user.displayName || user.email?.split('@')[0] || '';
+      document.getElementById('player-name-input').value = name;
+    }
+    return;
+  }
+
   if (user) {
     // Load user settings
     get(ref(db, `users/${user.uid}/settings`)).then(snap => {
@@ -1928,6 +1942,8 @@ function initDragDrop() {
 }
 
 // ── AUTO ROUTE ────────────────────────────────────────
+// Note: onAuthStateChanged above handles ?code= routing authoritatively.
+// This is a fast first-paint so mobile doesn't show a blank screen.
 const params=new URLSearchParams(window.location.search);
 if(params.get('code')) {
   showScreen('screen-player-join');
