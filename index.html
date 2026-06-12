@@ -607,18 +607,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 <!-- ══ CANCEL GAME FLYOUT ══ -->
 <!-- ══ HOST GAME ══ -->
 <div id="screen-host-game" class="screen">
-  <!-- Cancel confirmation flyout (inside screen so z-index works) -->
-  <div class="modal-overlay" id="modal-cancel-game">
-    <div class="modal" style="max-width:360px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
-      <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
-      <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
-        <button class="btn btn-secondary" onclick="closeModal('modal-cancel-game')" id="btn-keep-playing">No, seguir jugando</button>
-      </div>
-    </div>
-  </div>
+  <!-- cancel modal moved to end of body -->
   <div class="host-header">
     <span class="muted" id="host-q-counter">Pregunta 1/10</span>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -716,6 +705,17 @@ function showScreen(id) {
   var el = document.getElementById(id);
   if (el) el.classList.add('active');
 }
+// openModal / closeModal — needed for cancel button before module loads
+function openModal(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.add('open');
+}
+function closeModal(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+window.openModal = openModal;
+window.closeModal = closeModal;
 // These will be overridden by the module once it loads
 window.showPlayerJoin = showPlayerJoin;
 window.showScreen = showScreen;
@@ -1983,6 +1983,19 @@ try {
   if (!anyActive) showScreen('screen-landing');
 }
 </script>
+
+<!-- ══ CANCEL GAME MODAL (outside all screens for proper z-index) ══ -->
+<div class="modal-overlay" id="modal-cancel-game">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
+    <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
+    <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-cancel-game')" id="btn-keep-playing">No, seguir jugando</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // Sync routing — runs after DOM is ready, before Firebase resolves
