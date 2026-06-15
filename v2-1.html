@@ -2602,16 +2602,7 @@ function loadPlayerQuestion(i,startedAt) {
   startPlayerTimer(q.time||20);
 }
 
-function startPlayerTimer(seconds) {
-  clearInterval(timerInterval); timeLeft=seconds;
-  const el=document.getElementById('player-timer');
-  el.textContent=timeLeft; el.className='player-timer';
-  timerInterval=setInterval(()=>{
-    timeLeft--; el.textContent=timeLeft;
-    if(timeLeft<=5) el.className='player-timer urgent';
-    if(timeLeft<=0){clearInterval(timerInterval);if(!playerAnswered)timeoutAnswer();}
-  },1000);
-}
+// startPlayerTimer consolidated in V2.1 below
 
 window.submitPlayerAnswer = async function(answer) {
   if(playerAnswered) return;
