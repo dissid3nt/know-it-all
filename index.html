@@ -950,16 +950,30 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         <div><div class="settings-row-label" id="settings-theme-label">Apariencia</div></div>
         <button onclick="toggleTheme()" id="settings-theme-btn" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:7px 16px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;color:var(--text2);cursor:pointer;">☀️ Light</button>
       </div>
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:14px;">
         <div class="settings-row-label" id="settings-music-label">Música de fondo</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;width:100%;" id="music-theme-selector">
-          <button class="music-theme-btn active" data-theme="chill" onclick="setMusicTheme('chill')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">🌊 Chill</button>
-          <button class="music-theme-btn" data-theme="upbeat" onclick="setMusicTheme('upbeat')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">⚡ Upbeat</button>
-          <button class="music-theme-btn" data-theme="mysterious" onclick="setMusicTheme('mysterious')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">🌙 Misterioso</button>
-          <button class="music-theme-btn" data-theme="retro" onclick="setMusicTheme('retro')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">👾 Retro</button>
-          <button class="music-theme-btn" data-theme="off" onclick="setMusicTheme('off')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">🔕 Sin música</button>
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="music-theme-btn active" data-theme="funk" onclick="setMusicTheme('funk')" style="flex:1;padding:9px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;text-align:left;">🕹️ Arcade Funk</button>
+            <button class="music-preview-btn" data-theme="funk" onclick="previewMusic('funk')" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:0.85rem;flex-shrink:0;transition:all 0.2s;">▶</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="music-theme-btn" data-theme="tropical" onclick="setMusicTheme('tropical')" style="flex:1;padding:9px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;text-align:left;">🌴 Tropical Pop</button>
+            <button class="music-preview-btn" data-theme="tropical" onclick="previewMusic('tropical')" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:0.85rem;flex-shrink:0;transition:all 0.2s;">▶</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="music-theme-btn" data-theme="mansion" onclick="setMusicTheme('mansion')" style="flex:1;padding:9px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;text-align:left;">👻 Haunted Castle</button>
+            <button class="music-preview-btn" data-theme="mansion" onclick="previewMusic('mansion')" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:0.85rem;flex-shrink:0;transition:all 0.2s;">▶</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="music-theme-btn" data-theme="garden" onclick="setMusicTheme('garden')" style="flex:1;padding:9px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;text-align:left;">🌸 Garden Party</button>
+            <button class="music-preview-btn" data-theme="garden" onclick="previewMusic('garden')" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:0.85rem;flex-shrink:0;transition:all 0.2s;">▶</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="music-theme-btn" data-theme="off" onclick="setMusicTheme('off')" style="flex:1;padding:9px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;text-align:left;">🔕 Sin música</button>
+          </div>
         </div>
-        <div style="font-size:0.75rem;color:var(--text3);" id="music-preview-hint">La música suena durante el juego. Puedes silenciar con 🔊 en el topbar.</div>
+        <div style="font-size:0.75rem;color:var(--text3);" id="music-preview-hint">▶ preview · La música suena al iniciar el juego · 🔊 mute en la partida</div>
       </div>
       <div class="settings-row">
         <div><div class="settings-row-label" id="settings-lang-label">Idioma por defecto</div></div>
@@ -2097,6 +2111,7 @@ window.editDisplayName = async function() {
 // toggleTheme defined in fallback script above module
 
 window.goToDashboard = function() {
+  stopPreview();
   questions = []; currentQIndex = -1; gameCode = null;
   unsubscribers.forEach(u=>u()); unsubscribers=[];
   if (currentUser) { loadDashboard(); showScreen('screen-dashboard'); }
@@ -3348,115 +3363,205 @@ window.toggleMute = function() {
 }
 
 // ── BACKGROUND MUSIC ─────────────────────────────
-let currentTheme = localStorage.getItem('nia_theme_music') || 'chill';
+let currentTheme = localStorage.getItem('nia_theme_music') || 'funk';
+let previewNodes = null;
 
-const THEMES = {
-  chill: {
-    name: '🌊 Chill',
-    nameEs: '🌊 Chill',
-    pad: [261.63, 329.63, 392.00, 523.25],   // C maj
-    padType: 'sine', padVol: 0.06, lfoRate: 0.12,
-    pluckNotes: [523.25, 659.25, 783.99, 1046.50],
-    pluckInterval: 2200, pluckVol: 0.07,
+// ── TRACK DEFINITIONS ──────────────────────────────
+const TRACKS = {
+  funk: {
+    name:'🕹️ Arcade Funk', bpm:118,
+    melody:[[659,0.5,0.22],[0,0.25,0],[784,0.25,0.22],[880,0.5,0.22],[784,0.25,0.22],[0,0.25,0],[659,0.25,0.22],[0,0.25,0],[523,0.25,0.22],[659,0.25,0.22],[587,0.75,0.25],[0,0.25,0],[659,0.5,0.22],[0,0.25,0],[784,0.25,0.22],[1047,0.5,0.22],[880,0.25,0.22],[784,0.25,0.22],[659,0.25,0.22],[784,0.25,0.22],[659,0.25,0.22],[523,0.25,0.22],[440,1.0,0.28]],
+    melodyType:'sawtooth', bass:[110,146.83,110,130.81], bassType:'square',
+    drum:true, kickEvery:1, snareOn:[1,3],
   },
-  upbeat: {
-    name: '⚡ Upbeat',
-    nameEs: '⚡ Upbeat',
-    pad: [293.66, 369.99, 440.00, 587.33],   // D maj
-    padType: 'triangle', padVol: 0.07, lfoRate: 0.3,
-    pluckNotes: [587.33, 739.99, 880.00, 1174.66],
-    pluckInterval: 1200, pluckVol: 0.09,
+  tropical: {
+    name:'🌴 Tropical Pop', bpm:112,
+    melody:[[880,0.25,0.28],[784,0.25,0.28],[659,0.25,0.28],[523,0.25,0.28],[587,0.5,0.28],[659,0.5,0.28],[784,0.25,0.28],[880,0.25,0.28],[1047,0.5,0.3],[880,0.5,0.28],[784,0.25,0.28],[659,0.25,0.28],[523,0.25,0.28],[440,0.25,0.28],[494,0.5,0.28],[523,0.25,0.28],[587,0.25,0.28],[659,0.25,0.28],[784,0.25,0.28],[659,0.25,0.28],[523,0.5,0.3],[0,0.25,0]],
+    melodyType:'triangle', bass:[130.81,164.81,196,164.81], bassType:'triangle',
+    drum:true, kickEvery:1, snareOn:[1,3],
   },
-  mysterious: {
-    name: '🌙 Misterioso',
-    nameEs: '🌙 Misterioso',
-    pad: [246.94, 293.66, 369.99, 493.88],   // B min
-    padType: 'sine', padVol: 0.05, lfoRate: 0.08,
-    pluckNotes: [493.88, 587.33, 739.99, 987.77],
-    pluckInterval: 3000, pluckVol: 0.05,
+  mansion: {
+    name:'👻 Haunted Castle', bpm:110,
+    melody:[[440,0.25,0.28],[0,0.25,0],[523,0.25,0.26],[0,0.25,0],[494,0.5,0.3],[0,0.25,0],[415,0.25,0.28],[440,0.25,0.26],[0,0.125,0],[392,0.125,0.24],[440,0.25,0.28],[0,0.25,0],[349,0.75,0.3],[0,0.25,0],[370,0.25,0.28],[0,0.25,0],[440,0.25,0.26],[0,0.25,0],[494,0.5,0.28],[0,0.25,0],[523,0.25,0.26],[494,0.25,0.26],[440,0.25,0.26],[415,0.25,0.24],[392,0.25,0.22],[440,1.0,0.32]],
+    melodyType:'square', bass:[110,130.81,82.41,98.00], bassType:'triangle',
+    drum:true, kickEvery:2, snareOn:[2],
+    pad:true, padNotes:[220,261.63,329.63], padVol:0.04,
   },
-  retro: {
-    name: '👾 Retro',
-    nameEs: '👾 Retro',
-    pad: [220.00, 277.18, 329.63, 440.00],   // A min
-    padType: 'square', padVol: 0.04, lfoRate: 0.5,
-    pluckNotes: [440.00, 554.37, 659.25, 880.00],
-    pluckInterval: 800, pluckVol: 0.06,
+  garden: {
+    name:'🌸 Garden Party', bpm:90,
+    melody:[[523,0.5,0.26],[659,0.5,0.26],[784,0.25,0.26],[880,0.25,0.26],[784,0.25,0.24],[659,0.25,0.24],[523,0.75,0.28],[0,0.25,0],[659,0.5,0.26],[523,0.25,0.24],[440,0.25,0.24],[494,0.5,0.26],[523,0.5,0.28],[587,0.25,0.26],[659,0.25,0.26],[784,0.5,0.28],[659,0.5,0.26],[523,0.25,0.26],[440,0.25,0.24],[392,0.25,0.22],[440,0.25,0.24],[523,1.0,0.3]],
+    melodyType:'triangle', bass:[130.81,196.00,174.61,196.00], bassType:'sine',
+    drum:true, kickEvery:1, snareOn:[2], lightDrum:true,
   },
-  off: {
-    name: '🔕 Sin música',
-    nameEs: '🔕 Sin música',
-  }
+  off: { name:'🔕 Sin música', bpm:0 },
 };
+
+// ── PATTERN SCHEDULER ─────────────────────────────
+function schedulePattern(track, startTime) {
+  const c = getAudioCtx();
+  const beatLen = 60 / track.bpm;
+  const nodes = [];
+  let t = startTime;
+
+  // Melody
+  track.melody.forEach(([freq, dur, vol]) => {
+    if (freq > 0 && vol > 0) {
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = track.melodyType;
+      osc.frequency.value = freq;
+      const noteEnd = t + dur * beatLen * 0.75;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, Math.max(t + 0.02, noteEnd));
+      osc.connect(g); g.connect(c.destination);
+      osc.start(t); osc.stop(noteEnd + 0.05);
+      nodes.push(osc, g);
+    }
+    t += dur * beatLen;
+  });
+  const patternDur = t - startTime;
+
+  // Pad
+  if (track.pad) {
+    track.padNotes.forEach((freq, i) => {
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      g.gain.setValueAtTime(0, startTime);
+      g.gain.linearRampToValueAtTime(track.padVol * (1-i*0.02), startTime+0.3);
+      g.gain.setValueAtTime(track.padVol * (1-i*0.02), startTime+patternDur-0.3);
+      g.gain.linearRampToValueAtTime(0, startTime+patternDur);
+      osc.connect(g); g.connect(c.destination);
+      osc.start(startTime); osc.stop(startTime+patternDur);
+      nodes.push(osc, g);
+    });
+  }
+
+  // Bass
+  const bassDur = patternDur / track.bass.length;
+  track.bass.forEach((freq, i) => {
+    const bt = startTime + i * bassDur;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = track.bassType; osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.2, bt);
+    g.gain.exponentialRampToValueAtTime(0.001, bt + bassDur * 0.8);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(bt); osc.stop(bt + bassDur * 0.85);
+    nodes.push(osc, g);
+  });
+
+  // Drums
+  if (track.drum) {
+    const beats = Math.floor(patternDur / beatLen);
+    for (let k = 0; k < beats / track.kickEvery; k++) {
+      const kt = startTime + k * track.kickEvery * beatLen;
+      const ko = c.createOscillator(); const kg = c.createGain();
+      ko.type = 'sine';
+      ko.frequency.setValueAtTime(120, kt);
+      ko.frequency.exponentialRampToValueAtTime(40, kt + 0.1);
+      kg.gain.setValueAtTime(track.lightDrum ? 0.28 : 0.42, kt);
+      kg.gain.exponentialRampToValueAtTime(0.001, kt + 0.15);
+      ko.connect(kg); kg.connect(c.destination);
+      ko.start(kt); ko.stop(kt + 0.18);
+      nodes.push(ko, kg);
+    }
+    track.snareOn.forEach(beat => {
+      const st = startTime + beat * beatLen;
+      const buf = c.createBuffer(1, Math.floor(c.sampleRate*0.08), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const src = c.createBufferSource(); const sg = c.createGain();
+      src.buffer = buf;
+      sg.gain.setValueAtTime(track.lightDrum ? 0.12 : 0.2, st);
+      sg.gain.exponentialRampToValueAtTime(0.001, st+0.08);
+      src.connect(sg); sg.connect(c.destination); src.start(st);
+      nodes.push(src, sg);
+    });
+    const hhCount = Math.floor(patternDur / (beatLen * 0.5));
+    for (let h=0; h<hhCount; h++) {
+      const ht = startTime + h * beatLen * 0.5;
+      const buf = c.createBuffer(1, Math.floor(c.sampleRate*0.035), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+      const src = c.createBufferSource(); const g = c.createGain();
+      const filt = c.createBiquadFilter(); filt.type='highpass'; filt.frequency.value=7000;
+      src.buffer = buf;
+      const vol = h%2===0 ? (track.lightDrum?0.06:0.09) : (track.lightDrum?0.03:0.05);
+      g.gain.setValueAtTime(vol, ht); g.gain.exponentialRampToValueAtTime(0.001, ht+0.035);
+      src.connect(filt); filt.connect(g); g.connect(c.destination); src.start(ht);
+      nodes.push(src, g);
+    }
+  }
+  return { nodes, patternDur };
+}
 
 function startBgMusic() {
   if (audioMuted || bgMusicNodes) return;
   if (currentTheme === 'off') return;
   bgMusicPlaying = true;
-  const theme = THEMES[currentTheme] || THEMES.chill;
-  const ctx = getAudioCtx();
+  const track = TRACKS[currentTheme];
+  if (!track || !track.bpm) return;
+  const c = getAudioCtx();
+  let loopStart = c.currentTime + 0.05;
+  const first = schedulePattern(track, loopStart);
+  const patternDur = first.patternDur;
+  let allNodes = [...first.nodes];
+  const intervalId = setInterval(() => {
+    if (!bgMusicNodes) { clearInterval(intervalId); return; }
+    loopStart += patternDur;
+    const r = schedulePattern(track, loopStart);
+    allNodes.push(...r.nodes);
+    if (allNodes.length > 600) allNodes.splice(0, 200);
+  }, patternDur * 1000 - 80);
+  bgMusicNodes = { allNodes, intervalId };
+}
 
-  const masterGain = ctx.createGain();
-  masterGain.gain.setValueAtTime(0, ctx.currentTime);
-  masterGain.gain.linearRampToValueAtTime(theme.padVol, ctx.currentTime + 2);
-  masterGain.connect(ctx.destination);
-
-  const oscs = theme.pad.map((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = theme.padType;
-    osc.frequency.value = freq;
-    gain.gain.value = 0.25 - i * 0.04;
-    osc.connect(gain);
-    gain.connect(masterGain);
-    osc.start();
-    return { osc, gain };
+// ── PREVIEW (settings) ────────────────────────────
+window.previewMusic = function(themeId) {
+  // Stop any existing preview
+  stopPreview();
+  if (themeId === 'off') return;
+  const track = TRACKS[themeId];
+  if (!track || !track.bpm) return;
+  const c = getAudioCtx();
+  let loopStart = c.currentTime + 0.05;
+  const first = schedulePattern(track, loopStart);
+  const patternDur = first.patternDur;
+  let allNodes = [...first.nodes];
+  // Auto-stop after 8 seconds
+  const stopTimer = setTimeout(stopPreview, 8000);
+  const intervalId = setInterval(() => {
+    if (!previewNodes) { clearInterval(intervalId); return; }
+    loopStart += patternDur;
+    const r = schedulePattern(track, loopStart);
+    allNodes.push(...r.nodes);
+  }, patternDur * 1000 - 80);
+  previewNodes = { allNodes, intervalId, stopTimer };
+  // Update preview button states
+  document.querySelectorAll('.music-preview-btn').forEach(btn => {
+    const isThis = btn.dataset.theme === themeId;
+    btn.textContent = isThis ? '⏸' : '▶';
+    btn.style.background = isThis ? 'var(--brand)' : 'var(--surface2)';
+    btn.style.borderColor = isThis ? 'var(--brand)' : 'var(--border)';
   });
-
-  const lfo = ctx.createOscillator();
-  const lfoGain = ctx.createGain();
-  lfo.frequency.value = theme.lfoRate;
-  lfoGain.gain.value = 0.02;
-  lfo.connect(lfoGain);
-  oscs.forEach(({ gain }) => lfoGain.connect(gain.gain));
-  lfo.start();
-
-  let pluckInterval = setInterval(() => {
-    if (audioMuted || !bgMusicNodes) { clearInterval(pluckInterval); return; }
-    playPluck(ctx, masterGain, theme.pluckNotes, theme.pluckVol);
-  }, theme.pluckInterval);
-
-  bgMusicNodes = { masterGain, oscs, lfo, pluckInterval };
 }
 
-function stopBgMusic() {
-  if (!bgMusicNodes) return;
-  try {
-    const { masterGain, oscs, lfo, pluckInterval } = bgMusicNodes;
-    clearInterval(pluckInterval);
-    masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
-    setTimeout(() => {
-      try { oscs.forEach(({ osc }) => osc.stop()); lfo.stop(); } catch(e) {}
-    }, 600);
-  } catch(e) {}
-  bgMusicNodes = null;
+function stopPreview() {
+  if (!previewNodes) return;
+  clearInterval(previewNodes.intervalId);
+  clearTimeout(previewNodes.stopTimer);
+  previewNodes.allNodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch(e){} });
+  previewNodes = null;
+  document.querySelectorAll('.music-preview-btn').forEach(btn => {
+    btn.textContent = '▶';
+    btn.style.background = 'var(--surface2)';
+    btn.style.borderColor = 'var(--border)';
+  });
 }
 
-function playPluck(ctx, dest, pluckNotes, vol) {
-  pluckNotes = pluckNotes || [523.25, 659.25, 783.99, 1046.50];
-  vol = vol || 0.07;
-  const note = pluckNotes[Math.floor(Math.random() * pluckNotes.length)];
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'triangle';
-  osc.frequency.value = note;
-  gain.gain.setValueAtTime(vol, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-  osc.connect(gain);
-  gain.connect(dest);
-  osc.start();
-  osc.stop(ctx.currentTime + 1.2);
-}
+
 
 // ── SOUND EFFECTS ─────────────────────────────────
 
@@ -3593,11 +3698,10 @@ function sfxCountdown() {
 window.setMusicTheme = function(theme) {
   currentTheme = theme;
   localStorage.setItem('nia_theme_music', theme);
-  // Update UI
+  stopPreview();
   document.querySelectorAll('.music-theme-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.theme === theme);
   });
-  // Restart music with new theme if playing
   if (bgMusicPlaying) {
     stopBgMusic();
     if (theme !== 'off') setTimeout(startBgMusic, 300);
