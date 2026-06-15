@@ -665,9 +665,9 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     </div>
   </div>
   <div class="dash-body">
-    <div class="dash-welcome">
-      <h1 id="dash-greeting">¡Hola! 👋</h1>
-      <p class="muted" id="dash-subtitle">¿Qué quieres hacer hoy?</p>
+    <div>
+      <p class="section-label" id="dash-welcome-label">Bienvenido de vuelta</p>
+      <h1 class="dash-greeting" id="dash-greeting">¡Hola! 👋</h1>
     </div>
     <div class="dash-grid">
       <div class="dash-card featured new" onclick="newProject()">
@@ -677,27 +677,27 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
       </div>
       <div class="dash-card open" onclick="showScreen('screen-projects');loadProjects();">
         <div class="dash-card-icon">📂</div>
-        <div class="dash-card-title" id="dc-open-title">Juegos guardados</div>
-        <div class="dash-card-desc" id="dc-open-desc">Continúa o lanza un juego guardado</div>
+        <div class="dash-card-label" id="dc-open-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Mis juegos</div>
+        <div class="dash-card-title" id="dc-open-title">Guardados</div>
       </div>
       <div class="dash-card results" onclick="showScreen('screen-results');loadResults();">
         <div class="dash-card-icon">📊</div>
+        <div class="dash-card-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Historial</div>
         <div class="dash-card-title" id="dc-results-title">Resultados</div>
-        <div class="dash-card-desc" id="dc-results-desc">Revisa el historial y puntajes de juegos anteriores</div>
       </div>
       <div class="dash-card settings" onclick="showScreen('screen-settings');loadSettings();">
         <div class="dash-card-icon">⚙️</div>
+        <div class="dash-card-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Cuenta</div>
         <div class="dash-card-title" id="dc-settings-title">Ajustes</div>
-        <div class="dash-card-desc" id="dc-settings-desc">Personaliza tu cuenta y preferencias</div>
       </div>
-      <div class="dash-card" style="border-color:color-mix(in srgb,var(--green) 30%,var(--border));" onclick="showPlayerJoinFromDash()">
+      <div class="dash-card" onclick="showPlayerJoinFromDash()">
         <div class="dash-card-icon">🎯</div>
-        <div class="dash-card-title" id="dc-join-title">Unirse a sala</div>
-        <div class="dash-card-desc" id="dc-join-desc">Entra a la partida de otro host con un código</div>
+        <div class="dash-card-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Como jugador</div>
+        <div class="dash-card-title" id="dc-join-title">Unirme</div>
       </div>
     </div>
     <div class="dash-recent">
-      <h2 id="dash-recent-title">PROYECTOS RECIENTES</h2>
+      <p class="section-label" id="dash-recent-title">JUEGOS RECIENTES</p>
       <div id="dash-recent-list"><div class="empty-state"><div class="empty-icon">🗂️</div><p id="dash-no-projects">Aún no tienes juegos guardados. ¡Crea uno!</p></div></div>
     </div>
   </div>
@@ -843,24 +843,27 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 
 <!-- ══ HOST LOBBY ══ -->
 <div id="screen-host-lobby" class="screen">
-  <div style="width:100%;max-width:500px;display:flex;justify-content:space-between;align-items:center;">
-    <h1 class="section-title" id="lobby-title">Sala de espera</h1>
-    <div class="chip"><div class="status-dot"></div> <span id="live-label">En vivo</span></div>
+  <div style="width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;padding:0 4px;">
+    <h1 style="font-family:var(--font-display);font-size:1.15rem;font-weight:900;" id="lobby-title">Sala de espera</h1>
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:700;color:var(--emerald);">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);display:inline-block;animation:blink 1s infinite;"></span>
+      <span id="live-label">En vivo</span>
+    </div>
   </div>
-  <div class="game-code-display">
-    <div class="label-sm" id="code-label">Código del juego</div>
-    <div class="game-code-big" id="lobby-code">----</div>
-    <div class="muted" style="margin-top:4px;font-size:0.75rem;" id="qr-hint">o escanea el QR 👇</div>
+  <div class="code-display">
+    <div class="code-label" id="code-label">Código del juego</div>
+    <div class="code-value" id="lobby-code">----</div>
+    <div style="font-size:0.72rem;color:var(--text3);margin-top:6px;" id="qr-hint">o escanea el QR 👇</div>
   </div>
-  <div class="qr-container" id="qr-container"></div>
-  <div class="muted" style="font-size:0.8rem;text-align:center;">URL: <span id="join-url" style="color:var(--accent2)"></span></div>
-  <div class="card" style="max-width:500px;">
-    <div class="player-count" id="player-count-label">Esperando jugadores...</div>
-    <div class="players-grid" id="players-grid"></div>
+  <div class="qr-box"><div id="qr-container"></div></div>
+  <div style="font-size:0.72rem;color:var(--text3);text-align:center;">URL: <span id="join-url" style="color:var(--brand2)"></span></div>
+  <div style="text-align:center;width:100%;max-width:420px;">
+    <div style="font-size:0.75rem;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;" id="player-count-label">Esperando jugadores...</div>
+    <div class="players-chip-wrap" id="players-grid"></div>
   </div>
-  <div style="width:100%;max-width:500px;display:flex;gap:10px;">
+  <div style="display:flex;gap:10px;width:100%;max-width:420px;">
     <button class="btn btn-secondary" style="flex:1" onclick="showScreen('screen-question-builder')" id="btn-edit-q">← Editar</button>
-    <button class="btn btn-primary" style="flex:1" id="start-game-btn" onclick="startGame()" disabled>Empezar →</button>
+    <button class="btn btn-primary" style="flex:1" id="start-game-btn" onclick="startGame()" disabled>🚀 Empezar</button>
   </div>
 </div>
 
@@ -907,30 +910,33 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 
 <!-- ══ CANCEL GAME FLYOUT ══ -->
 <!-- ══ HOST GAME ══ -->
-<div id="screen-host-game" class="screen">
-  <!-- cancel modal moved to end of body -->
-  <div class="host-header">
-    <span class="muted" id="host-q-counter">Pregunta 1/10</span>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <span class="chip" id="host-game-code-chip" title="Código para unirse" style="font-family:var(--font-display);font-weight:700;color:var(--accent2);cursor:pointer;" onclick="copyGameCode()">🔗 <span id="host-game-code-display">----</span></span>
-      <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 resp</span></span>
-      <button class="btn btn-sm" onclick="document.getElementById('modal-cancel-game').classList.add('open')" id="btn-cancel-game" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,var(--border));padding:5px 12px;font-size:0.78rem;">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
+<div id="screen-host-game" class="screen" style="justify-content:flex-start;padding:0;">
+  <div class="game-topbar">
+    <span style="font-size:0.8rem;font-weight:700;color:var(--text3);" id="host-q-counter">Pregunta 1/10</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span style="display:flex;align-items:center;gap:5px;font-size:0.78rem;font-weight:700;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:3px 10px;cursor:pointer;" onclick="copyGameCode()" id="host-game-code-chip">
+        🔗 <span id="host-game-code-display" style="font-family:var(--font-display);color:var(--brand2);">----</span>
+      </span>
+      <span style="font-size:0.78rem;font-weight:700;color:var(--text3);" id="host-resp-count">0 resp</span>
+      <button class="btn btn-danger btn-sm" onclick="document.getElementById('modal-cancel-game').classList.add('open')" id="btn-cancel-game">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
     </div>
   </div>
-  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
-  <div class="q-display">
-    <div class="timer-circle" id="host-timer">20</div>
-    <div class="q-text-big" id="host-q-text">...</div>
-    <div class="options-grid" id="host-options"></div>
-    <div class="answer-reveal" id="answer-reveal"></div>
+  <div class="game-progress-bar"><div class="game-progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="game-body">
+    <div class="q-bubble">
+      <div class="timer-ring" id="host-timer">20</div>
+      <div class="q-text" id="host-q-text">...</div>
+      <div class="options-grid" id="host-options" style="margin-top:16px;"></div>
+      <div class="answer-reveal" id="answer-reveal" style="display:none;margin-top:12px;"></div>
+    </div>
+    <!-- Bar chart (only shown after reveal) -->
+    <div class="bar-chart" id="answer-bars" style="display:none;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
+      <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn" disabled>Siguiente →</button>
+    </div>
   </div>
-  <!-- Answer bar chart (only shown after all answer) -->
-  <div class="answer-bars" id="answer-bars" style="display:none;"></div>
-  <div style="display:flex;gap:10px;width:100%;max-width:700px;margin-top:8px;">
-    <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
-    <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn" disabled>Siguiente →</button>
-  </div>
-</div><!-- /screen-host-game -->
+</div>
 
 
 <!-- ══ HOST LEADERBOARD ══ -->
@@ -1671,13 +1677,13 @@ window.loadDashboard = async function() {
   }
   const projects = Object.entries(snap.val()).sort((a,b) => (b[1].updatedAt||0)-(a[1].updatedAt||0)).slice(0,5);
   list.innerHTML = projects.map(([id, p]) => `
-    <div class="project-row" onclick="openProject('${id}')">
-      <div class="project-icon">📋</div>
-      <div class="project-info">
-        <div class="project-name">${p.name||'Sin nombre'}</div>
-        <div class="project-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
+    <div class="game-row" onclick="openProject('${id}')">
+      <div class="game-row-icon">🎮</div>
+      <div class="game-row-info">
+        <div class="game-row-name">${p.name||'Sin nombre'}</div>
+        <div class="game-row-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
       </div>
-      <div class="project-arrow">›</div>
+      <div class="game-row-action">›</div>
     </div>`).join('');
 }
 
@@ -1898,24 +1904,23 @@ window.renderQuestionsList = function() {
         </div>`).join('');
 
     const div = document.createElement('div');
-    div.className = 'question-item'+(isExp?' expanded':'');
+    div.className = 'q-card'+(isExp?' expanded':'');
     div.setAttribute('data-index', i);
     div.setAttribute('draggable', 'true');
     div.innerHTML = `
-      <div class="q-header" onclick="toggleExpandInline(${i})" style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;cursor:pointer;">
-        <span class="drag-handle" onclick="event.stopPropagation()" title="${lang==='es'?'Arrastrar para reordenar':'Drag to reorder'}">⠿</span>
+      <div class="q-card-header" onclick="toggleExpandInline(${i})">
         <span class="q-num">${String(i+1).padStart(2,'0')}</span>
-        <div style="flex:1;">
-          <div class="q-text">${q.text}</div>
-          <div class="q-preview-correct">✓ ${correctLabel}</div>
+        <div class="q-preview">
+          <div class="q-preview-text">${q.text}</div>
+          <div class="q-preview-ans">✓ ${correctLabel}</div>
         </div>
-        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;">
-          <span class="q-badge">${q.type==='truefalse'?'V/F':'A-D'}</span>
-          <span class="q-badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);">${q.time||20}s</span>
-          <span class="q-expand-icon">▾</span>
+        <div class="q-chips">
+          <span class="chip chip-type">${q.type==='truefalse'?'V/F':'A-D'}</span>
+          <span class="chip chip-time">${q.time||20}s</span>
+          <span style="color:${isExp?'var(--brand2)':'var(--text3)'};font-size:0.8rem;">${isExp?'▴':'▾'}</span>
         </div>
       </div>
-      <div class="q-editor-inline">
+      <div class="q-card-body">
         <div class="form-group">
           <label style="font-size:0.7rem;">${lang==='es'?'PREGUNTA':'QUESTION'}</label>
           <input type="text" value="${q.text.replace(/"/g,'&quot;')}" oninput="updateQTextInline(${i},this.value)" style="font-size:0.9rem;padding:9px 12px;">
@@ -2112,8 +2117,8 @@ function loadHostQuestion(i) {
   // Reset bar chart
   renderAnswerBars({}, questions[i], false);
   const opts=document.getElementById('host-options');
-  if(q.type==='truefalse') opts.innerHTML=`<div class="option-host A"><span class="option-key">✓</span> ${t.tfTrue}</div><div class="option-host B"><span class="option-key">✗</span> ${t.tfFalse}</div>`;
-  else opts.innerHTML=['A','B','C','D'].map(k=>`<div class="option-host ${k}"><span class="option-key">${k}</span> ${q.options[k]}</div>`).join('');
+  if(q.type==='truefalse') opts.innerHTML=`<div class="opt-host true"><span class="opt-key">✓</span>${t.tfTrue}</div><div class="opt-host false"><span class="opt-key">✗</span>${t.tfFalse}</div>`;
+  else opts.innerHTML=['A','B','C','D'].map(k=>`<div class="opt-host ${k}"><span class="opt-key">${k}</span>${q.options[k]||''}</div>`).join('');
   update(ref(db,`games/${gameCode}`),{currentQuestion:i,questionStartedAt:Date.now(),status:'playing'});
   set(ref(db,`games/${gameCode}/answers/${i}`),null);
   // Reset Next button — disabled until all answer or timer ends
@@ -2273,44 +2278,47 @@ async function endGame() {
 function renderAnswerBars(answers, q, revealed) {
   const container = document.getElementById('answer-bars');
   if (!container || !q) return;
-  // Only show bar chart after reveal
   container.style.display = revealed ? 'flex' : 'none';
   if (!revealed) return;
 
-  // Count votes per option
   const votes = {};
-  const answerValues = Object.values(answers);
-  answerValues.forEach(a => {
-    votes[a.answer] = (votes[a.answer]||0) + 1;
-  });
-  const total = answerValues.length || 1;
+  Object.values(answers).forEach(a => { votes[a.answer] = (votes[a.answer]||0) + 1; });
   const maxVotes = Math.max(...Object.values(votes), 1);
 
-  // Build keys based on question type
-  let keys, labels;
+  let keys, labels, keyClass;
   if (q.type === 'truefalse') {
     keys = ['true','false'];
     labels = { true: lang==='es'?'V':'T', false: lang==='es'?'F':'F' };
+    keyClass = {true:'T', false:'F'};
   } else {
     keys = ['A','B','C','D'];
-    labels = { A:'A', B:'B', C:'C', D:'D' };
+    labels = {A:'A',B:'B',C:'C',D:'D'};
+    keyClass = {A:'A',B:'B',C:'C',D:'D'};
   }
-
-  const keyClass = q.type==='truefalse' ? {true:'T',false:'F'} : {A:'A',B:'B',C:'C',D:'D'};
 
   container.innerHTML = keys.map(k => {
     const count = votes[k]||0;
-    const pct = maxVotes > 0 ? Math.round((count/maxVotes)*100) : 0;
-    const isCorrect = revealed && k === q.correct;
+    const pct = Math.round((count/maxVotes)*100);
+    const isCorrect = k === q.correct;
     const cls = keyClass[k];
-    return `<div class="answer-bar-row ${isCorrect?'correct-row':''}">
-      <div class="answer-bar-key ${cls}">${labels[k]}</div>
-      <div class="answer-bar-track">
-        <div class="answer-bar-fill ${cls} ${isCorrect?'correct-highlight':''}" style="width:${pct}%"></div>
+    return `<div class="bar-row">
+      <div class="bar-key ${cls}">${labels[k]}</div>
+      <div class="bar-track">
+        <div class="bar-fill ${cls} ${isCorrect?'correct':''}"></div>
       </div>
-      <div class="answer-bar-count">${count}</div>
+      <div class="bar-count">${count}</div>
     </div>`;
   }).join('');
+
+  // Animate bars after render
+  requestAnimationFrame(() => {
+    keys.forEach(k => {
+      const count = votes[k]||0;
+      const pct = Math.round((count/maxVotes)*100);
+      const fill = container.querySelector(`.bar-fill.${keyClass[k]}`);
+      if(fill) fill.style.width = pct + '%';
+    });
+  });
 }
 
 
