@@ -1086,6 +1086,15 @@ window.closeModal = closeModal;
 // These will be overridden by the module once it loads
 window.showPlayerJoin = showPlayerJoin;
 window.showScreen = showScreen;
+
+// Show JS errors visually for debugging
+window.onerror = function(msg, src, line, col, err) {
+  var d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:60px;left:10px;right:10px;background:#FF5F5F;color:white;padding:12px;border-radius:8px;font-size:12px;z-index:99999;font-family:monospace;';
+  d.textContent = 'JS Error: ' + msg + ' (line ' + line + ')';
+  document.body.appendChild(d);
+  setTimeout(function(){ d.remove(); }, 10000);
+};
 </script>
 
 <script type="module">
