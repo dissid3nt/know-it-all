@@ -369,6 +369,25 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 /* ── V2: RESULTS DELETE ── */
 .result-game-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
 .result-delete-all-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:color-mix(in srgb,var(--red) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--red) 25%,var(--border));border-radius:12px;}
+
+/* ── V2: ANIMATED LEADERBOARD SCREEN ── */
+#screen-leaderboard{justify-content:flex-start;padding-top:0;gap:0;background:radial-gradient(ellipse at 50% 0%,#1a0d40 0%,var(--bg) 60%);}
+.lb-header{width:100%;max-width:700px;display:flex;justify-content:space-between;align-items:center;padding:20px 0 12px;}
+.lb-title{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent2);}
+.lb-q-counter{font-size:0.85rem;color:var(--muted);}
+.lb-list{width:100%;max-width:700px;display:flex;flex-direction:column;gap:8px;}
+.lb-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;transition:transform 0.5s ease,background 0.3s;}
+.lb-row.rank-1{background:color-mix(in srgb,var(--gold) 12%,var(--surface));border-color:color-mix(in srgb,var(--gold) 40%,var(--border));}
+.lb-rank{font-family:'Space Mono',monospace;font-size:1rem;min-width:36px;text-align:center;}
+.lb-name{flex:1;font-weight:600;font-size:1rem;}
+.lb-score{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);font-size:1rem;}
+.lb-delta{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;padding:2px 8px;border-radius:20px;background:color-mix(in srgb,var(--green) 20%,var(--surface2));color:var(--green);min-width:54px;text-align:center;opacity:0;transition:opacity 0.4s;}
+.lb-delta.show{opacity:1;}
+.lb-delta.zero{background:var(--surface2);color:var(--muted);}
+.lb-row.moved-up{animation:moveUp 0.6s ease forwards;}
+.lb-row.highlight{background:color-mix(in srgb,var(--green) 15%,var(--surface))!important;border-color:var(--green)!important;}
+@keyframes moveUp{0%{transform:translateY(20px);opacity:0.6}100%{transform:translateY(0);opacity:1}}
+.lb-next-btn{margin-top:20px;width:100%;max-width:700px;}
 </style>
 </head>
 <body>
@@ -684,17 +703,24 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <div class="options-grid" id="host-options"></div>
     <div class="answer-reveal" id="answer-reveal"></div>
   </div>
-  <!-- Answer bar chart -->
-  <div class="answer-bars" id="answer-bars"></div>
-  <div style="width:100%;max-width:700px;">
-    <div class="muted" style="margin-bottom:8px;font-size:0.8rem;" id="scoreboard-label">MARCADOR EN VIVO</div>
-    <div id="host-scoreboard" class="scoreboard"></div>
-  </div>
-  <div style="display:flex;gap:10px;width:100%;max-width:700px;">
+  <!-- Answer bar chart (only shown after all answer) -->
+  <div class="answer-bars" id="answer-bars" style="display:none;"></div>
+  <div style="display:flex;gap:10px;width:100%;max-width:700px;margin-top:8px;">
     <button class="btn btn-secondary btn-sm" onclick="revealAnswer()" style="flex:1" id="reveal-btn">👁 Revelar</button>
     <button class="btn btn-primary" onclick="nextQuestion()" style="flex:1" id="next-btn" disabled>Siguiente →</button>
   </div>
 </div><!-- /screen-host-game -->
+
+
+<!-- ══ HOST LEADERBOARD ══ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="lb-header">
+    <div class="lb-title" id="lb-title">📊 Leaderboard</div>
+    <div class="lb-q-counter" id="lb-q-counter"></div>
+  </div>
+  <div class="lb-list" id="lb-list"></div>
+  <button class="btn btn-primary lb-next-btn" onclick="proceedFromLeaderboard()" id="lb-next-btn">Siguiente pregunta →</button>
+</div>
 
 <!-- ══ HOST FINAL ══ -->
 <div id="screen-final" class="screen">
@@ -910,6 +936,7 @@ const T = {
     instrStep4Desc:'Tú controlas el ritmo. La ronda avanza automáticamente cuando todos respondan o se acabe el tiempo.',
     instrStartNow:'🚀 ¡Empezar ahora!',
     settingsDangerTitle:'ZONA DE PELIGRO',
+    lbTitle:'📊 Leaderboard',
     settingsSignoutLabel:'Cerrar sesión',
     inlineDone:'✓ Listo', inlineOptions:'OPCIONES (marca la correcta)',
     dragTooltip:'Arrastrar para reordenar',
@@ -1016,6 +1043,7 @@ const T = {
     instrStep4Desc:'You control the pace. The round advances automatically when everyone answers or time runs out.',
     instrStartNow:'🚀 Start now!',
     settingsDangerTitle:'DANGER ZONE',
+    lbTitle:'📊 Leaderboard',
     settingsSignoutLabel:'Sign out',
     inlineDone:'✓ Done', inlineOptions:'OPTIONS (mark correct)',
     dragTooltip:'Drag to reorder',
@@ -1075,6 +1103,7 @@ function applyTranslations() {
   s('settings-signout-desc', t.settingsSignoutDesc);
   s('btn-signout', t.btnSignout); s('btn-signout2', t.btnSignout2);
   s('settings-danger-title', t.settingsDangerTitle);
+  s('lb-title', t.lbTitle);
   s('settings-signout-label', t.settingsSignoutLabel);
   s('cancel-game-title', t.cancelGameTitle);
   s('cancel-game-desc', t.cancelGameDesc);
@@ -1675,10 +1704,8 @@ function listenResponses() {
 }
 
 function listenScoreboard() {
-  const unsub=onValue(ref(db,`games/${gameCode}/players`),snap=>{
-    renderScoreboard(snap.val()||{},'host-scoreboard');
-  });
-  unsubscribers.push(unsub);
+  // Scoreboard now shown on dedicated leaderboard screen after each question
+  // Keeping listener stub for compatibility
 }
 
 function renderScoreboard(players, containerId) {
@@ -1708,6 +1735,8 @@ window.revealAnswer = function() {
   scorePlayersForCurrentQuestion();
 }
 
+let prevScores = {}; // scores before this question
+
 async function scorePlayersForCurrentQuestion() {
   const q=questions[currentQIndex];
   const answersSnap=await get(ref(db,`games/${gameCode}/answers/${currentQIndex}`));
@@ -1717,6 +1746,9 @@ async function scorePlayersForCurrentQuestion() {
   const totalTime=(q.time||20)*1000;
   const playersSnap=await get(ref(db,`games/${gameCode}/players`));
   const players=playersSnap.val()||{};
+  // Save previous scores for delta animation
+  prevScores = {};
+  Object.entries(players).forEach(([pid,p]) => { prevScores[pid] = p.score||0; });
   const updates={};
   Object.entries(answers).forEach(([pid,ans])=>{
     if(ans.answer===q.correct){
@@ -1728,7 +1760,15 @@ async function scorePlayersForCurrentQuestion() {
   if(Object.keys(updates).length>0) await update(ref(db),updates);
 }
 
-window.nextQuestion = function() {
+window.nextQuestion = async function() {
+  // Show animated leaderboard before going to next question
+  const snap = await get(ref(db,`games/${gameCode}/players`));
+  const players = snap.val()||{};
+  const isLast = (currentQIndex + 1) >= questions.length;
+  showLeaderboard(players, isLast);
+}
+
+window.proceedFromLeaderboard = function() {
   currentQIndex++;
   if(currentQIndex>=questions.length) endGame(); else loadHostQuestion(currentQIndex);
 }
@@ -1768,6 +1808,9 @@ async function endGame() {
 function renderAnswerBars(answers, q, revealed) {
   const container = document.getElementById('answer-bars');
   if (!container || !q) return;
+  // Only show bar chart after reveal
+  container.style.display = revealed ? 'flex' : 'none';
+  if (!revealed) return;
 
   // Count votes per option
   const votes = {};
@@ -1803,6 +1846,60 @@ function renderAnswerBars(answers, q, revealed) {
       <div class="answer-bar-count">${count}</div>
     </div>`;
   }).join('');
+}
+
+
+// ── V2: ANIMATED LEADERBOARD ──────────────────────────
+function showLeaderboard(players, isLast) {
+  showScreen('screen-leaderboard');
+
+  // Update counter
+  const qCounter = document.getElementById('lb-q-counter');
+  if(qCounter) qCounter.textContent = lang==='es'
+    ? `Pregunta ${currentQIndex+1} de ${questions.length}`
+    : `Question ${currentQIndex+1} of ${questions.length}`;
+
+  // Update next button label
+  const nextBtn = document.getElementById('lb-next-btn');
+  if(nextBtn) nextBtn.textContent = isLast
+    ? (lang==='es'?'Ver resultados finales →':'See final results →')
+    : (lang==='es'?'Siguiente pregunta →':'Next question →');
+
+  // Sort by NEW score
+  const sorted = Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
+  const maxScore = sorted[0]?.[1]?.score || 1;
+  const list = document.getElementById('lb-list');
+  if(!list) return;
+
+  // Build rows
+  list.innerHTML = sorted.map(([pid, p], i) => {
+    const newScore = p.score||0;
+    const oldScore = prevScores[pid]||0;
+    const delta = newScore - oldScore;
+    const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
+    return `<div class="lb-row ${i===0?'rank-1':''} ${delta>0?'moved-up':''}" id="lb-row-${pid}" style="animation-delay:${i*80}ms">
+      <div class="lb-rank">${rankEmoji}</div>
+      <div class="lb-name">${p.name}</div>
+      <div class="lb-delta ${delta>0?'show':'show zero'}" id="lb-delta-${pid}">${delta>0?'+'+delta:'—'}</div>
+      <div class="lb-score">${newScore}</div>
+    </div>`;
+  }).join('');
+
+  // Animate deltas appearing after rows settle
+  setTimeout(() => {
+    sorted.forEach(([pid, p]) => {
+      const deltaEl = document.getElementById(`lb-delta-${pid}`);
+      const newScore = p.score||0;
+      const oldScore = prevScores[pid]||0;
+      const delta = newScore - oldScore;
+      if(deltaEl && delta > 0) {
+        deltaEl.classList.add('show');
+        // Highlight the row briefly
+        const row = document.getElementById(`lb-row-${pid}`);
+        if(row) { row.classList.add('highlight'); setTimeout(()=>row.classList.remove('highlight'),1200); }
+      }
+    });
+  }, 400);
 }
 
 // ── V2: IMAGE HANDLERS ────────────────────────────────
