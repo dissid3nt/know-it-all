@@ -464,7 +464,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <div class="dash-grid">
       <div class="dash-card new" onclick="newProject()">
         <div class="dash-card-icon">✨</div>
-        <div class="dash-card-title" id="dc-new-title">Nuevo proyecto</div>
+        <div class="dash-card-title" id="dc-new-title">Nuevo juego</div>
         <div class="dash-card-desc" id="dc-new-desc">Crea un nuevo juego con preguntas propias o generadas por IA</div>
       </div>
       <div class="dash-card open" onclick="showScreen('screen-projects');loadProjects();">
@@ -847,7 +847,7 @@ const T = {
     btnLoginEmail:'Iniciar sesión', btnRegister:'Crear cuenta',
     btnGoogle:'Continuar con Google', btnPlayerEntry:'👤 Soy jugador — unirme a una partida',
     greeting: n => `¡Hola, ${n}! 👋`, dashSubtitle:'¿Qué quieres hacer hoy?',
-    dcNewTitle:'Nuevo proyecto', dcNewDesc:'Crea un nuevo juego con preguntas propias o generadas por IA',
+    dcNewTitle:'Nuevo juego', dcNewDesc:'Crea un nuevo juego de trivia con tus propias preguntas',
     dcOpenTitle:'Abrir proyecto', dcOpenDesc:'Continúa o lanza un proyecto guardado',
     dcResultsTitle:'Resultados', dcResultsDesc:'Revisa el historial y puntajes de juegos anteriores',
     dcSettingsTitle:'Ajustes', dcSettingsDesc:'Personaliza tu cuenta y preferencias',
@@ -943,6 +943,22 @@ const T = {
     instrStartNow:'🚀 ¡Empezar ahora!',
     settingsDangerTitle:'ZONA DE PELIGRO',
     lbTitle:'📊 Leaderboard',
+    btnAddManual:'+ Add manually',
+    btnDeleteAll:'🗑 Delete all',
+    btnConfirmDelete:'Yes, delete',
+    btnCancelDelete:'Cancel',
+    waitingPlayers2:'Waiting for players...',
+    lbNextBtn:'Next question →',
+    posUp: (n) => `▲ +${n} spot${n>1?'s':''}`,
+    posDown: (n) => `▼ ${n} spot${n>1?'s':''}`,
+    btnAddManual:'+ Agregar manual',
+    btnDeleteAll:'🗑 Borrar todo',
+    btnConfirmDelete:'Sí, eliminar',
+    btnCancelDelete:'Cancelar',
+    waitingPlayers2:'Esperando jugadores...',
+    lbNextBtn:'Siguiente pregunta →',
+    posUp: (n) => `▲ +${n} puesto${n>1?'s':''}`,
+    posDown: (n) => `▼ ${n} puesto${n>1?'s':''}`,
     settingsSignoutLabel:'Cerrar sesión',
     inlineDone:'✓ Listo', inlineOptions:'OPCIONES (marca la correcta)',
     dragTooltip:'Arrastrar para reordenar',
@@ -954,7 +970,7 @@ const T = {
     btnLoginEmail:'Sign in', btnRegister:'Create account',
     btnGoogle:'Continue with Google', btnPlayerEntry:'👤 I\'m a player — join a game',
     greeting: n => `Hey, ${n}! 👋`, dashSubtitle:'What do you want to do today?',
-    dcNewTitle:'New project', dcNewDesc:'Create a new game with your own or AI-generated questions',
+    dcNewTitle:'New game', dcNewDesc:'Create a new trivia game with your own questions',
     dcOpenTitle:'Open project', dcOpenDesc:'Continue or launch a saved project',
     dcResultsTitle:'Results', dcResultsDesc:'Review history and scores from past games',
     dcSettingsTitle:'Settings', dcSettingsDesc:'Customize your account and preferences',
@@ -1050,6 +1066,14 @@ const T = {
     instrStartNow:'🚀 Start now!',
     settingsDangerTitle:'DANGER ZONE',
     lbTitle:'📊 Leaderboard',
+    btnAddManual:'+ Agregar manual',
+    btnDeleteAll:'🗑 Borrar todo',
+    btnConfirmDelete:'Sí, eliminar',
+    btnCancelDelete:'Cancelar',
+    waitingPlayers2:'Esperando jugadores...',
+    lbNextBtn:'Siguiente pregunta →',
+    posUp: (n) => `▲ +${n} puesto${n>1?'s':''}`,
+    posDown: (n) => `▼ ${n} puesto${n>1?'s':''}`,
     settingsSignoutLabel:'Sign out',
     inlineDone:'✓ Done', inlineOptions:'OPTIONS (mark correct)',
     dragTooltip:'Drag to reorder',
@@ -1110,6 +1134,11 @@ function applyTranslations() {
   s('btn-signout', t.btnSignout); s('btn-signout2', t.btnSignout2);
   s('settings-danger-title', t.settingsDangerTitle);
   s('lb-title', t.lbTitle);
+  s('btn-add-manual', t.btnAddManual);
+  s('btn-delete-all-results', t.btnDeleteAll);
+  s('btn-confirm-delete-results', t.btnConfirmDelete);
+  s('btn-cancel-delete-results', t.btnCancelDelete);
+  s('lb-next-btn', t.lbNextBtn);
   s('settings-signout-label', t.settingsSignoutLabel);
   s('cancel-game-title', t.cancelGameTitle);
   s('cancel-game-desc', t.cancelGameDesc);
@@ -1252,10 +1281,8 @@ window.loadDashboard = async function() {
 
 window.newProject = function() {
   questions = []; currentProjectId = null; currentProjectName = ''; editingIndex = -1;
-  document.getElementById('questions-list').innerHTML = '';
-  editingIndex = -1;
-  document.getElementById('gen-status').textContent = '';
-  document.getElementById('raw-data').value = '';
+  const ql = document.getElementById('questions-list');
+  if(ql) ql.innerHTML = '';
   renderQuestionsList();
   showScreen('screen-question-builder');
 }
@@ -1386,7 +1413,7 @@ window.loadResults = async function() {
           <span class="score-pts">${p.score||0}</span>
         </div>`).join('')}
         <div class="result-game-actions">
-          <button class="btn btn-sm btn-red" onclick="openDeleteModal('single','${id}')"
+          <button class="btn btn-sm btn-red" onclick="openDeleteModal('single','${id}')" id="del-single-${id}"
             style="font-size:0.78rem;">🗑 ${lang==='es'?'Eliminar esta partida':'Delete this game'}</button>
         </div>
       </div>
@@ -1525,7 +1552,7 @@ window.renderQuestionsList = function() {
   if(questions.length > 0) {
     const addBtn = document.createElement('button');
     addBtn.className = 'add-q-dashed';
-    addBtn.innerHTML = '+ '+(lang==='es'?'Agregar pregunta manual':'Add manual question');
+    addBtn.innerHTML = t.btnAddManual || '+ '+(lang==='es'?'Agregar pregunta manual':'Add manual question');
     addBtn.onclick = addManualQuestion;
     list.appendChild(addBtn);
   }
@@ -1628,7 +1655,7 @@ window.confirmCancelGame = async function() {
   clearInterval(timerInterval);
   await update(ref(db,`games/${gameCode}`),{status:'cancelled'});
   await set(ref(db,`games/${gameCode}`),null);
-  toast(lang==='es'?'Partida cancelada':'Game cancelled');
+  toast(lang==='es'?'Partida cancelada':'Game cancelled'); // already uses lang ternary
   goToDashboard();
 }
 
@@ -1903,7 +1930,7 @@ async function showLeaderboard(players, isLast) {
   const nextBtn = document.getElementById('lb-next-btn');
   if(nextBtn) nextBtn.textContent = isLast
     ? (lang==='es'?'Ver resultados finales →':'See final results →')
-    : (lang==='es'?'Siguiente pregunta →':'Next question →');
+    : t.lbNextBtn;
 
   // Sort by OLD score to show initial state
   const oldSorted = Object.entries(players)
@@ -1972,7 +1999,7 @@ async function showLeaderboard(players, isLast) {
     if(badge && diff !== 0){
       const isUp = diff > 0, abs = Math.abs(diff);
       badge.className = `pos-badge ${isUp?'up':'down'}`;
-      badge.textContent = isUp ? `▲ +${abs} puesto${abs>1?'s':''}` : `▼ ${abs} puesto${abs>1?'s':''}`;
+      badge.textContent = isUp ? t.posUp(abs) : t.posDown(abs);
       badge.classList.add('show');
     }
 
