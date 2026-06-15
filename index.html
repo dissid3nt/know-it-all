@@ -521,63 +521,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
   </div>
   <div class="builder-body">
-    <!-- AI SECTION -->
-    <div class="ai-generate-section ai-card">
-      <h3 id="ai-section-title" style="display:flex;align-items:center;gap:8px;">✨ Generar con IA <span style="font-size:0.68rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Gemini</span></h3>
-      <p class="muted" style="margin-bottom:4px;font-size:0.8rem;line-height:1.5;" id="ai-section-desc">Pega las respuestas de tus participantes en texto libre. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
-      <label id="raw-data-label">Datos de los participantes</label>
-      <textarea id="raw-data" style="min-height:130px;" placeholder="Ejemplo:&#10;&#10;Juan: 24 años, mascota: Winnie (perro)&#10;&#10;Denise:&#10;Something funny you've done?&#10;- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER&#10;- I found my dog in a shelter&#10;- I ran a half marathon&#10;&#10;Lucía: 25 años, trabaja en Google, le gusta el sushi"></textarea>
-      <div style="margin-top:12px;">
-        <div class="gen-options-title" id="gen-options-title">Opciones de generación</div>
-        <div class="gen-options-row">
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-num">Número de preguntas</span>
-              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-num">Cuántas preguntas quieres que la IA genere. Más datos = más variedad.</div></div>
-            </div>
-            <select id="num-questions" style="width:100%;">
-              <option value="5">5 preguntas</option>
-              <option value="10" selected>10 preguntas</option>
-              <option value="15">15 preguntas</option>
-              <option value="20">20 preguntas</option>
-            </select>
-          </div>
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-type">Tipo de pregunta</span>
-              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-type"><strong>Mixto:</strong> A/B/C/D + V/F.<br><br><strong>Solo A-D:</strong> 4 opciones.<br><br><strong>Solo V/F:</strong> más rápidas.</div></div>
-            </div>
-            <select id="q-type-gen" style="width:100%;">
-              <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
-              <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
-              <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
-            </select>
-          </div>
-          <div class="gen-option-group">
-            <div class="gen-option-label">
-              <span id="opt-label-diff">Dificultad</span>
-              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-diff"><strong>Fácil:</strong> distractores distintos.<br><br><strong>Medio:</strong> plausibles.<br><br><strong>Difícil:</strong> muy similares.</div></div>
-            </div>
-            <select id="q-difficulty" style="width:100%;">
-              <option value="easy">Fácil</option>
-              <option value="medium" selected id="opt-medium">Medio</option>
-              <option value="hard">Difícil</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn" style="width:auto;">✨ Generar</button>
-        <div id="gen-status" style="font-size:0.8rem;color:var(--muted);"></div>
-      </div>
-      <div class="step-indicator" id="step-indicator" style="display:none;">
-        <div class="step" id="step-1">1. Leyendo datos</div>
-        <span style="color:var(--border);">›</span>
-        <div class="step" id="step-2">2. Generando</div>
-        <span style="color:var(--border);">›</span>
-        <div class="step" id="step-3">3. Revisando</div>
-      </div>
-    </div>
 
     <!-- QUESTIONS LIST -->
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -1090,11 +1033,8 @@ function applyTranslations() {
   s('modal-save-title', t.modalSaveTitle); s('modal-proj-name-label', t.modalProjNameLabel);
   s('btn-save-project', t.btnSaveProject); s('btn-cancel-save', t.btnCancelSave);
   s('builder-title', t.builderTitle); s('btn-create-room', t.btnCreateRoom);
-  s('btn-add-manual', t.addManual);
   s('dc-join-title', t.dcJoinTitle); s('dc-join-desc', t.dcJoinDesc);
   s('btn-edit-name', t.btnEditName);
-  s('opt-mixed', t.optMixedFull); s('opt-multiple', t.optMultipleFull); s('opt-tf', t.optTFFull);
-  s('opt-medium', t.optMedium);
   s('lobby-title', t.lobbyTitle); s('live-label', t.liveLabel); s('code-label', t.codeLabel);
   s('qr-hint', t.qrHint); s('btn-edit-q', t.editQBtn);
   s('start-game-btn', t.startGame); s('scoreboard-label', t.scoreboardLabel);
@@ -1517,95 +1457,7 @@ window.saveEditedQuestion = function() { /* legacy removed */ }
 window.deleteEditedQuestion = function() { if(editingIndex>=0){questions.splice(editingIndex,1);} editingIndex=-1; renderQuestionsList(); }
 window.cancelEdit = function() { editingIndex=-1; renderQuestionsList(); }
 
-// ── AI GENERATE ───────────────────────────────────────
-window.generateQuestions = async function() {
-  const WORKER_URL = 'https://broken-fire-ccaf.desidente.workers.dev';
-  const rawData = document.getElementById('raw-data').value.trim();
-  if(!rawData){toast('⚠️ '+(lang==='es'?'Pega los datos primero':'Paste the data first'));return;}
-  const numQ   = document.getElementById('num-questions').value;
-  const qType  = document.getElementById('q-type-gen').value;
-  const diff   = document.getElementById('q-difficulty')?.value || 'medium';
-  const btn    = document.getElementById('gen-btn');
-  const status = document.getElementById('gen-status');
-  const stepEl = document.getElementById('step-indicator');
 
-  const typeInstr = {
-    mixed:    lang==='es'?'una mezcla de preguntas de opción múltiple (A/B/C/D) y Verdadero/Falso':'a mix of multiple choice (A/B/C/D) and True/False',
-    multiple: lang==='es'?'todas de opción múltiple con 4 opciones (A/B/C/D)':'all multiple choice with 4 options (A/B/C/D)',
-    truefalse:lang==='es'?'todas de Verdadero/Falso':'all True/False'
-  }[qType];
-  const diffInstr = {
-    easy:  lang==='es'?'Distractores claramente distintos de la correcta (fácil).':'Distractors clearly different from correct answer (easy).',
-    medium:lang==='es'?'Distractores plausibles pero distinguibles (medio).':'Distractors plausible but distinguishable (medium).',
-    hard:  lang==='es'?'Distractores muy similares a la correcta, difícil distinguir (difícil).':'Distractors very similar to correct answer, hard to distinguish (hard).'
-  }[diff];
-  const langInstr = lang==='es'?'Genera todas las preguntas y opciones en ESPAÑOL.':'Generate all questions and options in ENGLISH.';
-  const tfTrue  = lang==='es'?'Verdadero':'True';
-  const tfFalse = lang==='es'?'Falso':'False';
-
-  const prompt = `You are an expert trivia question designer for a Kahoot-style party game called "Know It All". Create fun, engaging trivia questions about real people from free-form data.
-
-RULES:
-1. ${langInstr}
-2. Create exactly ${numQ} questions as ${typeInstr}.
-3. ${diffInstr}
-4. CAPS detection: items in ALL CAPS = CORRECT answer. Lowercase items = distractors.
-5. Numeric data (ages, counts): ask about specific people OR who has a specific value.
-6. Free-form stories: extract the key fact, build a question around it.
-7. Use OTHER people's real data as distractors when possible — makes the game trickier.
-8. Vary formats: "Who...?", "How many...?", "What did X do...?", "True or False: X...".
-9. Keep questions concise and fun.
-
-OUTPUT: ONLY a valid JSON array, no markdown, no explanation:
-[{"text":"...","type":"multiple","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","time":20},{"text":"...","type":"truefalse","options":{"true":"${tfTrue}","false":"${tfFalse}"},"correct":"true","time":15}]
-
-PARTICIPANT DATA:
-${rawData}`;
-
-  btn.disabled=true; btn.innerHTML='<span class="spinner-inline"></span> '+(lang==='es'?'Generando...':'Generating...');
-  status.innerHTML=''; stepEl.style.display='flex';
-
-  const setStep = n => [1,2,3].forEach(i=>{
-    const el=document.getElementById('step-'+i);
-    if(el) el.className='step'+(i<n?' done':i===n?' active':'');
-  });
-
-  try {
-    setStep(1); await new Promise(r=>setTimeout(r,500));
-    setStep(2);
-    const res = await fetch(WORKER_URL, {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
-      })
-    });
-    // Get raw text first to handle any response format
-    const rawText = await res.text();
-    if (!rawText || rawText.trim() === '') throw new Error('Empty response from worker');
-    let data;
-    try { data = JSON.parse(rawText); } catch(e) { throw new Error('Worker returned invalid JSON: ' + rawText.substring(0,200)); }
-    // Check for worker-level error
-    if (data.error) throw new Error('Worker error: ' + JSON.stringify(data.error));
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!text) throw new Error('No text in response: ' + JSON.stringify(data).substring(0,200));
-    setStep(3); await new Promise(r=>setTimeout(r,300));
-    const clean = text.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
-    if(!Array.isArray(parsed)||parsed.length===0) throw new Error('No questions returned');
-    questions=[...questions,...parsed];
-    renderQuestionsList();
-    status.innerHTML=`<span style="color:var(--green)">${t.genDone(parsed.length)}</span>`;
-    toast(t.genToast(parsed.length));
-    document.getElementById('questions-list').scrollIntoView({behavior:'smooth'});
-  } catch(e) {
-    status.innerHTML=`<span style="color:var(--red)">${t.genError}</span>`;
-    console.error(e);
-    setStep(0);
-  }
-  btn.disabled=false; btn.innerHTML='✨ '+(lang==='es'?'Generar':'Generate');
-  setTimeout(()=>{if(stepEl) stepEl.style.display='none';},2500);
-}
 
 // ── LOBBY ─────────────────────────────────────────────
 async function goToLobby() {
