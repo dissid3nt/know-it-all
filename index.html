@@ -973,7 +973,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
             <button class="music-theme-btn" data-theme="off" onclick="setMusicTheme('off')" style="flex:1;padding:9px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;text-align:left;">🔕 Sin música</button>
           </div>
         </div>
-        <div style="font-size:0.75rem;color:var(--text3);" id="music-preview-hint">▶ preview · La música suena al iniciar el juego · 🔊 mute en la partida</div>
+        <div style="font-size:0.78rem;color:var(--text3);line-height:1.5;" id="music-preview-hint">Selecciona una canción y presiona ▶ para preescuchar. Si no seleccionas ninguna, no sonará música durante el juego.</div>
       </div>
       <div class="settings-row">
         <div><div class="settings-row-label" id="settings-lang-label">Idioma por defecto</div></div>
@@ -1508,6 +1508,7 @@ const T = {
     lbTitle:'📊 Leaderboard',
     themeLabel:'Apariencia',
     musicLabel:'Música de fondo',
+    musicHint:'Selecciona una canción y presiona ▶ para preescuchar. Si no seleccionas ninguna, no sonará música durante el juego.',
     previewTitle:'Vista previa',
     labelEmail:'Email',
     labelPassword:'Password',
@@ -1658,6 +1659,7 @@ const T = {
     lbTitle:'📊 Leaderboard',
     themeLabel:'Appearance',
     musicLabel:'Background music',
+    musicHint:'Select a song and press ▶ to preview. If you don\'t select one, no music will play during the game.',
     previewTitle:'Preview',
     labelEmail:'Email',
     labelPassword:'Password',
@@ -1740,6 +1742,7 @@ function applyTranslations() {
   s('lb-title', t.lbTitle);
   s('settings-theme-label', t.themeLabel);
   s('settings-music-label', t.musicLabel);
+  s('music-preview-hint', t.musicHint);
   s('dash-welcome-label', t.dcWelcomeLabel);
   // Update card sub-labels dynamically
   const subLabels = [
