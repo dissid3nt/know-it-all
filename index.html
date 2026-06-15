@@ -2486,10 +2486,14 @@ window.nextQuestion = async function() {
   showLeaderboard(players, isLast);
 }
 
-window.proceedFromLeaderboard = function() {
-  sfxNextQuestion();
+window.proceedFromLeaderboard = async function() {
   currentQIndex++;
-  if(currentQIndex>=questions.length) endGame(); else loadHostQuestion(currentQIndex);
+  if(currentQIndex>=questions.length) {
+    await endGame();
+  } else {
+    sfxNextQuestion();
+    loadHostQuestion(currentQIndex);
+  }
 }
 
 async function endGame() {
@@ -3351,6 +3355,13 @@ function getAudioCtx() {
 }
 
 // ── MUTE TOGGLE ──────────────────────────────────
+function stopBgMusic() {
+  if (!bgMusicNodes) return;
+  clearInterval(bgMusicNodes.intervalId);
+  bgMusicNodes.allNodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch(e){} });
+  bgMusicNodes = null;
+  bgMusicPlaying = false;
+}
 window.toggleMute = function() {
   audioMuted = !audioMuted;
   const btn = document.getElementById('mute-btn');
@@ -3517,6 +3528,8 @@ function startBgMusic() {
   }, patternDur * 1000 - 80);
   bgMusicNodes = { allNodes, intervalId };
 }
+
+
 
 // ── PREVIEW (settings) ────────────────────────────
 window.previewMusic = function(themeId) {
