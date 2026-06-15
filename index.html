@@ -113,7 +113,7 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .danger-zone{background:color-mix(in srgb,var(--red) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--red) 30%,var(--border));}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;display:none;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;}
 .modal h2{margin-bottom:20px;font-size:1.2rem;}
@@ -508,7 +508,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     </div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveProject()" id="btn-save-project">Guardar y lanzar</button>
-      <button class="btn btn-secondary" onclick="closeModal('modal-save-project')" id="btn-cancel-save">Cancelar</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-save-project').classList.remove('open')" id="btn-cancel-save">Cancelar</button>
     </div>
   </div>
 </div>
@@ -521,13 +521,62 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <button class="btn btn-primary btn-sm" onclick="openSaveModal()" id="btn-create-room">Guardar y lanzar →</button>
   </div>
   <div class="builder-body">
-    <!-- AI SECTION (hidden, available for future) -->
-    <div style="display:none;">
-      <textarea id="raw-data"></textarea>
-      <select id="num-questions"><option value="10" selected>10</option></select>
-      <select id="q-type-gen"><option value="mixed" id="opt-mixed">Mixto</option><option value="multiple" id="opt-multiple">Solo A-D</option><option value="truefalse" id="opt-tf">Solo V/F</option></select>
-      <select id="q-difficulty"><option value="medium" selected id="opt-medium">Medio</option></select>
-      <div id="gen-status"></div><div id="step-indicator"><div id="step-1"></div><div id="step-2"></div><div id="step-3"></div></div>
+    <!-- AI SECTION -->
+    <div class="ai-generate-section ai-card">
+      <h3 id="ai-section-title" style="display:flex;align-items:center;gap:8px;">✨ Generar con IA <span style="font-size:0.68rem;background:color-mix(in srgb,var(--accent) 20%,var(--surface2));color:var(--accent2);padding:2px 8px;border-radius:20px;font-weight:600;">Gemini</span></h3>
+      <p class="muted" style="margin-bottom:4px;font-size:0.8rem;line-height:1.5;" id="ai-section-desc">Pega las respuestas de tus participantes en texto libre. Escribe en MAYÚSCULAS la respuesta correcta cuando haya múltiples opciones.</p>
+      <label id="raw-data-label">Datos de los participantes</label>
+      <textarea id="raw-data" style="min-height:130px;" placeholder="Ejemplo:&#10;&#10;Juan: 24 años, mascota: Winnie (perro)&#10;&#10;Denise:&#10;Something funny you've done?&#10;- WHEN I WAS YOUNG I FOUND A NEST OF BIRDS AND HID IT IN A DRAWER&#10;- I found my dog in a shelter&#10;- I ran a half marathon&#10;&#10;Lucía: 25 años, trabaja en Google, le gusta el sushi"></textarea>
+      <div style="margin-top:12px;">
+        <div class="gen-options-title" id="gen-options-title">Opciones de generación</div>
+        <div class="gen-options-row">
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-num">Número de preguntas</span>
+              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-num">Cuántas preguntas quieres que la IA genere. Más datos = más variedad.</div></div>
+            </div>
+            <select id="num-questions" style="width:100%;">
+              <option value="5">5 preguntas</option>
+              <option value="10" selected>10 preguntas</option>
+              <option value="15">15 preguntas</option>
+              <option value="20">20 preguntas</option>
+            </select>
+          </div>
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-type">Tipo de pregunta</span>
+              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-type"><strong>Mixto:</strong> A/B/C/D + V/F.<br><br><strong>Solo A-D:</strong> 4 opciones.<br><br><strong>Solo V/F:</strong> más rápidas.</div></div>
+            </div>
+            <select id="q-type-gen" style="width:100%;">
+              <option value="mixed" id="opt-mixed">Mixto (A-D + V/F)</option>
+              <option value="multiple" id="opt-multiple">Solo opción múltiple</option>
+              <option value="truefalse" id="opt-tf">Solo Verdadero/Falso</option>
+            </select>
+          </div>
+          <div class="gen-option-group">
+            <div class="gen-option-label">
+              <span id="opt-label-diff">Dificultad</span>
+              <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box" id="tooltip-diff"><strong>Fácil:</strong> distractores distintos.<br><br><strong>Medio:</strong> plausibles.<br><br><strong>Difícil:</strong> muy similares.</div></div>
+            </div>
+            <select id="q-difficulty" style="width:100%;">
+              <option value="easy">Fácil</option>
+              <option value="medium" selected id="opt-medium">Medio</option>
+              <option value="hard">Difícil</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="generateQuestions()" id="gen-btn" style="width:auto;">✨ Generar</button>
+        <div id="gen-status" style="font-size:0.8rem;color:var(--muted);"></div>
+      </div>
+      <div class="step-indicator" id="step-indicator" style="display:none;">
+        <div class="step" id="step-1">1. Leyendo datos</div>
+        <span style="color:var(--border);">›</span>
+        <div class="step" id="step-2">2. Generando</div>
+        <span style="color:var(--border);">›</span>
+        <div class="step" id="step-3">3. Revisando</div>
+      </div>
     </div>
 
     <!-- QUESTIONS LIST -->
@@ -566,7 +615,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 <!-- ══ INSTRUCTIONS FLYOUT ══ -->
 <div class="modal-overlay" id="modal-instructions">
   <div class="modal" style="max-width:480px;position:relative;">
-    <button onclick="closeModal('modal-instructions');launchGame()" style="position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">✕</button>
+    <button onclick="document.getElementById('modal-instructions').classList.remove('open');launchGame()" style="position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">✕</button>
     <div style="font-size:2.5rem;margin-bottom:10px;text-align:center;">🎯</div>
     <h2 id="instr-title" style="text-align:center;margin-bottom:4px;">¡Todo listo para jugar!</h2>
     <p class="muted" id="instr-subtitle" style="text-align:center;margin-bottom:24px;font-size:0.85rem;"></p>
@@ -600,31 +649,20 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         </div>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="closeModal('modal-instructions');launchGame()" id="btn-start-now">🚀 ¡Empezar ahora!</button>
+    <button class="btn btn-primary" onclick="document.getElementById('modal-instructions').classList.remove('open');launchGame()" id="btn-start-now">🚀 ¡Empezar ahora!</button>
   </div>
 </div>
 
 <!-- ══ CANCEL GAME FLYOUT ══ -->
 <!-- ══ HOST GAME ══ -->
 <div id="screen-host-game" class="screen">
-  <!-- Cancel confirmation flyout (inside screen so z-index works) -->
-  <div class="modal-overlay" id="modal-cancel-game">
-    <div class="modal" style="max-width:360px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
-      <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
-      <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
-        <button class="btn btn-secondary" onclick="closeModal('modal-cancel-game')" id="btn-keep-playing">No, seguir jugando</button>
-      </div>
-    </div>
-  </div>
+  <!-- cancel modal moved to end of body -->
   <div class="host-header">
     <span class="muted" id="host-q-counter">Pregunta 1/10</span>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <span class="chip" id="host-game-code-chip" title="Código para unirse" style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);cursor:pointer;" onclick="copyGameCode()">🔗 <span id="host-game-code-display">----</span></span>
       <span class="chip"><div class="status-dot"></div> <span id="host-resp-count">0 resp</span></span>
-      <button class="btn btn-sm" onclick="openModal('modal-cancel-game')" id="btn-cancel-game" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,var(--border));padding:5px 12px;font-size:0.78rem;">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
+      <button class="btn btn-sm" onclick="document.getElementById('modal-cancel-game').classList.add('open')" id="btn-cancel-game" style="background:color-mix(in srgb,var(--red) 15%,var(--surface2));color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,var(--border));padding:5px 12px;font-size:0.78rem;">✕ <span id="cancel-game-btn-label">Cancelar</span></button>
     </div>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
@@ -716,6 +754,17 @@ function showScreen(id) {
   var el = document.getElementById(id);
   if (el) el.classList.add('active');
 }
+// openModal / closeModal — needed for cancel button before module loads
+function openModal(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.add('open');
+}
+function closeModal(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+window.openModal = openModal;
+window.closeModal = closeModal;
 // These will be overridden by the module once it loads
 window.showPlayerJoin = showPlayerJoin;
 window.showScreen = showScreen;
@@ -1188,7 +1237,7 @@ window.loadProjects = async function() {
         <div class="project-meta">${p.questionCount||0} ${t.questions} · ${new Date(p.updatedAt||0).toLocaleDateString()}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">▶ Lanzar</button>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openProject('${id}')">${lang==='es'?'▶ Lanzar':'▶ Launch'}</button>
         <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();deleteProject('${id}')">🗑</button>
       </div>
     </div>`).join('');
@@ -1456,6 +1505,7 @@ window.cancelEdit = function() { editingIndex=-1; renderQuestionsList(); }
 
 // ── AI GENERATE ───────────────────────────────────────
 window.generateQuestions = async function() {
+  const WORKER_URL = 'https://broken-fire-ccaf.desidente.workers.dev';
   const rawData = document.getElementById('raw-data').value.trim();
   if(!rawData){toast('⚠️ '+(lang==='es'?'Pega los datos primero':'Paste the data first'));return;}
   const numQ   = document.getElementById('num-questions').value;
@@ -1509,13 +1559,22 @@ ${rawData}`;
   try {
     setStep(1); await new Promise(r=>setTimeout(r,500));
     setStep(2);
-    const res = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2048,
-        messages:[{role:"user",content:prompt}]})
+    const res = await fetch(WORKER_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
+      })
     });
-    const data = await res.json();
-    const text = data.content?.find(b=>b.type==='text')?.text||'';
+    // Get raw text first to handle any response format
+    const rawText = await res.text();
+    if (!rawText || rawText.trim() === '') throw new Error('Empty response from worker');
+    let data;
+    try { data = JSON.parse(rawText); } catch(e) { throw new Error('Worker returned invalid JSON: ' + rawText.substring(0,200)); }
+    // Check for worker-level error
+    if (data.error) throw new Error('Worker error: ' + JSON.stringify(data.error));
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!text) throw new Error('No text in response: ' + JSON.stringify(data).substring(0,200));
     setStep(3); await new Promise(r=>setTimeout(r,300));
     const clean = text.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
@@ -1705,28 +1764,32 @@ window.nextQuestion = function() {
 
 async function endGame() {
   clearInterval(timerInterval);
+  // Mark finished first so players transition
   await update(ref(db,`games/${gameCode}`),{status:'finished'});
+  // Get players snapshot
   const snap=await get(ref(db,`games/${gameCode}/players`));
   const players=snap.val()||{};
   const sorted=Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
-  // Save to history
-  if(currentUser) {
-    const histRef = push(ref(db,`users/${currentUser.uid}/gameHistory`));
-    await set(histRef, {
-      projectName: currentProjectName||'Juego',
-      projectId:   currentProjectId||null,
-      gameCode:    gameCode,
-      playedAt:    Date.now(),
-      questionCount: questions.length,
-      players: Object.fromEntries(Object.values(players).map(p=>[p.name,{name:p.name,score:p.score||0}]))
-    });
-    // Clean up the live game node — no longer needed after history is saved
-    await set(ref(db,`games/${gameCode}`), null);
-  }
+  // Show final screen immediately — don't wait for history save
   showScreen('screen-final');
   const winner=sorted[0]?.[1];
   document.getElementById('winner-display').innerHTML=winner?`<div class="winner-name">${winner.name}</div><div class="muted">${winner.score} pts</div>`:'';
   renderScoreboard(players,'final-scoreboard');
+  // Save history and cleanup in background (non-blocking)
+  if(currentUser) {
+    try {
+      const histRef = push(ref(db,`users/${currentUser.uid}/gameHistory`));
+      await set(histRef, {
+        projectName: currentProjectName||'Juego',
+        projectId:   currentProjectId||null,
+        gameCode:    gameCode,
+        playedAt:    Date.now(),
+        questionCount: questions.length,
+        players: Object.fromEntries(Object.values(players).map(p=>[p.name,{name:p.name,score:p.score||0}]))
+      });
+      await set(ref(db,`games/${gameCode}`), null);
+    } catch(e) { console.warn('History save failed:', e); }
+  }
 }
 
 // ── PLAYER ────────────────────────────────────────────
@@ -1983,6 +2046,19 @@ try {
   if (!anyActive) showScreen('screen-landing');
 }
 </script>
+
+<!-- ══ CANCEL GAME MODAL (outside all screens for proper z-index) ══ -->
+<div class="modal-overlay" id="modal-cancel-game">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
+    <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
+    <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-cancel-game').classList.remove('open')" id="btn-keep-playing">No, seguir jugando</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // Sync routing — runs after DOM is ready, before Firebase resolves
