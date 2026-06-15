@@ -2315,6 +2315,10 @@ window.startGame = function() {
 }
 
 window.launchGame = async function() {
+  // Resume AudioContext on user gesture (browser autoplay policy)
+  if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
   startBgMusic();
   currentQIndex=0;
   await update(ref(db,`games/${gameCode}`),{status:'playing',currentQuestion:0});
@@ -3350,7 +3354,12 @@ let bgMusicPlaying = false;
 
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  return audioCtx;
+}
+async function getAudioCtxAsync() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
   return audioCtx;
 }
 
@@ -3508,13 +3517,13 @@ function schedulePattern(track, startTime) {
   return { nodes, patternDur };
 }
 
-function startBgMusic() {
+async function startBgMusic() {
   if (audioMuted || bgMusicNodes) return;
   if (currentTheme === 'off') return;
   bgMusicPlaying = true;
   const track = TRACKS[currentTheme];
   if (!track || !track.bpm) return;
-  const c = getAudioCtx();
+  const c = await getAudioCtxAsync();
   let loopStart = c.currentTime + 0.05;
   const first = schedulePattern(track, loopStart);
   const patternDur = first.patternDur;
@@ -3532,13 +3541,13 @@ function startBgMusic() {
 
 
 // ── PREVIEW (settings) ────────────────────────────
-window.previewMusic = function(themeId) {
+window.previewMusic = async function(themeId) {
   // Stop any existing preview
   stopPreview();
   if (themeId === 'off') return;
   const track = TRACKS[themeId];
   if (!track || !track.bpm) return;
-  const c = getAudioCtx();
+  const c = await getAudioCtxAsync();
   let loopStart = c.currentTime + 0.05;
   const first = schedulePattern(track, loopStart);
   const patternDur = first.patternDur;
