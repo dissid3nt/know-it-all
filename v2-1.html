@@ -791,6 +791,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .btn-ghost{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
 .btn-ghost:hover{border-color:var(--brand);color:var(--brand);}
 .btn-danger{background:color-mix(in srgb,var(--coral) 15%,var(--surface2));color:var(--coral);border:1.5px solid color-mix(in srgb,var(--coral) 40%,var(--border));}
+.music-theme-btn.active{background:var(--brand)!important;border-color:var(--brand)!important;color:white!important;}
 </style>
 </head>
 <body>
@@ -948,6 +949,17 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
       <div class="settings-row">
         <div><div class="settings-row-label" id="settings-theme-label">Apariencia</div></div>
         <button onclick="toggleTheme()" id="settings-theme-btn" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:7px 16px;font-family:var(--font-display);font-size:0.82rem;font-weight:700;color:var(--text2);cursor:pointer;">☀️ Light</button>
+      </div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
+        <div class="settings-row-label" id="settings-music-label">Música de fondo</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;width:100%;" id="music-theme-selector">
+          <button class="music-theme-btn active" data-theme="chill" onclick="setMusicTheme('chill')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">🌊 Chill</button>
+          <button class="music-theme-btn" data-theme="upbeat" onclick="setMusicTheme('upbeat')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">⚡ Upbeat</button>
+          <button class="music-theme-btn" data-theme="mysterious" onclick="setMusicTheme('mysterious')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">🌙 Misterioso</button>
+          <button class="music-theme-btn" data-theme="retro" onclick="setMusicTheme('retro')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">👾 Retro</button>
+          <button class="music-theme-btn" data-theme="off" onclick="setMusicTheme('off')" style="padding:7px 14px;border-radius:20px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.2s;">🔕 Sin música</button>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text3);" id="music-preview-hint">La música suena durante el juego. Puedes silenciar con 🔊 en el topbar.</div>
       </div>
       <div class="settings-row">
         <div><div class="settings-row-label" id="settings-lang-label">Idioma por defecto</div></div>
@@ -1481,6 +1493,7 @@ const T = {
     settingsDangerTitle:'ZONA DE PELIGRO',
     lbTitle:'📊 Leaderboard',
     themeLabel:'Apariencia',
+    musicLabel:'Música de fondo',
     previewTitle:'Vista previa',
     labelEmail:'Email',
     labelPassword:'Password',
@@ -1630,6 +1643,7 @@ const T = {
     settingsDangerTitle:'DANGER ZONE',
     lbTitle:'📊 Leaderboard',
     themeLabel:'Appearance',
+    musicLabel:'Background music',
     previewTitle:'Preview',
     labelEmail:'Email',
     labelPassword:'Password',
@@ -1711,6 +1725,7 @@ function applyTranslations() {
   s('settings-danger-title', t.settingsDangerTitle);
   s('lb-title', t.lbTitle);
   s('settings-theme-label', t.themeLabel);
+  s('settings-music-label', t.musicLabel);
   s('dash-welcome-label', t.dcWelcomeLabel);
   // Update card sub-labels dynamically
   const subLabels = [
@@ -2054,6 +2069,12 @@ window.loadSettings = function() {
   if (!currentUser) return;
   s('settings-name-val', currentUser.displayName || '—');
   s('settings-email-val', currentUser.email || '—');
+  // Restore music theme selection
+  const saved = localStorage.getItem('nia_theme_music') || 'chill';
+  currentTheme = saved;
+  document.querySelectorAll('.music-theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === saved);
+  });
 }
 
 window.saveSettings = async function() {
@@ -3327,24 +3348,63 @@ window.toggleMute = function() {
 }
 
 // ── BACKGROUND MUSIC ─────────────────────────────
-// Gentle, neutral ambient loop using oscillators
+let currentTheme = localStorage.getItem('nia_theme_music') || 'chill';
+
+const THEMES = {
+  chill: {
+    name: '🌊 Chill',
+    nameEs: '🌊 Chill',
+    pad: [261.63, 329.63, 392.00, 523.25],   // C maj
+    padType: 'sine', padVol: 0.06, lfoRate: 0.12,
+    pluckNotes: [523.25, 659.25, 783.99, 1046.50],
+    pluckInterval: 2200, pluckVol: 0.07,
+  },
+  upbeat: {
+    name: '⚡ Upbeat',
+    nameEs: '⚡ Upbeat',
+    pad: [293.66, 369.99, 440.00, 587.33],   // D maj
+    padType: 'triangle', padVol: 0.07, lfoRate: 0.3,
+    pluckNotes: [587.33, 739.99, 880.00, 1174.66],
+    pluckInterval: 1200, pluckVol: 0.09,
+  },
+  mysterious: {
+    name: '🌙 Misterioso',
+    nameEs: '🌙 Misterioso',
+    pad: [246.94, 293.66, 369.99, 493.88],   // B min
+    padType: 'sine', padVol: 0.05, lfoRate: 0.08,
+    pluckNotes: [493.88, 587.33, 739.99, 987.77],
+    pluckInterval: 3000, pluckVol: 0.05,
+  },
+  retro: {
+    name: '👾 Retro',
+    nameEs: '👾 Retro',
+    pad: [220.00, 277.18, 329.63, 440.00],   // A min
+    padType: 'square', padVol: 0.04, lfoRate: 0.5,
+    pluckNotes: [440.00, 554.37, 659.25, 880.00],
+    pluckInterval: 800, pluckVol: 0.06,
+  },
+  off: {
+    name: '🔕 Sin música',
+    nameEs: '🔕 Sin música',
+  }
+};
+
 function startBgMusic() {
   if (audioMuted || bgMusicNodes) return;
+  if (currentTheme === 'off') return;
   bgMusicPlaying = true;
+  const theme = THEMES[currentTheme] || THEMES.chill;
   const ctx = getAudioCtx();
 
-  // Create a master gain for bg music
   const masterGain = ctx.createGain();
   masterGain.gain.setValueAtTime(0, ctx.currentTime);
-  masterGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 2);
+  masterGain.gain.linearRampToValueAtTime(theme.padVol, ctx.currentTime + 2);
   masterGain.connect(ctx.destination);
 
-  // Soft pad — layered sine waves
-  const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
-  const oscs = notes.map((freq, i) => {
+  const oscs = theme.pad.map((freq, i) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'sine';
+    osc.type = theme.padType;
     osc.frequency.value = freq;
     gain.gain.value = 0.25 - i * 0.04;
     osc.connect(gain);
@@ -3353,20 +3413,18 @@ function startBgMusic() {
     return { osc, gain };
   });
 
-  // Slow LFO for gentle pulsing
   const lfo = ctx.createOscillator();
   const lfoGain = ctx.createGain();
-  lfo.frequency.value = 0.15;
+  lfo.frequency.value = theme.lfoRate;
   lfoGain.gain.value = 0.02;
   lfo.connect(lfoGain);
   oscs.forEach(({ gain }) => lfoGain.connect(gain.gain));
   lfo.start();
 
-  // Gentle rhythmic pluck every ~2s
   let pluckInterval = setInterval(() => {
     if (audioMuted || !bgMusicNodes) { clearInterval(pluckInterval); return; }
-    playPluck(ctx, masterGain);
-  }, 2000);
+    playPluck(ctx, masterGain, theme.pluckNotes, theme.pluckVol);
+  }, theme.pluckInterval);
 
   bgMusicNodes = { masterGain, oscs, lfo, pluckInterval };
 }
@@ -3384,14 +3442,15 @@ function stopBgMusic() {
   bgMusicNodes = null;
 }
 
-function playPluck(ctx, dest) {
-  const pluckNotes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+function playPluck(ctx, dest, pluckNotes, vol) {
+  pluckNotes = pluckNotes || [523.25, 659.25, 783.99, 1046.50];
+  vol = vol || 0.07;
   const note = pluckNotes[Math.floor(Math.random() * pluckNotes.length)];
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = 'triangle';
   osc.frequency.value = note;
-  gain.gain.setValueAtTime(0.07, ctx.currentTime);
+  gain.gain.setValueAtTime(vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
   osc.connect(gain);
   gain.connect(dest);
@@ -3528,6 +3587,22 @@ function sfxCountdown() {
   osc.stop(ctx.currentTime + 0.08);
 }
 
+
+
+// ── MUSIC THEME SELECTOR ──────────────────────────
+window.setMusicTheme = function(theme) {
+  currentTheme = theme;
+  localStorage.setItem('nia_theme_music', theme);
+  // Update UI
+  document.querySelectorAll('.music-theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  // Restart music with new theme if playing
+  if (bgMusicPlaying) {
+    stopBgMusic();
+    if (theme !== 'off') setTimeout(startBgMusic, 300);
+  }
+}
 
 // ── AUTO ROUTE ────────────────────────────────────────
 try {
