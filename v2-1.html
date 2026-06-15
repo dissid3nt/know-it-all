@@ -1276,12 +1276,27 @@ const T = {
     instrStartNow:'🚀 ¡Empezar ahora!',
     settingsDangerTitle:'ZONA DE PELIGRO',
     lbTitle:'📊 Leaderboard',
-    previewTitle:'Preview', btnPreview:'👁 Preview',
+    themeLabel:'Appearance',
+    previewTitle:'Preview',
+    labelEmail:'Email',
+    labelPassword:'Password',
+    labelName:'Name',
+    placeholderEmail:'your@email.com',
+    placeholderPassword:'••••••••',
+    placeholderName:'Your name',
+    placeholderMinPass:'Min. 6 characters', btnPreview:'👁 Preview',
     duplicateOf:'Copy of', duplicated:'created',
     reportTitle:'Game report',
     podiumTitle:'🏆 Game over!',
     streakMsg:'Answer streak!',
-    previewTitle:'Vista previa', btnPreview:'👁 Preview',
+    previewTitle:'Vista previa',
+    labelEmail:'Correo',
+    labelPassword:'Contraseña',
+    labelName:'Nombre',
+    placeholderEmail:'tu@correo.com',
+    placeholderPassword:'••••••••',
+    placeholderName:'Tu nombre',
+    placeholderMinPass:'Mínimo 6 caracteres', btnPreview:'👁 Preview',
     duplicateOf:'Copia de', duplicated:'creado',
     reportTitle:'Informe de partida',
     podiumTitle:'🏆 ¡Juego terminado!',
@@ -1409,17 +1424,25 @@ const T = {
     instrStartNow:'🚀 Start now!',
     settingsDangerTitle:'DANGER ZONE',
     lbTitle:'📊 Leaderboard',
-    previewTitle:'Vista previa', btnPreview:'👁 Preview',
-    duplicateOf:'Copia de', duplicated:'creado',
-    reportTitle:'Informe de partida',
-    podiumTitle:'🏆 ¡Juego terminado!',
-    streakMsg:'¡Racha de aciertos!',
-    btnAddManual:'+ Agregar manual',
-    btnDeleteAll:'🗑 Borrar todo',
-    btnConfirmDelete:'Sí, eliminar',
-    btnCancelDelete:'Cancelar',
-    waitingPlayers2:'Esperando jugadores...',
-    lbNextBtn:'Siguiente pregunta →',
+    themeLabel:'Appearance',
+    previewTitle:'Preview',
+    labelEmail:'Email',
+    labelPassword:'Password',
+    labelName:'Name',
+    placeholderEmail:'your@email.com',
+    placeholderPassword:'••••••••',
+    placeholderName:'Your name',
+    placeholderMinPass:'Min. 6 characters', btnPreview:'👁 Preview',
+    duplicateOf:'Copy of', duplicated:'created',
+    reportTitle:'Game report',
+    podiumTitle:'🏆 Game over!',
+    streakMsg:'Answer streak!',
+    btnAddManual:'+ Add manually',
+    btnDeleteAll:'🗑 Delete all',
+    btnConfirmDelete:'Yes, delete',
+    btnCancelDelete:'Cancel',
+    waitingPlayers2:'Waiting for players...',
+    lbNextBtn:'Next question →',
     posUp: (n) => `▲ +${n} puesto${n>1?'s':''}`,
     posDown: (n) => `▼ ${n} puesto${n>1?'s':''}`,
     settingsSignoutLabel:'Sign out',
@@ -1482,6 +1505,26 @@ function applyTranslations() {
   s('btn-signout', t.btnSignout); s('btn-signout2', t.btnSignout2);
   s('settings-danger-title', t.settingsDangerTitle);
   s('lb-title', t.lbTitle);
+  s('settings-theme-label', t.themeLabel);
+  s('label-email', t.labelEmail);
+  s('label-password', t.labelPassword);
+  // placeholders
+  const loginEmail = document.getElementById('login-email');
+  if(loginEmail) loginEmail.placeholder = t.placeholderEmail;
+  const loginPass = document.getElementById('login-password');
+  if(loginPass) loginPass.placeholder = t.placeholderPassword;
+  const regName = document.getElementById('reg-name');
+  if(regName) regName.placeholder = t.placeholderName;
+  const regEmail = document.getElementById('reg-email');
+  if(regEmail) regEmail.placeholder = t.placeholderEmail;
+  const regPass = document.getElementById('reg-password');
+  if(regPass) regPass.placeholder = t.placeholderMinPass;
+  const regNameLabel = document.querySelector('label[for="reg-name"], #auth-register-form label');
+  // Update register form labels inline
+  const regLabels = document.querySelectorAll('#auth-register-form label');
+  if(regLabels[0]) regLabels[0].textContent = t.labelName;
+  if(regLabels[1]) regLabels[1].textContent = t.labelEmail;
+  if(regLabels[2]) regLabels[2].textContent = t.labelPassword;
   s('preview-title', t.previewTitle);
   s('report-title', t.reportTitle);
   s('podium-title', t.podiumTitle);
