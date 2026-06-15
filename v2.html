@@ -382,12 +382,14 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .lb-name{flex:1;font-weight:600;font-size:1rem;}
 .lb-score{font-family:'Space Mono',monospace;font-weight:700;color:var(--accent2);font-size:1rem;}
 .lb-delta{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;padding:2px 8px;border-radius:20px;background:color-mix(in srgb,var(--green) 20%,var(--surface2));color:var(--green);min-width:54px;text-align:center;opacity:0;transition:opacity 0.4s;}
-.lb-delta.show{opacity:1;}
+.lb-delta.show{opacity:1;transition:opacity 0.5s;}
 .lb-delta.zero{background:var(--surface2);color:var(--muted);}
-.lb-row.moved-up{animation:moveUp 0.6s ease forwards;}
-.lb-row.highlight{background:color-mix(in srgb,var(--green) 15%,var(--surface))!important;border-color:var(--green)!important;}
-@keyframes moveUp{0%{transform:translateY(20px);opacity:0.6}100%{transform:translateY(0);opacity:1}}
+.lb-row.moved-up{animation:moveUp 0.9s ease forwards;}
+.lb-row.highlight{background:color-mix(in srgb,var(--green) 15%,var(--surface))!important;border-color:var(--green)!important;transition:background 0.4s,border-color 0.4s;}
+@keyframes moveUp{0%{transform:translateY(28px);opacity:0.4}100%{transform:translateY(0);opacity:1}}
 .lb-next-btn{margin-top:20px;width:100%;max-width:700px;}
+.lb-bar-wrap{flex:1;min-width:60px;background:var(--surface2);border-radius:6px;height:8px;overflow:hidden;margin:0 8px;}
+.lb-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width 1s ease;}
 </style>
 </head>
 <body>
@@ -1633,6 +1635,7 @@ window.copyGameCode = function() {
 
 function loadHostQuestion(i) {
   const q=questions[i]; if(!q) return;
+  showScreen('screen-host-game'); // always ensure host sees game screen
   s('host-q-counter', t.qCounter(i+1,questions.length));
   document.getElementById('progress-fill').style.width=`${((i+1)/questions.length)*100}%`;
   s('host-q-text', q.text);
@@ -1877,29 +1880,51 @@ function showLeaderboard(players, isLast) {
     const oldScore = prevScores[pid]||0;
     const delta = newScore - oldScore;
     const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
-    return `<div class="lb-row ${i===0?'rank-1':''} ${delta>0?'moved-up':''}" id="lb-row-${pid}" style="animation-delay:${i*80}ms">
+    return `<div class="lb-row ${i===0?'rank-1':''} ${delta>0?'moved-up':''}" id="lb-row-${pid}" style="animation-delay:${i*120}ms">
       <div class="lb-rank">${rankEmoji}</div>
       <div class="lb-name">${p.name}</div>
+      <div class="lb-bar-wrap"><div class="lb-bar-fill" id="lb-bar-${pid}" style="width:0%"></div></div>
       <div class="lb-delta ${delta>0?'show':'show zero'}" id="lb-delta-${pid}">${delta>0?'+'+delta:'—'}</div>
-      <div class="lb-score">${newScore}</div>
+      <div class="lb-score" id="lb-score-${pid}">${oldScore}</div>
     </div>`;
   }).join('');
 
-  // Animate deltas appearing after rows settle
+  // Animate bars + score counting after rows appear
+  const maxScoreVal = sorted[0]?.[1]?.score || 1;
   setTimeout(() => {
     sorted.forEach(([pid, p]) => {
-      const deltaEl = document.getElementById(`lb-delta-${pid}`);
       const newScore = p.score||0;
       const oldScore = prevScores[pid]||0;
       const delta = newScore - oldScore;
+
+      // Animate bar width
+      const bar = document.getElementById(`lb-bar-${pid}`);
+      if(bar) bar.style.width = `${Math.round((newScore/maxScoreVal)*100)}%`;
+
+      // Animate score counter
+      const scoreEl = document.getElementById(`lb-score-${pid}`);
+      if(scoreEl && delta > 0) {
+        const duration = 800, steps = 20, increment = delta/steps;
+        let current = oldScore, step = 0;
+        const interval = setInterval(() => {
+          step++;
+          current = step >= steps ? newScore : Math.round(oldScore + increment*step);
+          scoreEl.textContent = current;
+          if(step >= steps) clearInterval(interval);
+        }, duration/steps);
+      } else if(scoreEl) {
+        scoreEl.textContent = newScore;
+      }
+
+      // Show delta badge + highlight
+      const deltaEl = document.getElementById(`lb-delta-${pid}`);
       if(deltaEl && delta > 0) {
         deltaEl.classList.add('show');
-        // Highlight the row briefly
         const row = document.getElementById(`lb-row-${pid}`);
-        if(row) { row.classList.add('highlight'); setTimeout(()=>row.classList.remove('highlight'),1200); }
+        if(row) { row.classList.add('highlight'); setTimeout(()=>row.classList.remove('highlight'),1600); }
       }
     });
-  }, 400);
+  }, 700);
 }
 
 // ── V2: IMAGE HANDLERS ────────────────────────────────
