@@ -589,6 +589,20 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   </div>
 </div>
 
+
+<!-- ══ CANCEL GAME MODAL ══ -->
+<div class="modal-overlay" id="modal-cancel-game">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
+    <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
+    <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-cancel-game').classList.remove('open')" id="btn-keep-playing">No, seguir jugando</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ HOST LOBBY ══ -->
 <div id="screen-host-lobby" class="screen">
   <div style="width:100%;max-width:500px;display:flex;justify-content:space-between;align-items:center;">
@@ -2047,18 +2061,6 @@ try {
 }
 </script>
 
-<!-- ══ CANCEL GAME MODAL (outside all screens for proper z-index) ══ -->
-<div class="modal-overlay" id="modal-cancel-game">
-  <div class="modal" style="max-width:360px;text-align:center;">
-    <div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>
-    <h2 id="cancel-game-title" style="margin-bottom:8px;">¿Cancelar partida?</h2>
-    <p class="muted" id="cancel-game-desc" style="margin-bottom:20px;">Se terminará el juego para todos los jugadores y no se guardará el resultado.</p>
-    <div style="display:flex;gap:10px;">
-      <button class="btn btn-red" onclick="confirmCancelGame()" id="btn-confirm-cancel">Sí, cancelar</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('modal-cancel-game').classList.remove('open')" id="btn-keep-playing">No, seguir jugando</button>
-    </div>
-  </div>
-</div>
 
 <script>
 // Sync routing — runs after DOM is ready, before Firebase resolves
