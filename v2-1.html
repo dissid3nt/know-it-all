@@ -703,6 +703,8 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   transition: border-color 0.2s;
 }
 .q-card:hover { border-color: var(--brand); }
+.q-card .q-card-body { display: none; }
+.q-card.expanded .q-card-body { display: flex; flex-direction: column; gap: 10px; }
 .q-card.expanded { border-color: var(--brand2); }
 .q-card-header {
   display: flex; align-items: flex-start; gap: 10px;
@@ -871,22 +873,22 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
       </div>
       <div class="dash-card open" onclick="showScreen('screen-projects');loadProjects();">
         <div class="dash-card-icon">📂</div>
-        <div class="dash-card-label" id="dc-open-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Mis juegos</div>
+        <div class="dash-card-label" id="dc-open-sublabel" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Mis juegos</div>
         <div class="dash-card-title" id="dc-open-title">Guardados</div>
       </div>
       <div class="dash-card results" onclick="showScreen('screen-results');loadResults();">
         <div class="dash-card-icon">📊</div>
-        <div class="dash-card-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Historial</div>
+        <div class="dash-card-label" id="dc-results-sublabel" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Historial</div>
         <div class="dash-card-title" id="dc-results-title">Resultados</div>
       </div>
       <div class="dash-card settings" onclick="showScreen('screen-settings');loadSettings();">
         <div class="dash-card-icon">⚙️</div>
-        <div class="dash-card-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Cuenta</div>
+        <div class="dash-card-label" id="dc-settings-sublabel" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Cuenta</div>
         <div class="dash-card-title" id="dc-settings-title">Ajustes</div>
       </div>
       <div class="dash-card" onclick="showPlayerJoinFromDash()">
         <div class="dash-card-icon">🎯</div>
-        <div class="dash-card-label" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Como jugador</div>
+        <div class="dash-card-label" id="dc-join-sublabel" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Como jugador</div>
         <div class="dash-card-title" id="dc-join-title">Unirme</div>
       </div>
     </div>
@@ -1381,6 +1383,7 @@ const T = {
     btnGoogle:'Continuar con Google', btnPlayerEntry:'👤 Soy jugador — unirme a una partida',
     greeting: n => `¡Hola, ${n}! 👋`, dashSubtitle:'¿Qué quieres hacer hoy?',
     dcNewTitle:'Nuevo juego', dcNewDesc:'Crea un nuevo juego de trivia con tus propias preguntas',
+    dcWelcomeLabel:'Bienvenido de vuelta', dcNewLabel:'Empezar', dcOpenLabel:'Mis juegos', dcResultsLabel:'Historial', dcSettingsLabel:'Cuenta', dcJoinLabel:'Como jugador',
     dcOpenTitle:'Juegos guardados', dcOpenDesc:'Continúa o lanza un juego guardado',
     dcResultsTitle:'Resultados', dcResultsDesc:'Revisa el historial y puntajes de juegos anteriores',
     dcSettingsTitle:'Ajustes', dcSettingsDesc:'Personaliza tu cuenta y preferencias',
@@ -1529,6 +1532,7 @@ const T = {
     btnGoogle:'Continue with Google', btnPlayerEntry:'👤 I\'m a player — join a game',
     greeting: n => `Hey, ${n}! 👋`, dashSubtitle:'What do you want to do today?',
     dcNewTitle:'New game', dcNewDesc:'Create a new trivia game with your own questions',
+    dcWelcomeLabel:'Welcome back', dcNewLabel:'Start', dcOpenLabel:'My games', dcResultsLabel:'History', dcSettingsLabel:'Account', dcJoinLabel:'As player',
     dcOpenTitle:'Saved games', dcOpenDesc:'Continue or launch a saved game',
     dcResultsTitle:'Results', dcResultsDesc:'Review history and scores from past games',
     dcSettingsTitle:'Settings', dcSettingsDesc:'Customize your account and preferences',
@@ -1706,6 +1710,16 @@ function applyTranslations() {
   s('settings-danger-title', t.settingsDangerTitle);
   s('lb-title', t.lbTitle);
   s('settings-theme-label', t.themeLabel);
+  s('dash-welcome-label', t.dcWelcomeLabel);
+  // Update card sub-labels dynamically
+  const subLabels = [
+    ['dc-new-sublabel', t.dcNewLabel],
+    ['dc-open-sublabel', t.dcOpenLabel],
+    ['dc-results-sublabel', t.dcResultsLabel],
+    ['dc-settings-sublabel', t.dcSettingsLabel],
+    ['dc-join-sublabel', t.dcJoinLabel],
+  ];
+  subLabels.forEach(([id, text]) => { const el=document.getElementById(id); if(el) el.textContent=text; });
   s('label-email', t.labelEmail);
   s('label-password', t.labelPassword);
   // placeholders
@@ -2935,14 +2949,14 @@ function initDragDrop() {
   const list = document.getElementById('questions-list');
   if (!list) return;
   list.addEventListener('dragstart', e => {
-    const item = e.target.closest('.question-item');
+    const item = e.target.closest('.question-item, .q-card');
     if (!item) return;
     dragSrcIndex = parseInt(item.dataset.index);
     item.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
   });
   list.addEventListener('dragend', e => {
-    document.querySelectorAll('.question-item').forEach(el => {
+    document.querySelectorAll('.question-item, .q-card').forEach(el => {
       el.classList.remove('dragging', 'drag-over');
     });
   });
@@ -2955,7 +2969,7 @@ function initDragDrop() {
   });
   list.addEventListener('drop', e => {
     e.preventDefault();
-    const item = e.target.closest('.question-item');
+    const item = e.target.closest('.question-item, .q-card');
     if (!item) return;
     const destIndex = parseInt(item.dataset.index);
     if (dragSrcIndex === null || dragSrcIndex === destIndex) return;
