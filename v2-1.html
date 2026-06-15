@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Crect x='18' y='16' width='64' height='50' rx='14' fill='white'/%3E%3Cpolygon points='28,66 10,88 46,66' fill='white'/%3E%3Ctext x='50' y='58' font-family='Arial' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E" type="image/svg+xml">
 <meta name="theme-color" content="#7C3AED">
 <title>Know It All 🎯 v2.1</title>
+<!-- build:20260615-r3 -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap');
 :root{
@@ -1992,7 +1993,8 @@ async function goToLobby() {
 window.goToLobby = goToLobby;
 
 function listenPlayers() {
-  const unsub = onValue(ref(db,`games/${gameCode}/players`), snap => {
+  let unsub = null;
+  unsub = onValue(ref(db,`games/${gameCode}/players`), snap => {
     const players=snap.val()||{};
     const grid=document.getElementById('players-grid');
     grid.innerHTML='';
@@ -2090,7 +2092,8 @@ function startHostTimer(seconds) {
 }
 
 function listenResponses() {
-  const unsub=onValue(ref(db,`games/${gameCode}/answers`),snap=>{
+  let unsub=null;
+  unsub=onValue(ref(db,`games/${gameCode}/answers`),snap=>{
     const all=snap.val()||{};
     const currentAnswers=all[currentQIndex]||{};
     const count=Object.keys(currentAnswers).length;
@@ -2540,7 +2543,8 @@ function _enterWaitScreen(name) {
 }
 
 function listenPlayerCount() {
-  const unsub=onValue(ref(db,`games/${gameCode}/players`),snap=>{
+  let unsub=null;
+  unsub=onValue(ref(db,`games/${gameCode}/players`),snap=>{
     const count=Object.keys(snap.val()||{}).length;
     s('wait-player-count',t.waitCount(count));
   });
@@ -2548,7 +2552,8 @@ function listenPlayerCount() {
 }
 
 function listenGameState() {
-  const unsub=onValue(ref(db,`games/${gameCode}`),snap=>{
+  let unsub=null;
+  unsub=onValue(ref(db,`games/${gameCode}`),snap=>{
     const game=snap.val(); if(!game) return;
     if(game.status==='playing'){
       const qi=game.currentQuestion;
@@ -2599,29 +2604,51 @@ function loadPlayerQuestion(i,startedAt) {
   } else {
     area.innerHTML=`<div class="answer-btns">${['A','B','C','D'].map(k=>`<button class="answer-btn ${k}" onclick="submitPlayerAnswer('${k}')"><span class="opt-letter">${k}</span><span>${q.options[k]}</span></button>`).join('')}</div>`;
   }
-  startPlayerTimer(q.time||20);
+  // startedAt unknown here — use current time as approximation
+  startPlayerTimer(q.time||20, Date.now());
 }
 
 // startPlayerTimer consolidated in V2.1 below
 
 window.submitPlayerAnswer = async function(answer) {
   if(playerAnswered) return;
-  playerAnswered=true; clearInterval(timerInterval);
-  await set(ref(db,`games/${gameCode}/answers/${currentQIndex}/${playerId}`),{answer,timestamp:Date.now()});
+  playerAnswered=true;
+  clearInterval(timerInterval);
+  clearInterval(playerTimerInterval);
+  const timestamp = Date.now();
+  await set(ref(db,`games/${gameCode}/answers/${currentQIndex}/${playerId}`),{answer,timestamp});
+  document.querySelectorAll('.answer-btn,.tf-btn').forEach(b=>b.disabled=true);
+  // Show reaction bar
+  const reactionBar=document.getElementById('reaction-bar');
+  if(reactionBar) reactionBar.style.display='flex';
+  // Calculate points optimistically for immediate feedback
   const q=questions[currentQIndex];
   const correct=answer===q.correct;
-  document.querySelectorAll('.answer-btn,.tf-btn').forEach(b=>b.disabled=true);
-  const resultEl=document.getElementById('player-result');
-  resultEl.style.display='block';
-  if(correct) resultEl.innerHTML=`<div class="result-badge correct">${t.correct}</div>`;
-  else {
-    const correctLabel=q.type==='truefalse'?(q.correct==='true'?t.trueCorrect:t.falseCorrect):`${q.correct}: ${q.options[q.correct]}`;
-    resultEl.innerHTML=`<div class="result-badge wrong">${t.wrong(correctLabel)}</div>`;
-  }
-  const unsub=onValue(ref(db,`games/${gameCode}/players/${playerId}/score`),snap=>{
-    playerScore=snap.val()||0;
+  const correctLabel=q.type==='truefalse'
+    ?(q.correct==='true'?t.trueCorrect:t.falseCorrect)
+    :`${q.correct}: ${q.options?.[q.correct]||''}`;
+  if(correct){
+    const startSnap=await get(ref(db,`games/${gameCode}/questionStartedAt`));
+    const startedAt=startSnap.val()||timestamp;
+    const totalTime=(q.time||20)*1000;
+    const elapsed=timestamp-startedAt;
+    const points=500+Math.max(0,Math.floor((1-elapsed/totalTime)*500));
+    playerScore+=points;
     s('player-score-live',t.pts(playerScore));
-    unsub();
+    showPlayerAnswerResult(true, correctLabel, points);
+    // Show streak badge if applicable
+    const pSnap=await get(ref(db,`games/${gameCode}/players/${playerId}`));
+    const streak=(pSnap.val()?.streak||0)+1;
+    if(streak>=3) showStreakBadge(streak);
+  } else {
+    showPlayerAnswerResult(false, correctLabel, 0);
+  }
+  // Sync real score from Firebase
+  let unsubScore;
+  unsubScore=onValue(ref(db,`games/${gameCode}/players/${playerId}/score`),snap=>{
+    const real=snap.val();
+    if(real!==null && real!==undefined){ playerScore=real; s('player-score-live',t.pts(playerScore)); }
+    if(unsubScore) unsubScore();
   });
 }
 
@@ -2731,7 +2758,8 @@ window.sendReaction = async function(emoji) {
 
 function listenReactions() {
   const reactRef = ref(db, `games/${gameCode}/reactions`);
-  const unsub = onValue(reactRef, snap => {
+  let unsub = null;
+  unsub = onValue(reactRef, snap => {
     const all = snap.val()||{};
     // Only show reactions from the last 3 seconds
     const now = Date.now();
