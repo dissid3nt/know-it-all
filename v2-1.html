@@ -6,7 +6,7 @@
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Crect x='18' y='16' width='64' height='50' rx='14' fill='white'/%3E%3Cpolygon points='28,66 10,88 46,66' fill='white'/%3E%3Ctext x='50' y='58' font-family='Arial' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E" type="image/svg+xml">
 <meta name="theme-color" content="#7C3AED">
-<title>Know It All 🎯 v2</title>
+<title>Know It All 🎯 v2.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap');
 :root{
@@ -1447,7 +1447,7 @@ function applyTranslations() {
   s('btn-edit-name', t.btnEditName);
   s('lobby-title', t.lobbyTitle); s('live-label', t.liveLabel); s('code-label', t.codeLabel);
   s('qr-hint', t.qrHint); s('btn-edit-q', t.editQBtn);
-  s('start-game-btn', t.startGame); s('scoreboard-label', t.scoreboardLabel);
+  s('start-game-btn', t.startGame);
   s('reveal-btn', t.revealBtn); s('next-btn', t.nextBtn);
   s('final-title', t.finalTitle); s('btn-play-again', t.playAgain);
   s('join-title', t.joinTitle); s('label-code', t.labelCode);
@@ -1675,6 +1675,9 @@ window.saveProject = async function() {
 }
 
 // ── RESULTS ──────────────────────────────────────────
+// Store game data for report modal (avoids JSON in onclick attrs)
+window._gameDataStore = {};
+
 window.loadResults = async function() {
   if (!currentUser) return;
   const snap = await get(ref(db, `users/${currentUser.uid}/gameHistory`));
@@ -1686,6 +1689,7 @@ window.loadResults = async function() {
     return;
   }
   const games = Object.entries(snap.val()).sort((a,b) => (b[1].playedAt||0)-(a[1].playedAt||0));
+  games.forEach(([id, g]) => { window._gameDataStore[id] = g; });
   if(deleteBar) {
     deleteBar.style.display='flex';
     const countLabel = document.getElementById('results-count-label');
@@ -1711,7 +1715,7 @@ window.loadResults = async function() {
           <span class="score-pts">${p.score||0}</span>
         </div>`).join('')}
         <div class="result-game-actions">
-          <button class="btn btn-sm btn-secondary" onclick="openReport('${id}',${JSON.stringify(g).replace(/'/g,'&#39;')})">📊 ${lang==='es'?'Ver informe':'View report'}</button>
+          <button class="btn btn-sm btn-secondary" onclick="openReport('${id}')">📊 ${lang==='es'?'Ver informe':'View report'}</button>
           <button class="btn btn-sm btn-red" onclick="openDeleteModal('single','${id}')" id="del-single-${id}"
             style="font-size:0.78rem;">🗑 ${lang==='es'?'Eliminar esta partida':'Delete this game'}</button>
         </div>
@@ -2904,9 +2908,10 @@ window.duplicateProject = async function(id) {
 }
 
 // ── GAME REPORT ──────────────────────────────────
-window.openReport = function(id, gameData) {
+window.openReport = function(id) {
+  const g = window._gameDataStore && window._gameDataStore[id];
+  if(!g){ toast(lang==='es'?'Datos no disponibles':'Data not available'); return; }
   showScreen('screen-report');
-  const g = typeof gameData === 'string' ? JSON.parse(gameData) : gameData;
   const players = Object.values(g.players||{}).sort((a,b)=>(b.score||0)-(a.score||0));
   const totalPlayers = players.length;
   const avgScore = totalPlayers ? Math.round(players.reduce((s,p)=>s+(p.score||0),0)/totalPlayers) : 0;
