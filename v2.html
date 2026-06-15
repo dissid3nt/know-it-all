@@ -376,7 +376,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .lb-title{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent2);}
 .lb-q-counter{font-size:0.85rem;color:var(--muted);}
 .lb-list{width:100%;max-width:700px;display:flex;flex-direction:column;gap:8px;}
-.lb-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;transition:transform 0.5s ease,background 0.3s;}
+.lb-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;transition:top 0.5s cubic-bezier(0.34,1.1,0.64,1),background 0.4s,border-color 0.4s,box-shadow 0.3s;}
 .lb-row.rank-1{background:color-mix(in srgb,var(--gold) 12%,var(--surface));border-color:color-mix(in srgb,var(--gold) 40%,var(--border));}
 .lb-rank{font-family:'Space Mono',monospace;font-size:1rem;min-width:36px;text-align:center;}
 .lb-name{flex:1;font-weight:600;font-size:1rem;}
@@ -384,9 +384,13 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .lb-delta{font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;padding:2px 8px;border-radius:20px;background:color-mix(in srgb,var(--green) 20%,var(--surface2));color:var(--green);min-width:54px;text-align:center;opacity:0;transition:opacity 0.4s;}
 .lb-delta.show{opacity:1;transition:opacity 0.5s;}
 .lb-delta.zero{background:var(--surface2);color:var(--muted);}
-.lb-row.moved-up{animation:moveUp 0.9s ease forwards;}
+.pos-badge{position:absolute;right:10px;top:-13px;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:20px;opacity:0;transform:translateY(5px);transition:opacity 0.4s,transform 0.4s;white-space:nowrap;z-index:30;}
+.pos-badge.up{background:color-mix(in srgb,var(--green) 25%,var(--surface));color:var(--green);border:1px solid var(--green);}
+.pos-badge.down{background:color-mix(in srgb,var(--red) 20%,var(--surface));color:var(--red);border:1px solid var(--red);}
+.pos-badge.show{opacity:1;transform:translateY(0);}
+.lb-row.moving{z-index:20;box-shadow:0 8px 32px rgba(124,58,237,0.45);border-color:var(--accent2)!important;}
 .lb-row.highlight{background:color-mix(in srgb,var(--green) 15%,var(--surface))!important;border-color:var(--green)!important;transition:background 0.4s,border-color 0.4s;}
-@keyframes moveUp{0%{transform:translateY(28px);opacity:0.4}100%{transform:translateY(0);opacity:1}}
+
 .lb-next-btn{margin-top:20px;width:100%;max-width:700px;}
 .lb-bar-wrap{flex:1;min-width:60px;background:var(--surface2);border-radius:6px;height:8px;overflow:hidden;margin:0 8px;}
 .lb-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width 1s ease;}
@@ -720,8 +724,8 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <div class="lb-title" id="lb-title">📊 Leaderboard</div>
     <div class="lb-q-counter" id="lb-q-counter"></div>
   </div>
-  <div class="lb-list" id="lb-list"></div>
-  <button class="btn btn-primary lb-next-btn" onclick="proceedFromLeaderboard()" id="lb-next-btn">Siguiente pregunta →</button>
+  <div class="lb-list" id="lb-list" style="position:relative;width:100%;max-width:700px;"></div>
+  <button class="btn btn-primary lb-next-btn" onclick="proceedFromLeaderboard()" id="lb-next-btn" style="margin-top:20px;width:100%;max-width:700px;">Siguiente pregunta →</button>
 </div>
 
 <!-- ══ HOST FINAL ══ -->
@@ -1853,78 +1857,134 @@ function renderAnswerBars(answers, q, revealed) {
 
 
 // ── V2: ANIMATED LEADERBOARD ──────────────────────────
-function showLeaderboard(players, isLast) {
+const LB_ROW_H = 56, LB_GAP = 8, LB_STEP = 56 + 8;
+let lbPositions = {}; // pid -> current index
+
+function lbTopForIdx(i){ return i * LB_STEP; }
+function lbRankEmoji(i){ return i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`; }
+
+function lbMoveRow(pid, newIdx) {
+  const fromIdx = lbPositions[pid];
+  if(fromIdx === newIdx) return;
+  // Shift other rows
+  Object.entries(lbPositions).forEach(([otherPid, otherIdx]) => {
+    if(otherPid === pid) return;
+    let dest = otherIdx;
+    if(fromIdx < newIdx){ if(otherIdx > fromIdx && otherIdx <= newIdx) dest = otherIdx - 1; }
+    else                 { if(otherIdx >= newIdx && otherIdx < fromIdx) dest = otherIdx + 1; }
+    if(dest !== otherIdx){
+      const el = document.getElementById(`lb-row-${otherPid}`);
+      if(el) el.style.top = lbTopForIdx(dest)+'px';
+      lbPositions[otherPid] = dest;
+    }
+  });
+  const el = document.getElementById(`lb-row-${pid}`);
+  if(el){ el.classList.add('moving'); el.style.top = lbTopForIdx(newIdx)+'px'; }
+  lbPositions[pid] = newIdx;
+}
+
+function lbUpdateAllMedals() {
+  Object.entries(lbPositions).forEach(([pid, idx]) => {
+    const rankEl = document.getElementById(`lb-rank-${pid}`);
+    if(rankEl) rankEl.textContent = lbRankEmoji(idx);
+    const row = document.getElementById(`lb-row-${pid}`);
+    if(row) row.classList.toggle('rank-1', idx===0);
+  });
+}
+
+async function showLeaderboard(players, isLast) {
   showScreen('screen-leaderboard');
 
-  // Update counter
   const qCounter = document.getElementById('lb-q-counter');
   if(qCounter) qCounter.textContent = lang==='es'
     ? `Pregunta ${currentQIndex+1} de ${questions.length}`
     : `Question ${currentQIndex+1} of ${questions.length}`;
 
-  // Update next button label
   const nextBtn = document.getElementById('lb-next-btn');
   if(nextBtn) nextBtn.textContent = isLast
     ? (lang==='es'?'Ver resultados finales →':'See final results →')
     : (lang==='es'?'Siguiente pregunta →':'Next question →');
 
-  // Sort by NEW score
-  const sorted = Object.entries(players).sort((a,b)=>(b[1].score||0)-(a[1].score||0));
-  const maxScore = sorted[0]?.[1]?.score || 1;
+  // Sort by OLD score to show initial state
+  const oldSorted = Object.entries(players)
+    .map(([pid,p]) => ({pid, name:p.name, score:p.score||0, old:prevScores[pid]||0}))
+    .sort((a,b) => b.old - a.old);
+  const newSorted = [...oldSorted].sort((a,b) => b.score - a.score);
+  const maxScore = newSorted[0]?.score || 1;
+
+  // Build rows in OLD order
   const list = document.getElementById('lb-list');
   if(!list) return;
-
-  // Build rows
-  list.innerHTML = sorted.map(([pid, p], i) => {
-    const newScore = p.score||0;
-    const oldScore = prevScores[pid]||0;
-    const delta = newScore - oldScore;
-    const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}`;
-    return `<div class="lb-row ${i===0?'rank-1':''} ${delta>0?'moved-up':''}" id="lb-row-${pid}" style="animation-delay:${i*120}ms">
-      <div class="lb-rank">${rankEmoji}</div>
+  list.style.height = (oldSorted.length * LB_STEP - LB_GAP) + 'px';
+  lbPositions = {};
+  list.innerHTML = oldSorted.map((p, i) => {
+    lbPositions[p.pid] = i;
+    return `<div class="lb-row ${i===0?'rank-1':''}" id="lb-row-${p.pid}" style="top:${lbTopForIdx(i)}px">
+      <div class="lb-rank" id="lb-rank-${p.pid}">${lbRankEmoji(i)}</div>
       <div class="lb-name">${p.name}</div>
-      <div class="lb-bar-wrap"><div class="lb-bar-fill" id="lb-bar-${pid}" style="width:0%"></div></div>
-      <div class="lb-delta ${delta>0?'show':'show zero'}" id="lb-delta-${pid}">${delta>0?'+'+delta:'—'}</div>
-      <div class="lb-score" id="lb-score-${pid}">${oldScore}</div>
+      <div class="lb-bar-wrap"><div class="lb-bar-fill" id="lb-bar-${p.pid}" style="width:0%"></div></div>
+      <div class="lb-delta gray" id="lb-delta-${p.pid}" style="opacity:0">—</div>
+      <div class="lb-score" id="lb-score-${p.pid}">${p.old}</div>
+      <div class="pos-badge" id="lb-badge-${p.pid}"></div>
     </div>`;
   }).join('');
 
-  // Animate bars + score counting after rows appear
-  const maxScoreVal = sorted[0]?.[1]?.score || 1;
-  setTimeout(() => {
-    sorted.forEach(([pid, p]) => {
-      const newScore = p.score||0;
-      const oldScore = prevScores[pid]||0;
-      const delta = newScore - oldScore;
+  await new Promise(r=>setTimeout(r,500));
 
-      // Animate bar width
-      const bar = document.getElementById(`lb-bar-${pid}`);
-      if(bar) bar.style.width = `${Math.round((newScore/maxScoreVal)*100)}%`;
+  // Phase 1: bars + score counters
+  oldSorted.forEach(p => {
+    const bar = document.getElementById(`lb-bar-${p.pid}`);
+    if(bar) bar.style.width = Math.round((p.score/maxScore)*100)+'%';
+    const scoreEl = document.getElementById(`lb-score-${p.pid}`);
+    const delta = p.score - p.old;
+    if(scoreEl && delta > 0){
+      const steps=20, dur=700, inc=delta/steps;
+      let cur=p.old, s=0;
+      const iv=setInterval(()=>{ s++; cur=s>=steps?p.score:Math.round(p.old+inc*s); scoreEl.textContent=cur; if(s>=steps)clearInterval(iv); }, dur/steps);
+    } else if(scoreEl){ scoreEl.textContent=p.score; }
+  });
+  await new Promise(r=>setTimeout(r,500));
 
-      // Animate score counter
-      const scoreEl = document.getElementById(`lb-score-${pid}`);
-      if(scoreEl && delta > 0) {
-        const duration = 800, steps = 20, increment = delta/steps;
-        let current = oldScore, step = 0;
-        const interval = setInterval(() => {
-          step++;
-          current = step >= steps ? newScore : Math.round(oldScore + increment*step);
-          scoreEl.textContent = current;
-          if(step >= steps) clearInterval(interval);
-        }, duration/steps);
-      } else if(scoreEl) {
-        scoreEl.textContent = newScore;
-      }
+  // Phase 2: deltas
+  oldSorted.forEach(p => {
+    const delta = p.score - p.old;
+    const deltaEl = document.getElementById(`lb-delta-${p.pid}`);
+    if(!deltaEl) return;
+    if(delta > 0){
+      deltaEl.className='lb-delta green'; deltaEl.style.opacity='1'; deltaEl.textContent='+'+delta;
+      const row=document.getElementById(`lb-row-${p.pid}`);
+      if(row){ row.classList.add('highlight'); setTimeout(()=>row.classList.remove('highlight'),1200); }
+    } else {
+      deltaEl.className='lb-delta gray'; deltaEl.style.opacity='0.6'; deltaEl.textContent='—';
+    }
+  });
+  await new Promise(r=>setTimeout(r,1000));
 
-      // Show delta badge + highlight
-      const deltaEl = document.getElementById(`lb-delta-${pid}`);
-      if(deltaEl && delta > 0) {
-        deltaEl.classList.add('show');
-        const row = document.getElementById(`lb-row-${pid}`);
-        if(row) { row.classList.add('highlight'); setTimeout(()=>row.classList.remove('highlight'),1600); }
-      }
-    });
-  }, 700);
+  // Phase 3: move each player one by one to new position
+  for(let newIdx=0; newIdx<newSorted.length; newIdx++){
+    const p = newSorted[newIdx];
+    const fromIdx = lbPositions[p.pid];
+    if(fromIdx === newIdx) continue;
+
+    // Show position badge
+    const badge = document.getElementById(`lb-badge-${p.pid}`);
+    const diff = fromIdx - newIdx;
+    if(badge && diff !== 0){
+      const isUp = diff > 0, abs = Math.abs(diff);
+      badge.className = `pos-badge ${isUp?'up':'down'}`;
+      badge.textContent = isUp ? `▲ +${abs} puesto${abs>1?'s':''}` : `▼ ${abs} puesto${abs>1?'s':''}`;
+      badge.classList.add('show');
+    }
+
+    lbMoveRow(p.pid, newIdx);
+    await new Promise(r=>setTimeout(r,500));
+
+    const row = document.getElementById(`lb-row-${p.pid}`);
+    if(row) row.classList.remove('moving');
+
+    lbUpdateAllMedals();
+    await new Promise(r=>setTimeout(r,300));
+  }
 }
 
 // ── V2: IMAGE HANDLERS ────────────────────────────────
