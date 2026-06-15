@@ -1083,6 +1083,20 @@ function closeModal(id) {
 }
 window.openModal = openModal;
 window.closeModal = closeModal;
+
+// toggleTheme must be in fallback — it's called before module loads
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  var isLight = document.body.classList.contains('light');
+  var label = isLight ? '🌙 Dark' : '☀️ Light';
+  var btn = document.getElementById('theme-btn');
+  if(btn) btn.textContent = label;
+  var settingsBtn = document.getElementById('settings-theme-btn');
+  if(settingsBtn) settingsBtn.textContent = label;
+  try { localStorage.setItem('nia_theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+window.toggleTheme = toggleTheme;
+
 // These will be overridden by the module once it loads
 window.showPlayerJoin = showPlayerJoin;
 window.showScreen = showScreen;
@@ -1763,16 +1777,7 @@ window.editDisplayName = async function() {
   }
 }
 
-window.toggleTheme = function() {
-  document.body.classList.toggle('light');
-  const isLight = document.body.classList.contains('light');
-  const label = isLight ? '🌙 Dark' : '☀️ Light';
-  const btn = document.getElementById('theme-btn');
-  if(btn) btn.textContent = label;
-  const settingsBtn = document.getElementById('settings-theme-btn');
-  if(settingsBtn) settingsBtn.textContent = label;
-  localStorage.setItem('nia_theme', isLight ? 'light' : 'dark');
-}
+// toggleTheme defined in fallback script above module
 
 window.goToDashboard = function() {
   questions = []; currentQIndex = -1; gameCode = null;
