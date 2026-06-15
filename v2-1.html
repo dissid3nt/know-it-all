@@ -420,7 +420,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .result-delete-all-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:color-mix(in srgb,var(--red) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--red) 25%,var(--border));border-radius:12px;}
 
 /* ── V2: ANIMATED LEADERBOARD SCREEN ── */
-#screen-leaderboard{justify-content:flex-start;padding-top:0;gap:0;background:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--brand) 20%,var(--bg)) 0%,var(--bg) 60%);}
+#screen-leaderboard{align-items:center;gap:14px;padding:24px 16px 100px;background:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--brand) 20%,var(--bg)) 0%,var(--bg) 60%);}
 .lb-header{width:100%;max-width:700px;display:flex;justify-content:space-between;align-items:center;padding:20px 0 12px;}
 .lb-title{font-family:var(--font-display);font-size:1.2rem;font-weight:900;}
 .lb-q-counter{font-size:0.85rem;color:var(--muted);}
@@ -595,6 +595,200 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
   font-size:0.82rem;color:var(--text3);margin-top:6px;
 }
 .correct-answer-reveal strong{color:var(--emerald);}
+
+/* ══ PROTOTYPE COMPONENT STYLES ══ */
+.dash-greeting { font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; }
+.dash-greeting span { color: var(--brand2); }
+.section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
+.game-row {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.game-row:hover { border-color: var(--brand); }
+.game-row-icon { font-size: 1.3rem; }
+.game-row-info { flex: 1; }
+.game-row-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 800; }
+.game-row-meta { font-size: 0.75rem; color: var(--text3); margin-top: 2px; }
+.game-row-action { color: var(--text3); font-size: 1.1rem; }
+.code-display {
+  background: var(--surface);
+  border: 2px solid var(--brand);
+  border-radius: var(--radius-lg);
+  padding: 20px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-brand);
+  width: 100%; max-width: 360px;
+}
+.code-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 6px; }
+.code-value {
+  font-family: var(--font-display);
+  font-size: 2.8rem; font-weight: 900;
+  color: var(--brand2);
+  letter-spacing: 8px;
+}
+.qr-box { background: white; border-radius: var(--radius-sm); padding: 12px; display: inline-block; }
+.players-chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 400px; }
+.game-topbar {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.game-progress-bar { height: 4px; background: var(--surface2); position: relative; }
+.game-progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand), var(--emerald)); width: 40%; transition: width 0.4s; }
+.game-body { padding: 16px 16px 100px; max-width: 700px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.q-bubble {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-align: center;
+}
+.timer-ring {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
+  color: white; margin: 0 auto 14px;
+  box-shadow: 0 0 0 6px var(--brand-glow);
+}
+.q-text { font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; line-height: 1.4; }
+.q-num { font-family: 'Nunito', monospace; font-size: 0.72rem; font-weight: 900; color: var(--text3); min-width: 24px; }
+.opt-host {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 14px; border-radius: var(--radius-sm);
+  font-family: var(--font-display); font-size: 0.88rem; font-weight: 700;
+}
+.opt-host.A { background: color-mix(in srgb, var(--ans-A) 18%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--ans-A) 50%, var(--border)); }
+.opt-host.B { background: color-mix(in srgb, var(--ans-B) 18%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--ans-B) 50%, var(--border)); }
+.opt-host.C { background: color-mix(in srgb, var(--ans-C) 18%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--ans-C) 50%, var(--border)); }
+.opt-host.D { background: color-mix(in srgb, var(--ans-D) 18%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--ans-D) 50%, var(--border)); }
+.opt-key { font-size: 0.72rem; opacity: 0.7; font-weight: 900; }
+.bar-chart { display: flex; flex-direction: column; gap: 7px; }
+.bar-row { display: flex; align-items: center; gap: 8px; }
+.bar-key {
+  font-family: var(--font-display); font-size: 0.75rem; font-weight: 900;
+  width: 26px; height: 26px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;
+}
+.bar-key.A { background: var(--ans-A); }
+.bar-key.B { background: var(--ans-B); }
+.bar-key.C { background: var(--ans-C); }
+.bar-key.D { background: var(--ans-D); }
+.bar-track { flex: 1; background: var(--surface2); border-radius: 6px; height: 26px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+.bar-fill.A { background: color-mix(in srgb, var(--ans-A) 60%, var(--surface2)); }
+.bar-fill.B { background: color-mix(in srgb, var(--ans-B) 60%, var(--surface2)); }
+.bar-fill.C { background: color-mix(in srgb, var(--ans-C) 60%, var(--surface2)); }
+.bar-fill.D { background: color-mix(in srgb, var(--ans-D) 60%, var(--surface2)); }
+.bar-fill.correct { filter: brightness(1.4); outline: 2px solid white; }
+.bar-count { font-family: var(--font-display); font-size: 0.8rem; font-weight: 800; min-width: 20px; text-align: right; color: var(--text2); }
+.reveal-strip {
+  background: color-mix(in srgb, var(--emerald) 12%, var(--surface));
+  border: 1.5px solid var(--emerald);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-family: var(--font-display); font-size: 0.88rem; font-weight: 800;
+  color: var(--emerald);
+}
+.q-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.q-card:hover { border-color: var(--brand); }
+.q-card.expanded { border-color: var(--brand2); }
+.q-card-header {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 14px 16px; cursor: pointer;
+}
+.q-card-body { padding: 0 16px 16px; border-top: 1.5px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.q-card-header {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 14px 16px; cursor: pointer;
+}
+.q-card-body { padding: 0 16px 16px; border-top: 1.5px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.q-preview { flex: 1; }
+.q-preview-text { font-family: var(--font-display); font-size: 0.92rem; font-weight: 700; }
+.q-preview-ans { font-size: 0.72rem; color: var(--emerald); font-weight: 700; margin-top: 3px; }
+.q-preview-text { font-family: var(--font-display); font-size: 0.92rem; font-weight: 700; }
+.q-preview-ans { font-size: 0.72rem; color: var(--emerald); font-weight: 700; margin-top: 3px; }
+.q-chips { display: flex; gap: 5px; align-items: center; }
+.chip-type { background: color-mix(in srgb, var(--brand) 15%, var(--surface2)); color: var(--brand2); }
+.chip-time { background: var(--surface2); color: var(--text3); }
+.btn-brand {
+  background: var(--brand);
+  color: white;
+  box-shadow: var(--shadow-brand);
+}
+.btn-brand:hover { background: var(--brand2); transform: translateY(-1px); }
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--brand); color: var(--brand); }
+.lb-header-area { text-align: center; }
+.lb-sub { font-size: 0.8rem; color: var(--text3); font-weight: 600; }
+.lb-wrap { width: 100%; max-width: 500px; position: relative; }
+.lb-pts { font-family: var(--font-display); font-size: 0.88rem; font-weight: 900; color: var(--brand2); min-width: 44px; text-align: right; }
+.user-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 5px 12px 5px 5px;
+}
+.dash-logo-sm {
+  font-family: var(--font-display);
+  font-size: 1.1rem; font-weight: 900;
+  display: flex; align-items: center; gap: 8px;
+}
+.dash-logo-sm .dot { color: var(--brand); }
+.add-btn {
+  border: 2px dashed var(--border);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  width: 100%;
+  color: var(--text3);
+  font-family: var(--font-display); font-size: 0.9rem; font-weight: 800;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.add-btn:hover { border-color: var(--brand); color: var(--brand2); }
+.option-row { display: flex; align-items: center; gap: 8px; }
+.opt-letter { font-family: var(--font-display); font-size: 0.75rem; font-weight: 900; width: 18px; color: var(--text3); }
+.player-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 480px; }
+.player-q { font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; text-align: center; line-height: 1.5; max-width: 480px; }
+.player-timer { font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: var(--brand2); }
+.answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 480px; }
+.ans-btn {
+  border: none; border-radius: var(--radius);
+  padding: 22px 12px;
+  font-family: var(--font-display); font-size: 0.95rem; font-weight: 800;
+  cursor: pointer; color: white;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  transition: all 0.15s;
+}
+.ans-btn:hover { transform: scale(1.03); filter: brightness(1.1); }
+.ans-btn .key { font-size: 0.72rem; opacity: 0.8; font-weight: 900; }
+.ans-btn.A { background: var(--ans-A); box-shadow: 0 4px 16px rgba(108,71,255,0.3); }
+.ans-btn.B { background: var(--ans-B); box-shadow: 0 4px 16px rgba(0,191,255,0.3); }
+.ans-btn.C { background: var(--ans-C); box-shadow: 0 4px 16px rgba(0,200,150,0.3); }
+.ans-btn.D { background: var(--ans-D); box-shadow: 0 4px 16px rgba(255,184,0,0.25); }
+
+
+/* ── BUTTON ALIASES (prototype ↔ v2 compatibility) ── */
+.btn-brand{background:var(--brand);color:white;box-shadow:var(--shadow-brand);}
+.btn-brand:hover{background:var(--brand2);transform:translateY(-1px);}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand);}
+.btn-danger{background:color-mix(in srgb,var(--coral) 15%,var(--surface2));color:var(--coral);border:1.5px solid color-mix(in srgb,var(--coral) 40%,var(--border));}
 </style>
 </head>
 <body>
@@ -650,17 +844,17 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 
 <!-- ══ DASHBOARD ══ -->
 <div id="screen-dashboard" class="screen" style="justify-content:flex-start;padding:0;">
-  <div class="dash-header">
-    <div class="dash-header-left">
-      <div class="dash-logo">Know It <span>All</span></div>
-      <div class="lang-toggle" style="transform:scale(0.85);transform-origin:left;">
+   <div class="dash-header">
+    <div class="dash-logo-sm">Know It <span class="dot">All</span></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="lang-toggle" style="transform:scale(0.8);transform-origin:right;">
         <button class="lang-btn active" onclick="setLang('es')" id="dash-lang-es">🇨🇴</button>
         <button class="lang-btn" onclick="setLang('en')" id="dash-lang-en">🇺🇸</button>
       </div>
-    </div>
-    <div class="user-info">
-      <div class="user-avatar" id="dash-avatar">?</div>
-      <span class="user-name" id="dash-user-name">Usuario</span>
+      <div class="user-pill">
+        <div class="user-avatar" id="dash-avatar">?</div>
+        <span class="user-name" id="dash-user-name">Usuario</span>
+      </div>
       <button class="btn btn-secondary btn-sm" onclick="signOut()" id="btn-signout">Salir</button>
     </div>
   </div>
@@ -927,7 +1121,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
       <div class="timer-ring" id="host-timer">20</div>
       <div class="q-text" id="host-q-text">...</div>
       <div class="options-grid" id="host-options" style="margin-top:16px;"></div>
-      <div class="answer-reveal" id="answer-reveal" style="display:none;margin-top:12px;"></div>
+      <div class="reveal-strip" id="answer-reveal" style="display:none;margin-top:12px;"></div>
     </div>
     <!-- Bar chart (only shown after reveal) -->
     <div class="bar-chart" id="answer-bars" style="display:none;"></div>
@@ -941,12 +1135,12 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 
 <!-- ══ HOST LEADERBOARD ══ -->
 <div id="screen-leaderboard" class="screen">
-  <div class="lb-header">
+  <div class="lb-header-area">
     <div class="lb-title" id="lb-title">📊 Leaderboard</div>
-    <div class="lb-q-counter" id="lb-q-counter"></div>
+    <div class="lb-sub" id="lb-q-counter"></div>
   </div>
-  <div class="lb-list" id="lb-list" style="position:relative;width:100%;max-width:700px;"></div>
-  <button class="btn btn-primary lb-next-btn" onclick="proceedFromLeaderboard()" id="lb-next-btn" style="margin-top:20px;width:100%;max-width:700px;">Siguiente pregunta →</button>
+  <div class="lb-wrap" id="lb-list" style="width:100%;max-width:500px;"></div>
+  <button class="btn btn-brand" onclick="proceedFromLeaderboard()" id="lb-next-btn" style="width:100%;max-width:500px;margin-top:16px;">Siguiente pregunta →</button>
 </div>
 
 
@@ -2187,7 +2381,7 @@ window.revealAnswer = function() {
   const q=questions[currentQIndex];
   const correctLabel=q.type==='truefalse'?(q.correct==='true'?t.trueCorrect:t.falseCorrect):`${q.correct}: ${q.options[q.correct]}`;
   const el=document.getElementById('answer-reveal');
-  el.textContent=t.correctAnswer(correctLabel); el.style.display='block';
+  el.textContent='✅ '+t.correctAnswer(correctLabel); el.style.display='block';
   const nextBtn=document.getElementById('next-btn');
   if(nextBtn) nextBtn.disabled=false;
   // Highlight correct answer in bar chart
