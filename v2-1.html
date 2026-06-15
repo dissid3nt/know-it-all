@@ -1101,6 +1101,43 @@ window.toggleTheme = toggleTheme;
 window.showPlayerJoin = showPlayerJoin;
 window.showScreen = showScreen;
 
+// Landing functions — stubs that work before module loads
+// The module will override these with full Firebase versions
+function switchAuthTab(tab) {
+  var login = document.getElementById('auth-login-form');
+  var reg = document.getElementById('auth-register-form');
+  var tabLogin = document.getElementById('tab-login');
+  var tabReg = document.getElementById('tab-register');
+  if(login) login.style.display = tab === 'login' ? 'flex' : 'none';
+  if(reg) reg.style.display = tab === 'register' ? 'flex' : 'none';
+  if(tabLogin) tabLogin.classList.toggle('active', tab === 'login');
+  if(tabReg) tabReg.classList.toggle('active', tab === 'register');
+}
+function loginEmail() {
+  // Will be overridden by module — show loading state
+  var btn = document.getElementById('btn-login-email');
+  if(btn) btn.textContent = '...';
+}
+function registerEmail() {
+  var btn = document.getElementById('btn-register');
+  if(btn) btn.textContent = '...';
+}
+function loginGoogle() {
+  var btn = document.querySelector('.btn-google');
+  if(btn) btn.textContent = '...';
+}
+function setLang(l) {
+  // Basic lang switch before module — just update button states
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.onclick && b.onclick.toString().includes("'" + l + "'"));
+  });
+}
+window.switchAuthTab = switchAuthTab;
+window.loginEmail = loginEmail;
+window.registerEmail = registerEmail;
+window.loginGoogle = loginGoogle;
+window.setLang = setLang;
+
 // Show JS errors visually for debugging
 window.onerror = function(msg, src, line, col, err) {
   var d = document.createElement('div');
