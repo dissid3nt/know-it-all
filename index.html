@@ -885,9 +885,11 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         <div><div class="settings-row-label" id="auto-diff-label">Dificultad</div></div>
         <select id="auto-difficulty" style="padding:8px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.88rem;font-weight:700;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);">
           <option value="mixed" selected id="auto-diff-mixed">Mixta</option>
+          <option value="very_easy" id="auto-diff-very-easy">Muy fácil</option>
           <option value="easy" id="auto-diff-easy">Fácil</option>
           <option value="medium" id="auto-diff-medium">Media</option>
           <option value="hard" id="auto-diff-hard">Difícil</option>
+          <option value="very_hard" id="auto-diff-very-hard">Muy difícil</option>
         </select>
       </div>
       <div class="settings-row">
@@ -931,6 +933,12 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
       <h1 class="dash-greeting" id="dash-greeting">¡Hola! 👋</h1>
     </div>
     <div class="dash-grid">
+
+      <div class="dash-card auto" onclick="showScreen('screen-auto-game')" style="border-color:color-mix(in srgb,var(--emerald) 40%,var(--border));">
+        <div class="dash-card-icon">🤖</div>
+        <div class="dash-card-desc" id="dc-auto-desc" style="color:var(--text3);font-size:0.8rem;line-height:1.4;flex:1;">Genera preguntas automáticamente de distintos temas</div>
+        <div class="dash-card-title" id="dc-auto-title" style="font-weight:900;color:var(--emerald);">Juego automático</div>
+      </div>
       <div class="dash-card featured new" onclick="newProject()">
         <div class="dash-card-icon">✨</div>
         <div class="dash-card-desc" id="dc-new-desc" style="color:rgba(255,255,255,0.75);font-size:0.8rem;line-height:1.4;flex:1;">Crea un nuevo juego de trivia con tus propias preguntas</div>
@@ -955,11 +963,6 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         <div class="dash-card-icon">🎯</div>
         <div class="dash-card-label" id="dc-join-sublabel" style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);">Como jugador</div>
         <div class="dash-card-title" id="dc-join-title">Unirme</div>
-      </div>
-      <div class="dash-card auto" onclick="showScreen('screen-auto-game')" style="border-color:color-mix(in srgb,var(--emerald) 40%,var(--border));">
-        <div class="dash-card-icon">🤖</div>
-        <div class="dash-card-desc" id="dc-auto-desc" style="color:var(--text3);font-size:0.8rem;line-height:1.4;flex:1;">Genera preguntas automáticamente de distintos temas</div>
-        <div class="dash-card-title" id="dc-auto-title" style="font-weight:900;color:var(--emerald);">Juego automático</div>
       </div>
     </div>
     <div class="dash-recent">
@@ -1483,7 +1486,7 @@ const T = {
     dcAutoTitle:'Juego automático', dcAutoDesc:'Genera preguntas automáticamente de distintos temas',
     autoTitle:'🤖 Juego automático', autoCatLabel:'CATEGORÍAS', autoOptsLabel:'OPCIONES',
     autoCountLabel:'Número de preguntas', autoDiffLabel:'Dificultad', autoTimeLabel:'Tiempo por pregunta',
-    autoDiffMixed:'Mixta', autoDiffEasy:'Fácil', autoDiffMedium:'Media', autoDiffHard:'Difícil',
+    autoDiffMixed:'Mixta', autoDiffVeryEasy:'Muy fácil', autoDiffEasy:'Fácil', autoDiffMedium:'Media', autoDiffHard:'Difícil', autoDiffVeryHard:'Muy difícil',
     autoHint:'Se generarán preguntas aleatorias del banco. Cada partida es única.',
     btnGenerate:'✨ Generar y guardar juego',
     catScience:'🔬 Ciencia', catGeo:'🌍 Geografía', catHist:'📜 Historia',
@@ -1643,7 +1646,7 @@ const T = {
     dcAutoTitle:'Auto game', dcAutoDesc:'Automatically generate questions from various topics',
     autoTitle:'🤖 Auto game', autoCatLabel:'CATEGORIES', autoOptsLabel:'OPTIONS',
     autoCountLabel:'Number of questions', autoDiffLabel:'Difficulty', autoTimeLabel:'Time per question',
-    autoDiffMixed:'Mixed', autoDiffEasy:'Easy', autoDiffMedium:'Medium', autoDiffHard:'Hard',
+    autoDiffMixed:'Mixed', autoDiffVeryEasy:'Very easy', autoDiffEasy:'Easy', autoDiffMedium:'Medium', autoDiffHard:'Hard', autoDiffVeryHard:'Very hard',
     autoHint:'Random questions generated from the bank. Every game is unique.',
     btnGenerate:'✨ Generate and save game',
     catScience:'🔬 Science', catGeo:'🌍 Geography', catHist:'📜 History',
@@ -2403,6 +2406,7 @@ window.startGame = function() {
 }
 
 window.launchGame = async function() {
+  questions = shuffleAllOptions(questions);
   // Resume AudioContext on user gesture (browser autoplay policy)
   if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3822,539 +3826,63 @@ window.setMusicTheme = function(theme) {
 // ════════════════════════════════════════════════════════════════
 // KNOW IT ALL — QUESTION BANK v1.0 (480 questions, bilingüe)
 // ════════════════════════════════════════════════════════════════
-const QB = [
-{c:"science",d:"easy",es:{t:"¿Cuál es el planeta más grande del sistema solar?",o:["Saturno", "Júpiter", "Urano", "Neptuno"],r:"B"},en:{t:"What is the largest planet in the solar system?",o:["Saturn", "Jupiter", "Uranus", "Neptune"],r:"B"}},
-{c:"science",d:"easy",es:{t:"¿Cuántos huesos tiene el cuerpo humano adulto?",o:["206", "186", "226", "246"],r:"A"},en:{t:"How many bones does the adult human body have?",o:["206", "186", "226", "246"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuál es el símbolo químico del oro?",o:["Au", "Ag", "Fe", "Go"],r:"A"},en:{t:"What is the chemical symbol for gold?",o:["Au", "Ag", "Fe", "Go"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué gas es esencial para respirar?",o:["Oxígeno", "Nitrógeno", "CO₂", "Hidrógeno"],r:"A"},en:{t:"Which gas is essential for breathing?",o:["Oxygen", "Nitrogen", "CO₂", "Hydrogen"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuál es la velocidad de la luz?",o:["300.000 km/s", "150.000 km/s", "450.000 km/s", "200.000 km/s"],r:"A"},en:{t:"What is the speed of light?",o:["300,000 km/s", "150,000 km/s", "450,000 km/s", "200,000 km/s"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué órgano bombea la sangre?",o:["Pulmón", "Riñón", "Corazón", "Hígado"],r:"C"},en:{t:"Which organ pumps blood?",o:["Lung", "Kidney", "Heart", "Liver"],r:"C"}},
-{c:"science",d:"easy",es:{t:"¿Cuántos planetas tiene el sistema solar?",o:["8", "9", "7", "10"],r:"A"},en:{t:"How many planets does the solar system have?",o:["8", "9", "7", "10"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Quién descubrió la radiactividad?",o:["Marie Curie", "Rosalind Franklin", "Lise Meitner", "Ada Lovelace"],r:"A"},en:{t:"Who discovered radioactivity?",o:["Marie Curie", "Rosalind Franklin", "Lise Meitner", "Ada Lovelace"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuál es la fórmula del agua?",o:["H₂O", "CO₂", "NaCl", "O₂"],r:"A"},en:{t:"What is the formula for water?",o:["H₂O", "CO₂", "NaCl", "O₂"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué planeta es conocido como el rojo?",o:["Marte", "Júpiter", "Saturno", "Venus"],r:"A"},en:{t:"Which planet is known as the red one?",o:["Mars", "Jupiter", "Saturn", "Venus"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuál es el hueso más largo del cuerpo?",o:["Fémur", "Tibia", "Húmero", "Peroné"],r:"A"},en:{t:"What is the longest bone in the body?",o:["Femur", "Tibia", "Humerus", "Fibula"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿En cuántos días orbita la Tierra al Sol?",o:["365", "360", "366", "354"],r:"A"},en:{t:"How many days does Earth take to orbit the Sun?",o:["365", "360", "366", "354"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuántas cámaras tiene el corazón humano?",o:["4", "2", "3", "5"],r:"A"},en:{t:"How many chambers does the human heart have?",o:["4", "2", "3", "5"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuántas lunas tiene la Tierra?",o:["1", "2", "0", "3"],r:"A"},en:{t:"How many moons does Earth have?",o:["1", "2", "0", "3"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuál es el estado sólido del agua?",o:["Hielo", "Vapor", "Plasma", "Gel"],r:"A"},en:{t:"What is the solid state of water?",o:["Ice", "Steam", "Plasma", "Gel"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué órgano produce la insulina?",o:["Páncreas", "Hígado", "Riñón", "Estómago"],r:"A"},en:{t:"Which organ produces insulin?",o:["Pancreas", "Liver", "Kidney", "Stomach"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuántos colores tiene el arcoíris?",o:["7", "6", "8", "5"],r:"A"},en:{t:"How many colors does a rainbow have?",o:["7", "6", "8", "5"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué sentido usa el murciélago para orientarse?",o:["Ecolocalización", "Vista", "Olfato", "Tacto"],r:"A"},en:{t:"How do bats navigate?",o:["Echolocation", "Sight", "Smell", "Touch"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué tipo de energía produce el Sol?",o:["Nuclear", "Química", "Eléctrica", "Mecánica"],r:"A"},en:{t:"What type of energy does the Sun produce?",o:["Nuclear", "Chemical", "Electrical", "Mechanical"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuántos colores tiene la luz blanca?",o:["7", "3", "5", "12"],r:"A"},en:{t:"How many colors make up white light?",o:["7", "3", "5", "12"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué vitamina produce la piel con el sol?",o:["D", "A", "C", "B12"],r:"A"},en:{t:"Which vitamin does skin produce with sunlight?",o:["D", "A", "C", "B12"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuál es el metal más conductor de electricidad?",o:["Plata", "Cobre", "Oro", "Aluminio"],r:"A"},en:{t:"Which metal conducts electricity best?",o:["Silver", "Copper", "Gold", "Aluminum"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué animal tiene el período de gestación más largo?",o:["Elefante", "Ballena", "Jirafa", "Rinoceronte"],r:"A"},en:{t:"Which animal has the longest gestation period?",o:["Elephant", "Whale", "Giraffe", "Rhinoceros"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuántas alas tiene un insecto típico?",o:["4", "2", "6", "8"],r:"A"},en:{t:"How many wings does a typical insect have?",o:["4", "2", "6", "8"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué hace la vacuna en el cuerpo?",o:["Estimula el sistema inmune", "Mata bacterias", "Cura enfermedades", "Elimina virus"],r:"A"},en:{t:"What does a vaccine do in the body?",o:["Stimulates the immune system", "Kills bacteria", "Cures diseases", "Eliminates viruses"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Qué es una estrella fugaz?",o:["Meteorito", "Cometa", "Asteroide", "Planeta"],r:"A"},en:{t:"What is a shooting star?",o:["Meteoroid", "Comet", "Asteroid", "Planet"],r:"A"}},
-{c:"science",d:"easy",es:{t:"¿Cuántas horas dura un día en la Tierra?",o:["24", "23", "25", "22"],r:"A"},en:{t:"How many hours is a day on Earth?",o:["24", "23", "25", "22"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuál es el número atómico del carbono?",o:["6", "8", "12", "4"],r:"A"},en:{t:"What is the atomic number of carbon?",o:["6", "8", "12", "4"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué parte de la célula contiene el ADN?",o:["Membrana", "Núcleo", "Mitocondria", "Citoplasma"],r:"B"},en:{t:"Which part of the cell contains DNA?",o:["Membrane", "Nucleus", "Mitochondria", "Cytoplasm"],r:"B"}},
-{c:"science",d:"medium",es:{t:"¿Qué proceso usan las plantas para obtener energía?",o:["Fotosíntesis", "Respiración", "Fermentación", "Digestión"],r:"A"},en:{t:"What process do plants use to get energy?",o:["Photosynthesis", "Respiration", "Fermentation", "Digestion"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántos pares de cromosomas tiene el ser humano?",o:["23", "24", "22", "46"],r:"A"},en:{t:"How many chromosome pairs does a human have?",o:["23", "24", "22", "46"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuál es la unidad de frecuencia?",o:["Hertz", "Joule", "Newton", "Pascal"],r:"A"},en:{t:"What is the unit of frequency?",o:["Hertz", "Joule", "Newton", "Pascal"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿A qué temperatura hierve el agua al nivel del mar?",o:["100°C", "90°C", "110°C", "80°C"],r:"A"},en:{t:"At what temperature does water boil at sea level?",o:["100°C", "90°C", "110°C", "80°C"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuál es el pH del agua pura?",o:["7", "6", "8", "5"],r:"A"},en:{t:"What is the pH of pure water?",o:["7", "6", "8", "5"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué partícula tiene carga negativa?",o:["Electrón", "Protón", "Neutrón", "Positrón"],r:"A"},en:{t:"Which particle has a negative charge?",o:["Electron", "Proton", "Neutron", "Positron"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántos litros de sangre tiene un adulto?",o:["5", "3", "7", "9"],r:"A"},en:{t:"How many liters of blood does an adult have?",o:["5", "3", "7", "9"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué gas causa principalmente el efecto invernadero?",o:["CO₂", "O₂", "N₂", "Ar"],r:"A"},en:{t:"Which gas mainly causes the greenhouse effect?",o:["CO₂", "O₂", "N₂", "Ar"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántos elementos hay en la tabla periódica?",o:["118", "108", "128", "98"],r:"A"},en:{t:"How many elements are on the periodic table?",o:["118", "108", "128", "98"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué organelo sintetiza proteínas?",o:["Ribosoma", "Mitocondria", "Núcleo", "Vacuola"],r:"A"},en:{t:"Which organelle synthesizes proteins?",o:["Ribosome", "Mitochondria", "Nucleus", "Vacuole"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuál es la primera ley de Newton?",o:["Inercia", "Fuerza-aceleración", "Acción-reacción", "Gravedad"],r:"A"},en:{t:"What is Newton's first law?",o:["Inertia", "Force-acceleration", "Action-reaction", "Gravity"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué tipo de radiación tiene más energía?",o:["Gamma", "Alfa", "Beta", "UV"],r:"A"},en:{t:"Which type of radiation has the most energy?",o:["Gamma", "Alpha", "Beta", "UV"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué es la osmosis?",o:["Paso de agua por membrana semipermeable", "División celular", "Síntesis de glucosa", "Proceso respiratorio"],r:"A"},en:{t:"What is osmosis?",o:["Water passing through semipermeable membrane", "Cell division", "Glucose synthesis", "Respiratory process"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántos neutrones tiene el hidrógeno común?",o:["0", "1", "2", "3"],r:"A"},en:{t:"How many neutrons does common hydrogen have?",o:["0", "1", "2", "3"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué es un año luz?",o:["Distancia que viaja la luz en un año", "Tiempo para llegar al Sol", "Velocidad de la luz", "Tamaño del universo"],r:"A"},en:{t:"What is a light year?",o:["Distance light travels in one year", "Time to reach the Sun", "Speed of light", "Size of the universe"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuál es el grupo sanguíneo universal donante?",o:["O−", "A+", "AB+", "B−"],r:"A"},en:{t:"Which blood type is the universal donor?",o:["O−", "A+", "AB+", "B−"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuál es el mineral más duro de la naturaleza?",o:["Diamante", "Rubí", "Cuarzo", "Topacio"],r:"A"},en:{t:"What is the hardest natural mineral?",o:["Diamond", "Ruby", "Quartz", "Topaz"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué tipo de célula no tiene núcleo definido?",o:["Procariota", "Eucariota", "Vegetal", "Animal"],r:"A"},en:{t:"What type of cell has no defined nucleus?",o:["Prokaryote", "Eukaryote", "Plant", "Animal"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántas capas tiene la atmósfera terrestre?",o:["5", "3", "7", "4"],r:"A"},en:{t:"How many layers does Earth's atmosphere have?",o:["5", "3", "7", "4"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué es la mitosis?",o:["División celular", "Síntesis proteica", "Respiración celular", "Transcripción"],r:"A"},en:{t:"What is mitosis?",o:["Cell division", "Protein synthesis", "Cellular respiration", "Transcription"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué tipo de onda es el sonido?",o:["Mecánica longitudinal", "Electromagnética", "Transversal", "Gravitacional"],r:"A"},en:{t:"What type of wave is sound?",o:["Mechanical longitudinal", "Electromagnetic", "Transverse", "Gravitational"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué fuerza mantiene los planetas en órbita?",o:["Gravedad", "Magnetismo", "Fricción", "Electricidad"],r:"A"},en:{t:"What force keeps planets in orbit?",o:["Gravity", "Magnetism", "Friction", "Electricity"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántos pares de nervios craneales tiene el ser humano?",o:["12", "10", "14", "8"],r:"A"},en:{t:"How many pairs of cranial nerves does a human have?",o:["12", "10", "14", "8"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Cuántos sentidos clásicos tiene el ser humano?",o:["5", "6", "7", "4"],r:"A"},en:{t:"How many classical senses does a human have?",o:["5", "6", "7", "4"],r:"A"}},
-{c:"science",d:"medium",es:{t:"¿Qué es el número de Avogadro?",o:["6.022×10²³ partículas por mol", "Velocidad de la luz", "Constante de Planck", "Carga del electrón"],r:"A"},en:{t:"What is Avogadro's number?",o:["6.022×10²³ particles per mole", "Speed of light", "Planck constant", "Electron charge"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué partícula no tiene carga eléctrica?",o:["Neutrón", "Protón", "Electrón", "Positrón"],r:"A"},en:{t:"Which subatomic particle has no charge?",o:["Neutron", "Proton", "Electron", "Positron"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué relaciona la constante de Planck?",o:["Energía y frecuencia del fotón", "Velocidad de la luz", "Carga del electrón", "Masa del protón"],r:"A"},en:{t:"What does Planck's constant relate?",o:["Energy and photon frequency", "Speed of light", "Electron charge", "Proton mass"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿En qué año se descubrió la estructura del ADN?",o:["1953", "1944", "1962", "1970"],r:"A"},en:{t:"In what year was DNA structure discovered?",o:["1953", "1944", "1962", "1970"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué ley dice que la energía no se crea ni destruye?",o:["Termodinámica", "Gravitación", "Relatividad", "Coulomb"],r:"A"},en:{t:"Which law says energy is neither created nor destroyed?",o:["Thermodynamics", "Gravitation", "Relativity", "Coulomb's"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuántas neuronas tiene el cerebro humano aprox.?",o:["86 mil millones", "1 billón", "10 millones", "500 millones"],r:"A"},en:{t:"Approximately how many neurons does the brain have?",o:["86 billion", "1 trillion", "10 million", "500 million"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuál es el elemento más ligero de la tabla periódica?",o:["Hidrógeno", "Helio", "Litio", "Berilio"],r:"A"},en:{t:"What is the lightest element on the periodic table?",o:["Hydrogen", "Helium", "Lithium", "Beryllium"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué organela es la central energética de la célula?",o:["Mitocondria", "Ribosoma", "Núcleo", "Lisosoma"],r:"A"},en:{t:"Which organelle is the cell powerhouse?",o:["Mitochondria", "Ribosome", "Nucleus", "Lysosome"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué describe E=mc²?",o:["Equivalencia masa-energía", "Ley de gravitación", "Energía cinética", "Entropía"],r:"A"},en:{t:"What does E=mc² describe?",o:["Mass-energy equivalence", "Law of gravitation", "Kinetic energy", "Entropy"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es el bosón de Higgs?",o:["Partícula que da masa a otras", "Antimateria", "Quark elemental", "Fotón de alta energía"],r:"A"},en:{t:"What is the Higgs boson?",o:["Particle that gives mass to others", "Antimatter", "Elementary quark", "High-energy photon"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuántos pares de bases tiene el genoma humano?",o:["3.200 millones", "1.000 millones", "500 millones", "10.000 millones"],r:"A"},en:{t:"How many base pairs does the human genome have?",o:["3.2 billion", "1 billion", "500 million", "10 billion"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la mecánica cuántica?",o:["Física de partículas subatómicas", "Movimiento macroscópico", "Termodinámica avanzada", "Electromagnetismo clásico"],r:"A"},en:{t:"What is quantum mechanics?",o:["Physics of subatomic particles", "Macroscopic motion", "Advanced thermodynamics", "Classical electromagnetism"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la entropía?",o:["Medida del desorden de un sistema", "Energía potencial", "Fuerza nuclear", "Presión termodinámica"],r:"A"},en:{t:"What is entropy?",o:["Measure of a system disorder", "Potential energy", "Nuclear force", "Thermodynamic pressure"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la bioluminiscencia?",o:["Emisión de luz por seres vivos", "Fotosíntesis profunda", "Reflexión UV", "Fluorescencia mineral"],r:"A"},en:{t:"What is bioluminescence?",o:["Light emission by living things", "Deep photosynthesis", "UV reflection", "Mineral fluorescence"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es un agujero negro?",o:["Región donde nada escapa a la gravedad", "Estrella apagada", "Planeta sin atmósfera", "Vacío interestelar"],r:"A"},en:{t:"What is a black hole?",o:["Region where nothing escapes gravity", "Burnt-out star", "Planet without atmosphere", "Interstellar void"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué enlace mantiene la doble hélice del ADN?",o:["Puentes de hidrógeno", "Covalente", "Iónico", "Van der Waals"],r:"A"},en:{t:"What bond holds the DNA double helix?",o:["Hydrogen bonds", "Covalent", "Ionic", "Van der Waals"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué proceso ocurre en el núcleo del Sol?",o:["Fusión nuclear", "Fisión nuclear", "Combustión química", "Aniquilación"],r:"A"},en:{t:"What process occurs in the Sun's core?",o:["Nuclear fusion", "Nuclear fission", "Chemical combustion", "Annihilation"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuál es la diferencia clave entre ARN y ADN?",o:["ARN tiene uracilo, ADN tiene timina", "ARN es doble hélice", "ADN forma proteínas directamente", "ARN solo está en el núcleo"],r:"A"},en:{t:"What is the key difference between RNA and DNA?",o:["RNA has uracil, DNA has thymine", "RNA is double helix", "DNA forms proteins directly", "RNA is only in the nucleus"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la materia oscura?",o:["Materia sin emisión de luz pero con masa", "Gas interestelar oscuro", "Agujero negro pequeño", "Partícula sin carga"],r:"A"},en:{t:"What is dark matter?",o:["Matter that emits no light but has mass", "Dark interstellar gas", "Small black hole", "Chargeless particle"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es el efecto Doppler?",o:["Cambio de frecuencia por movimiento relativo", "Refracción de luz", "Interferencia de ondas", "Resonancia magnética"],r:"A"},en:{t:"What is the Doppler effect?",o:["Frequency change due to relative motion", "Light refraction", "Wave interference", "Magnetic resonance"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la superconductividad?",o:["Resistencia eléctrica cero a bajas temperaturas", "Máxima conductividad a alta temperatura", "Campo magnético perfecto", "Fusión nuclear controlada"],r:"A"},en:{t:"What is superconductivity?",o:["Zero resistance at low temperatures", "Max conductivity at high temperature", "Perfect magnetic field", "Controlled nuclear fusion"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué mide el espectrómetro de masas?",o:["Masa de moléculas e isótopos", "Temperatura de partículas", "Velocidad de reacciones", "Presión atmosférica"],r:"A"},en:{t:"What does a mass spectrometer measure?",o:["Mass of molecules and isotopes", "Particle temperature", "Reaction speed", "Atmospheric pressure"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la telomerasa?",o:["Enzima que repara los telómeros", "Proteína estructural", "ARN mensajero", "Catalizador de glucosa"],r:"A"},en:{t:"What is telomerase?",o:["Enzyme that repairs telomeres", "Structural protein", "Messenger RNA", "Glucose catalyst"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuántas proteínas codifica el genoma humano?",o:["~20.000", "~100.000", "~5.000", "~50.000"],r:"A"},en:{t:"How many proteins does the human genome encode?",o:["~20,000", "~100,000", "~5,000", "~50,000"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuál fue el primer organismo con genoma secuenciado?",o:["Haemophilus influenzae", "E. coli", "Levadura", "Arabidopsis"],r:"A"},en:{t:"What was the first organism to have its genome sequenced?",o:["Haemophilus influenzae", "E. coli", "Yeast", "Arabidopsis"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Cuántas dimensiones describe la relatividad general?",o:["4 (3 espacio + 1 tiempo)", "3", "5", "6"],r:"A"},en:{t:"How many dimensions does general relativity describe?",o:["4 (3 space + 1 time)", "3", "5", "6"],r:"A"}},
-{c:"science",d:"hard",es:{t:"¿Qué es la telencéfalo?",o:["Parte del cerebro que incluye los hemisferios", "El tronco cerebral", "El cerebelo", "La médula espinal"],r:"A"},en:{t:"What is the telencephalon?",o:["Brain part including the hemispheres", "The brainstem", "The cerebellum", "The spinal cord"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el país más grande del mundo?",o:["Rusia", "China", "Canadá", "Brasil"],r:"A"},en:{t:"What is the largest country?",o:["Russia", "China", "Canada", "Brazil"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Francia?",o:["París", "Londres", "Berlín", "Madrid"],r:"A"},en:{t:"What is the capital of France?",o:["Paris", "London", "Berlin", "Madrid"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿En qué continente está Brasil?",o:["América del Sur", "África", "Asia", "Europa"],r:"A"},en:{t:"On which continent is Brazil?",o:["South America", "Africa", "Asia", "Europe"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el río más largo del mundo?",o:["Nilo", "Amazonas", "Yangtsé", "Misisipi"],r:"A"},en:{t:"What is the longest river in the world?",o:["Nile", "Amazon", "Yangtze", "Mississippi"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el océano más grande?",o:["Pacífico", "Atlántico", "Índico", "Ártico"],r:"A"},en:{t:"What is the largest ocean?",o:["Pacific", "Atlantic", "Indian", "Arctic"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuántos continentes hay?",o:["7", "5", "6", "8"],r:"A"},en:{t:"How many continents are there?",o:["7", "5", "6", "8"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la montaña más alta del mundo?",o:["Everest", "K2", "Kangchenjunga", "Lhotse"],r:"A"},en:{t:"What is the highest mountain?",o:["Everest", "K2", "Kangchenjunga", "Lhotse"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿En qué país está la Torre Eiffel?",o:["Francia", "Italia", "España", "Alemania"],r:"A"},en:{t:"In which country is the Eiffel Tower?",o:["France", "Italy", "Spain", "Germany"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el desierto más grande del mundo?",o:["Sahara", "Gobi", "Kalahari", "Atacama"],r:"A"},en:{t:"What is the largest desert?",o:["Sahara", "Gobi", "Kalahari", "Atacama"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Japón?",o:["Tokio", "Osaka", "Kioto", "Hiroshima"],r:"A"},en:{t:"What is the capital of Japan?",o:["Tokyo", "Osaka", "Kyoto", "Hiroshima"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Qué país tiene la mayor población del mundo?",o:["India", "China", "EE.UU.", "Indonesia"],r:"A"},en:{t:"Which country has the largest population?",o:["India", "China", "USA", "Indonesia"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de México?",o:["Ciudad de México", "Guadalajara", "Monterrey", "Puebla"],r:"A"},en:{t:"What is the capital of Mexico?",o:["Mexico City", "Guadalajara", "Monterrey", "Puebla"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿En qué continente está Egipto?",o:["África", "Asia", "Europa", "Oceanía"],r:"A"},en:{t:"On which continent is Egypt?",o:["Africa", "Asia", "Europe", "Oceania"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el continente más grande?",o:["Asia", "América", "África", "Europa"],r:"A"},en:{t:"What is the largest continent?",o:["Asia", "America", "Africa", "Europe"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Alemania?",o:["Berlín", "Múnich", "Hamburgo", "Frankfurt"],r:"A"},en:{t:"What is the capital of Germany?",o:["Berlin", "Munich", "Hamburg", "Frankfurt"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿En qué país está la Gran Muralla?",o:["China", "Mongolia", "Japón", "Corea"],r:"A"},en:{t:"In which country is the Great Wall?",o:["China", "Mongolia", "Japan", "Korea"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el continente más pequeño?",o:["Oceanía", "Europa", "Antártida", "América"],r:"A"},en:{t:"What is the smallest continent?",o:["Oceania", "Europe", "Antarctica", "America"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Italia?",o:["Roma", "Milán", "Venecia", "Nápoles"],r:"A"},en:{t:"What is the capital of Italy?",o:["Rome", "Milan", "Venice", "Naples"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿En qué país están las Pirámides de Giza?",o:["Egipto", "Irak", "Irán", "Sudán"],r:"A"},en:{t:"In which country are the Pyramids of Giza?",o:["Egypt", "Iraq", "Iran", "Sudan"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de España?",o:["Madrid", "Barcelona", "Sevilla", "Valencia"],r:"A"},en:{t:"What is the capital of Spain?",o:["Madrid", "Barcelona", "Seville", "Valencia"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿En qué continente está Australia?",o:["Oceanía", "Asia", "América", "África"],r:"A"},en:{t:"On which continent is Australia?",o:["Oceania", "Asia", "America", "Africa"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Argentina?",o:["Buenos Aires", "Córdoba", "Rosario", "Mendoza"],r:"A"},en:{t:"What is the capital of Argentina?",o:["Buenos Aires", "Córdoba", "Rosario", "Mendoza"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el mar más salado del mundo?",o:["Mar Muerto", "Mar Rojo", "Mar Caspio", "Mediterráneo"],r:"A"},en:{t:"What is the saltiest body of water?",o:["Dead Sea", "Red Sea", "Caspian Sea", "Mediterranean"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Colombia?",o:["Bogotá", "Medellín", "Cali", "Barranquilla"],r:"A"},en:{t:"What is the capital of Colombia?",o:["Bogotá", "Medellín", "Cali", "Barranquilla"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es el lago más grande del mundo?",o:["Mar Caspio", "Superior", "Victoria", "Hurón"],r:"A"},en:{t:"What is the largest lake in the world?",o:["Caspian Sea", "Superior", "Victoria", "Huron"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Perú?",o:["Lima", "Cusco", "Arequipa", "Trujillo"],r:"A"},en:{t:"What is the capital of Peru?",o:["Lima", "Cusco", "Arequipa", "Trujillo"],r:"A"}},
-{c:"geography",d:"easy",es:{t:"¿Cuál es la capital de Brasil?",o:["Brasilia", "São Paulo", "Río de Janeiro", "Salvador"],r:"A"},en:{t:"What is the capital of Brazil?",o:["Brasilia", "São Paulo", "Rio de Janeiro", "Salvador"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué país tiene más idiomas oficiales?",o:["Sudáfrica", "Suiza", "Bolivia", "India"],r:"A"},en:{t:"Which country has the most official languages?",o:["South Africa", "Switzerland", "Bolivia", "India"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es el lago más profundo del mundo?",o:["Baikal", "Titicaca", "Caspio", "Superior"],r:"A"},en:{t:"What is the deepest lake?",o:["Baikal", "Titicaca", "Caspian", "Superior"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué estrecho separa Europa de África?",o:["Gibraltar", "Bering", "Magallanes", "Ormuz"],r:"A"},en:{t:"Which strait separates Europe from Africa?",o:["Gibraltar", "Bering", "Magellan", "Hormuz"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es la capital de Australia?",o:["Canberra", "Sídney", "Melbourne", "Brisbane"],r:"A"},en:{t:"What is the capital of Australia?",o:["Canberra", "Sydney", "Melbourne", "Brisbane"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es el país más pequeño del mundo?",o:["Vaticano", "Mónaco", "San Marino", "Liechtenstein"],r:"A"},en:{t:"What is the smallest country in the world?",o:["Vatican", "Monaco", "San Marino", "Liechtenstein"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué país está Machu Picchu?",o:["Perú", "Bolivia", "Ecuador", "Colombia"],r:"A"},en:{t:"In which country is Machu Picchu?",o:["Peru", "Bolivia", "Ecuador", "Colombia"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuántos países componen América Central?",o:["7", "5", "6", "8"],r:"A"},en:{t:"How many countries make up Central America?",o:["7", "5", "6", "8"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué cordillera es la más larga del mundo?",o:["Los Andes", "Himalayas", "Rocosas", "Alpes"],r:"A"},en:{t:"Which mountain range is the longest?",o:["Andes", "Himalayas", "Rockies", "Alps"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué país tiene más islas?",o:["Suecia", "Filipinas", "Indonesia", "Noruega"],r:"A"},en:{t:"Which country has the most islands?",o:["Sweden", "Philippines", "Indonesia", "Norway"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es la capital de Canadá?",o:["Ottawa", "Toronto", "Vancouver", "Montreal"],r:"A"},en:{t:"What is the capital of Canada?",o:["Ottawa", "Toronto", "Vancouver", "Montreal"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué país está el Kilimanjaro?",o:["Tanzania", "Kenia", "Uganda", "Etiopía"],r:"A"},en:{t:"In which country is Kilimanjaro?",o:["Tanzania", "Kenya", "Uganda", "Ethiopia"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuántos países tiene África?",o:["54", "48", "60", "45"],r:"A"},en:{t:"How many countries does Africa have?",o:["54", "48", "60", "45"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué ciudad está el Big Ben?",o:["Londres", "Edimburgo", "Manchester", "Liverpool"],r:"A"},en:{t:"In which city is Big Ben?",o:["London", "Edinburgh", "Manchester", "Liverpool"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es la capital de Turquía?",o:["Ankara", "Estambul", "Izmir", "Bursa"],r:"A"},en:{t:"What is the capital of Turkey?",o:["Ankara", "Istanbul", "Izmir", "Bursa"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué país tiene más selva tropical?",o:["Brasil", "Congo", "Indonesia", "Perú"],r:"A"},en:{t:"Which country has the most tropical rainforest?",o:["Brazil", "Congo", "Indonesia", "Peru"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es la capital administrativa de Sudáfrica?",o:["Pretoria", "Johanesburgo", "Ciudad del Cabo", "Durban"],r:"A"},en:{t:"What is South Africa's administrative capital?",o:["Pretoria", "Johannesburg", "Cape Town", "Durban"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué país está el Taj Mahal?",o:["India", "Pakistán", "Bangladesh", "Nepal"],r:"A"},en:{t:"In which country is the Taj Mahal?",o:["India", "Pakistan", "Bangladesh", "Nepal"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué país tiene la costa más larga?",o:["Canadá", "Rusia", "Noruega", "Indonesia"],r:"A"},en:{t:"Which country has the longest coastline?",o:["Canada", "Russia", "Norway", "Indonesia"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué país está la Ópera de Sídney?",o:["Australia", "Nueva Zelanda", "UK", "Canadá"],r:"A"},en:{t:"In which country is the Sydney Opera House?",o:["Australia", "New Zealand", "UK", "Canada"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es la capital de Corea del Sur?",o:["Seúl", "Busan", "Incheon", "Daegu"],r:"A"},en:{t:"What is the capital of South Korea?",o:["Seoul", "Busan", "Incheon", "Daegu"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué país está Bali?",o:["Indonesia", "Filipinas", "Tailandia", "Malasia"],r:"A"},en:{t:"In which country is Bali?",o:["Indonesia", "Philippines", "Thailand", "Malaysia"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es el volcán más activo del mundo?",o:["Kilauea", "Etna", "Popocatépetl", "Pinatubo"],r:"A"},en:{t:"What is the most active volcano in the world?",o:["Kilauea", "Etna", "Popocatepetl", "Pinatubo"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué continente está la Patagonia?",o:["América del Sur", "Asia", "África", "Europa"],r:"A"},en:{t:"On which continent is Patagonia?",o:["South America", "Asia", "Africa", "Europe"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Qué país tiene la mayor frontera con Rusia?",o:["Kazajistán", "China", "Mongolia", "Ucrania"],r:"A"},en:{t:"Which country shares the longest border with Russia?",o:["Kazakhstan", "China", "Mongolia", "Ukraine"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuántos países baña el río Danubio?",o:["10", "8", "12", "6"],r:"A"},en:{t:"How many countries does the Danube flow through?",o:["10", "8", "12", "6"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿Cuál es la capital de Marruecos?",o:["Rabat", "Casablanca", "Marrakech", "Fez"],r:"A"},en:{t:"What is the capital of Morocco?",o:["Rabat", "Casablanca", "Marrakech", "Fez"],r:"A"}},
-{c:"geography",d:"medium",es:{t:"¿En qué país está el Río de la Plata?",o:["Entre Argentina y Uruguay", "Solo Argentina", "Solo Uruguay", "Entre Chile y Argentina"],r:"A"},en:{t:"Where is the Río de la Plata?",o:["Between Argentina and Uruguay", "Only Argentina", "Only Uruguay", "Between Chile and Argentina"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué país tiene la mayor densidad poblacional?",o:["Mónaco", "Bangladesh", "Singapur", "Maldivas"],r:"A"},en:{t:"Which country has the highest population density?",o:["Monaco", "Bangladesh", "Singapore", "Maldives"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuántos países comparten la Amazonia?",o:["9", "6", "7", "8"],r:"A"},en:{t:"How many countries share the Amazon rainforest?",o:["9", "6", "7", "8"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es la ciudad habitada más alta del mundo?",o:["La Rinconada, Perú", "La Paz", "Potosí", "Quito"],r:"A"},en:{t:"What is the highest permanently inhabited city?",o:["La Rinconada, Peru", "La Paz", "Potosi", "Quito"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuántos países de Sudamérica no tienen mar?",o:["2", "1", "3", "0"],r:"A"},en:{t:"How many South American countries are landlocked?",o:["2", "1", "3", "0"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es la profundidad máxima de la Fosa Mariana?",o:["~11 km", "~8 km", "~15 km", "~6 km"],r:"A"},en:{t:"What is the max depth of the Mariana Trench?",o:["~11 km", "~8 km", "~15 km", "~6 km"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué istmo une Norteamérica con Sudamérica?",o:["Panamá", "Guatemala", "Honduras", "Nicaragua"],r:"A"},en:{t:"Which isthmus connects North and South America?",o:["Panama", "Guatemala", "Honduras", "Nicaragua"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es la ciudad más al norte del mundo?",o:["Longyearbyen", "Tromsø", "Barrow", "Murmansk"],r:"A"},en:{t:"What is the northernmost city in the world?",o:["Longyearbyen", "Tromsø", "Barrow", "Murmansk"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué país tiene tres capitales oficiales?",o:["Sudáfrica", "Bolivia", "Sri Lanka", "Países Bajos"],r:"A"},en:{t:"Which country has three official capitals?",o:["South Africa", "Bolivia", "Sri Lanka", "Netherlands"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuántos husos horarios tiene Rusia?",o:["11", "9", "13", "7"],r:"A"},en:{t:"How many time zones does Russia span?",o:["11", "9", "13", "7"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué porcentaje del agua del planeta es dulce?",o:["3%", "10%", "1%", "20%"],r:"A"},en:{t:"What percentage of Earth's water is fresh?",o:["3%", "10%", "1%", "20%"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es el río más ancho del mundo?",o:["Río de la Plata", "Amazonas", "Congo", "Misisipi"],r:"A"},en:{t:"What is the widest river in the world?",o:["Río de la Plata", "Amazon", "Congo", "Mississippi"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué país produce más café en el mundo?",o:["Brasil", "Colombia", "Vietnam", "Etiopía"],r:"A"},en:{t:"Which country produces the most coffee?",o:["Brazil", "Colombia", "Vietnam", "Ethiopia"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué cordillera divide Europa de Asia?",o:["Urales", "Cáucaso", "Alpes", "Pirineos"],r:"A"},en:{t:"Which mountain range divides Europe from Asia?",o:["Urals", "Caucasus", "Alps", "Pyrenees"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es la ciudad más austral del mundo?",o:["Ushuaia", "Punta Arenas", "Puerto Williams", "Stanley"],r:"A"},en:{t:"What is the southernmost city in the world?",o:["Ushuaia", "Punta Arenas", "Puerto Williams", "Stanley"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuántos husos horarios tiene China?",o:["1", "4", "5", "3"],r:"A"},en:{t:"How many time zones does China officially use?",o:["1", "4", "5", "3"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿En qué país está el desierto de Atacama?",o:["Chile", "Perú", "Bolivia", "Argentina"],r:"A"},en:{t:"In which country is the Atacama Desert?",o:["Chile", "Peru", "Bolivia", "Argentina"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es el nombre del mar entre Italia y los Balcanes?",o:["Adriático", "Jónico", "Tirreno", "Egeo"],r:"A"},en:{t:"What sea lies between Italy and the Balkans?",o:["Adriatic", "Ionian", "Tyrrhenian", "Aegean"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuántos estados tiene EE.UU.?",o:["50", "48", "52", "49"],r:"A"},en:{t:"How many states does the USA have?",o:["50", "48", "52", "49"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿En qué país nació el Tango?",o:["Argentina", "Uruguay", "Brasil", "Chile"],r:"A"},en:{t:"In which country did Tango originate?",o:["Argentina", "Uruguay", "Brazil", "Chile"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es la capital de Kazajistán?",o:["Astana", "Almaty", "Shymkent", "Aktobe"],r:"A"},en:{t:"What is the capital of Kazakhstan?",o:["Astana", "Almaty", "Shymkent", "Aktobe"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿En qué país está el lago Titicaca principalmente?",o:["Bolivia y Perú", "Solo Bolivia", "Solo Perú", "Argentina y Bolivia"],r:"A"},en:{t:"Where is Lake Titicaca mainly located?",o:["Bolivia and Peru", "Only Bolivia", "Only Peru", "Argentina and Bolivia"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuántos países tiene la Unión Europea?",o:["27", "28", "25", "30"],r:"A"},en:{t:"How many countries are in the European Union?",o:["27", "28", "25", "30"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Qué país tiene más premios Nobel per cápita?",o:["Suecia", "Estados Unidos", "Suiza", "Noruega"],r:"A"},en:{t:"Which country has the most Nobel Prizes per capita?",o:["Sweden", "United States", "Switzerland", "Norway"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿Cuál es la cordillera más alta del mundo?",o:["Himalayas", "Andes", "Alpes", "Urales"],r:"A"},en:{t:"Which is the highest mountain range in the world?",o:["Himalayas", "Andes", "Alps", "Urals"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿En qué año fue fundada la ciudad de Roma?",o:["753 a.C.", "500 a.C.", "600 a.C.", "400 a.C."],r:"A"},en:{t:"In what year was Rome founded?",o:["753 BC", "500 BC", "600 BC", "400 BC"],r:"A"}},
-{c:"geography",d:"hard",es:{t:"¿En qué mar desemboca el río Nilo?",o:["Mediterráneo", "Rojo", "Arábigo", "Negro"],r:"A"},en:{t:"Into which sea does the Nile flow?",o:["Mediterranean", "Red", "Arabian", "Black"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año llegó Colón a América?",o:["1492", "1502", "1498", "1488"],r:"A"},en:{t:"In what year did Columbus arrive in America?",o:["1492", "1502", "1498", "1488"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Qué civilización construyó las pirámides de Giza?",o:["Egipcia", "Romana", "Griega", "Persa"],r:"A"},en:{t:"Which civilization built the Pyramids of Giza?",o:["Egyptian", "Roman", "Greek", "Persian"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año comenzó la Segunda Guerra Mundial?",o:["1939", "1941", "1937", "1943"],r:"A"},en:{t:"In what year did WWII begin?",o:["1939", "1941", "1937", "1943"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue el primer presidente de EE.UU.?",o:["George Washington", "Abraham Lincoln", "Thomas Jefferson", "John Adams"],r:"A"},en:{t:"Who was the first US President?",o:["George Washington", "Abraham Lincoln", "Thomas Jefferson", "John Adams"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Qué muro dividió Berlín en la Guerra Fría?",o:["Muro de Berlín", "Gran Muralla", "Línea Maginot", "Muro Atlántico"],r:"A"},en:{t:"Which wall divided Berlin during the Cold War?",o:["Berlin Wall", "Great Wall", "Maginot Line", "Atlantic Wall"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año cayó el Imperio Romano de Occidente?",o:["476", "410", "395", "500"],r:"A"},en:{t:"In what year did the Western Roman Empire fall?",o:["476", "410", "395", "500"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año fue el primer alunizaje?",o:["1969", "1965", "1972", "1968"],r:"A"},en:{t:"In what year was the first Moon landing?",o:["1969", "1965", "1972", "1968"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Qué guerra terminó con el Tratado de Versalles?",o:["Primera Guerra Mundial", "Segunda GM", "Guerra Fría", "Guerra de Crimea"],r:"A"},en:{t:"Which war ended with the Treaty of Versailles?",o:["World War I", "World War II", "Cold War", "Crimean War"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue el líder de la Revolución Cubana?",o:["Fidel Castro", "Che Guevara", "Batista", "Raúl Castro"],r:"A"},en:{t:"Who led the Cuban Revolution?",o:["Fidel Castro", "Che Guevara", "Batista", "Raúl Castro"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué siglo ocurrió la Revolución Francesa?",o:["XVIII", "XIX", "XVII", "XX"],r:"A"},en:{t:"In which century did the French Revolution occur?",o:["18th", "19th", "17th", "20th"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue Julio César?",o:["Dictador romano", "Rey griego", "Faraón egipcio", "Filósofo persa"],r:"A"},en:{t:"Who was Julius Caesar?",o:["Roman dictator", "Greek king", "Egyptian pharaoh", "Persian philosopher"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año terminó la Segunda Guerra Mundial?",o:["1945", "1943", "1947", "1946"],r:"A"},en:{t:"In what year did WWII end?",o:["1945", "1943", "1947", "1946"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién escribió El origen de las especies?",o:["Darwin", "Lamarck", "Mendel", "Wallace"],r:"A"},en:{t:"Who wrote 'On the Origin of Species'?",o:["Darwin", "Lamarck", "Mendel", "Wallace"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Qué evento inició la Primera Guerra Mundial?",o:["Asesinato de Francisco Fernando", "Invasión de Polonia", "Revolución Rusa", "Huelga en Alemania"],r:"A"},en:{t:"What triggered World War I?",o:["Assassination of Franz Ferdinand", "Invasion of Poland", "Russian Revolution", "German Strike"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año se independizó EE.UU.?",o:["1776", "1783", "1789", "1800"],r:"A"},en:{t:"In what year did the US declare independence?",o:["1776", "1783", "1789", "1800"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue Cleopatra?",o:["Reina de Egipto", "Emperatriz romana", "Princesa griega", "Guerrera persa"],r:"A"},en:{t:"Who was Cleopatra?",o:["Queen of Egypt", "Roman empress", "Greek princess", "Persian warrior"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Cuándo cayó el Muro de Berlín?",o:["1989", "1991", "1987", "1985"],r:"A"},en:{t:"When did the Berlin Wall fall?",o:["1989", "1991", "1987", "1985"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue Mahatma Gandhi?",o:["Líder de independencia india", "Presidente de India", "Rey de India", "PM de Pakistán"],r:"A"},en:{t:"Who was Mahatma Gandhi?",o:["Indian independence leader", "President of India", "King of India", "PM of Pakistan"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue Martin Luther King Jr.?",o:["Activista por derechos civiles", "Presidente de EE.UU.", "Líder religioso", "Senador"],r:"A"},en:{t:"Who was Martin Luther King Jr.?",o:["Civil rights activist", "US President", "Religious leader", "Senator"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué país ocurrió la Revolución Industrial?",o:["Reino Unido", "Francia", "Alemania", "EE.UU."],r:"A"},en:{t:"Where did the Industrial Revolution begin?",o:["United Kingdom", "France", "Germany", "USA"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue Napoleón Bonaparte?",o:["Emperador de Francia", "Rey de Inglaterra", "General ruso", "Presidente de España"],r:"A"},en:{t:"Who was Napoleon Bonaparte?",o:["Emperor of France", "King of England", "Russian general", "President of Spain"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Qué civilización inventó el alfabeto?",o:["Fenicia", "Griega", "Romana", "Egipcia"],r:"A"},en:{t:"Which civilization invented the alphabet?",o:["Phoenician", "Greek", "Roman", "Egyptian"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año se independizó Colombia?",o:["1819", "1810", "1830", "1800"],r:"A"},en:{t:"In what year did Colombia gain independence?",o:["1819", "1810", "1830", "1800"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Quién fue Simón Bolívar?",o:["Libertador de Sudamérica", "Presidente de España", "Conquistador", "General napoleónico"],r:"A"},en:{t:"Who was Simón Bolívar?",o:["Liberator of South America", "President of Spain", "Conquistador", "Napoleonic general"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué año fue el primer Gran Premio de F1?",o:["1950", "1946", "1955", "1960"],r:"A"},en:{t:"In what year was the first F1 Grand Prix?",o:["1950", "1946", "1955", "1960"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿Qué civilización construyó el Coliseo?",o:["Romana", "Griega", "Egipcia", "Persa"],r:"A"},en:{t:"Which civilization built the Colosseum?",o:["Roman", "Greek", "Egyptian", "Persian"],r:"A"}},
-{c:"history",d:"easy",es:{t:"¿En qué país nació la democracia?",o:["Grecia", "Roma", "Egipto", "Mesopotamia"],r:"A"},en:{t:"In which country was democracy born?",o:["Greece", "Rome", "Egypt", "Mesopotamia"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año comenzó la Revolución Francesa?",o:["1789", "1793", "1799", "1787"],r:"A"},en:{t:"In what year did the French Revolution begin?",o:["1789", "1793", "1799", "1787"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue el primer faraón del Antiguo Egipto?",o:["Menes", "Ramsés", "Tutankamón", "Cleopatra"],r:"A"},en:{t:"Who was the first pharaoh of Ancient Egypt?",o:["Menes", "Ramses", "Tutankhamun", "Cleopatra"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año ocurrió la Revolución Rusa?",o:["1917", "1905", "1921", "1914"],r:"A"},en:{t:"In what year did the Russian Revolution occur?",o:["1917", "1905", "1921", "1914"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue el último zar de Rusia?",o:["Nicolás II", "Alejandro III", "Pedro el Grande", "Catalina la Grande"],r:"A"},en:{t:"Who was the last Tsar of Russia?",o:["Nicholas II", "Alexander III", "Peter the Great", "Catherine the Great"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Qué fue el Proyecto Manhattan?",o:["Programa nuclear de EE.UU.", "Plan de reconstrucción europeo", "Invasión de Normandía", "Estrategia del Pacífico"],r:"A"},en:{t:"What was the Manhattan Project?",o:["US nuclear program", "European reconstruction plan", "Normandy invasion", "Pacific strategy"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año se fundó la ONU?",o:["1945", "1948", "1940", "1950"],r:"A"},en:{t:"In what year was the UN founded?",o:["1945", "1948", "1940", "1950"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Qué civilización construyó Tenochtitlán?",o:["Azteca", "Maya", "Inca", "Olmeca"],r:"A"},en:{t:"Which civilization built Tenochtitlan?",o:["Aztec", "Maya", "Inca", "Olmec"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año se abolió la esclavitud en EE.UU.?",o:["1865", "1863", "1870", "1860"],r:"A"},en:{t:"In what year was slavery abolished in the USA?",o:["1865", "1863", "1870", "1860"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Qué fue el apartheid?",o:["Segregación racial en Sudáfrica", "Guerra civil en Ruanda", "Colonialismo belga", "Dictadura zimbabuense"],r:"A"},en:{t:"What was apartheid?",o:["Racial segregation in South Africa", "Civil war in Rwanda", "Belgian colonialism", "Zimbabwean dictatorship"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año fue asesinado Abraham Lincoln?",o:["1865", "1870", "1860", "1875"],r:"A"},en:{t:"In what year was Lincoln assassinated?",o:["1865", "1870", "1860", "1875"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue Nelson Mandela?",o:["Primer presidente negro de Sudáfrica", "Líder del apartheid", "General sudafricano", "Rey zulú"],r:"A"},en:{t:"Who was Nelson Mandela?",o:["First Black president of South Africa", "Apartheid leader", "South African general", "Zulu king"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año fue la Batalla de Waterloo?",o:["1815", "1805", "1812", "1820"],r:"A"},en:{t:"In what year was the Battle of Waterloo?",o:["1815", "1805", "1812", "1820"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año ocurrió la Revolución Mexicana?",o:["1910", "1917", "1905", "1920"],r:"A"},en:{t:"In what year did the Mexican Revolution begin?",o:["1910", "1917", "1905", "1920"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año fue la Batalla de Hastings?",o:["1066", "1086", "1050", "1100"],r:"A"},en:{t:"In what year was the Battle of Hastings?",o:["1066", "1086", "1050", "1100"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue el PM del Reino Unido en la WWII?",o:["Churchill", "Chamberlain", "Attlee", "Eden"],r:"A"},en:{t:"Who was UK PM during WWII?",o:["Churchill", "Chamberlain", "Attlee", "Eden"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año se firmó la Magna Carta?",o:["1215", "1189", "1265", "1300"],r:"A"},en:{t:"In what year was the Magna Carta signed?",o:["1215", "1189", "1265", "1300"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue Mao Zedong?",o:["Fundador de la República Popular China", "Último emperador chino", "Líder de Taiwán", "General japonés"],r:"A"},en:{t:"Who was Mao Zedong?",o:["Founder of People's Republic of China", "Last Chinese emperor", "Leader of Taiwan", "Japanese general"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Qué fue la Inquisición española?",o:["Tribunal religioso", "Ejército real", "Institución educativa", "Consejo de estado"],r:"A"},en:{t:"What was the Spanish Inquisition?",o:["Religious tribunal", "Royal army", "Educational institution", "Council of state"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Qué fue la Guerra Fría?",o:["Tensión EE.UU.-URSS sin conflicto directo", "Guerra entre EE.UU. y Rusia", "Conflicto en el Ártico", "Alianza militar secreta"],r:"A"},en:{t:"What was the Cold War?",o:["US-USSR tension without direct conflict", "War between USA and Russia", "Arctic conflict", "Secret military alliance"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año fue el Tratado de Tordesillas?",o:["1494", "1492", "1500", "1498"],r:"A"},en:{t:"In what year was the Treaty of Tordesillas?",o:["1494", "1492", "1500", "1498"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año cayó Constantinopla ante los otomanos?",o:["1453", "1402", "1481", "1520"],r:"A"},en:{t:"In what year did Constantinople fall to the Ottomans?",o:["1453", "1402", "1481", "1520"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue Espartaco?",o:["Líder de rebelión de esclavos en Roma", "General cartaginés", "Filósofo griego", "Rey de Esparta"],r:"A"},en:{t:"Who was Spartacus?",o:["Leader of a slave rebellion in Rome", "Carthaginian general", "Greek philosopher", "King of Sparta"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año comenzó la Reconquista española?",o:["722", "711", "800", "900"],r:"A"},en:{t:"In what year did the Spanish Reconquista begin?",o:["722", "711", "800", "900"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año fue la Revolución de Independencia de Venezuela?",o:["1811", "1819", "1830", "1821"],r:"A"},en:{t:"In what year did Venezuela declare independence?",o:["1811", "1819", "1830", "1821"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Qué fue la Paz de Westfalia?",o:["Tratado que estableció los estados soberanos modernos", "Unificación de Alemania", "Final de las Cruzadas", "Fundación del Imperio Habsburgo"],r:"A"},en:{t:"What was the Peace of Westphalia?",o:["Treaty establishing modern sovereign states", "German unification", "End of the Crusades", "Habsburg Empire founding"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿En qué año fue fundada Roma?",o:["753 a.C.", "500 a.C.", "600 a.C.", "400 a.C."],r:"A"},en:{t:"In what year was Rome founded?",o:["753 BC", "500 BC", "600 BC", "400 BC"],r:"A"}},
-{c:"history",d:"medium",es:{t:"¿Quién fue el líder de la Alemania Nazi?",o:["Hitler", "Mussolini", "Hirohito", "Stalin"],r:"A"},en:{t:"Who was the leader of Nazi Germany?",o:["Hitler", "Mussolini", "Hirohito", "Stalin"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año fue el Edicto de Milán?",o:["313", "325", "380", "410"],r:"A"},en:{t:"In what year was the Edict of Milan?",o:["313", "325", "380", "410"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Tamerlán?",o:["Conquistador turco-mongol", "Sultán otomano", "Faraón egipcio", "Emperador chino"],r:"A"},en:{t:"Who was Tamerlane?",o:["Turco-Mongol conqueror", "Ottoman sultan", "Egyptian pharaoh", "Chinese emperor"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue la Conspiración de la Pólvora?",o:["Intento de volar el Parlamento inglés en 1605", "Revuelta campesina francesa", "Golpe de estado otomano", "Rebelión en las colonias americanas"],r:"A"},en:{t:"What was the Gunpowder Plot?",o:["Attempt to blow up English Parliament in 1605", "French peasant revolt", "Ottoman coup", "American colonial rebellion"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Ashoka el Grande?",o:["Emperador maurya que difundió el budismo", "Rey persa", "Conquistador griego", "Faraón egipcio"],r:"A"},en:{t:"Who was Ashoka the Great?",o:["Mauryan emperor who spread Buddhism", "Persian king", "Greek conqueror", "Egyptian pharaoh"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año comenzó la Guerra del Peloponeso?",o:["431 a.C.", "480 a.C.", "404 a.C.", "336 a.C."],r:"A"},en:{t:"In what year did the Peloponnesian War begin?",o:["431 BC", "480 BC", "404 BC", "336 BC"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue el primer ministro de Israel?",o:["David Ben-Gurion", "Golda Meir", "Moshe Dayan", "Levi Eshkol"],r:"A"},en:{t:"Who was the first PM of Israel?",o:["David Ben-Gurion", "Golda Meir", "Moshe Dayan", "Levi Eshkol"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue la Revolución de las Comunas de París?",o:["Gobierno revolucionario de 1871", "Revolución de 1789", "Revuelta de 1848", "Levantamiento de 1830"],r:"A"},en:{t:"What was the Paris Commune?",o:["Revolutionary government of 1871", "Revolution of 1789", "Revolt of 1848", "Uprising of 1830"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Saladino?",o:["Sultán que reconquistó Jerusalén", "Rey de las Cruzadas", "Califa otomano", "Faraón árabe"],r:"A"},en:{t:"Who was Saladin?",o:["Sultan who reconquered Jerusalem", "King of the Crusades", "Ottoman caliph", "Arab pharaoh"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año fue la batalla de Maratón?",o:["490 a.C.", "480 a.C.", "510 a.C.", "460 a.C."],r:"A"},en:{t:"In what year was the Battle of Marathon?",o:["490 BC", "480 BC", "510 BC", "460 BC"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Vercingetórix?",o:["Jefe galo que resistió a César", "General cartaginés", "Rey britano", "Caudillo germano"],r:"A"},en:{t:"Who was Vercingetorix?",o:["Gallic chief who resisted Caesar", "Carthaginian general", "British king", "Germanic warlord"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue el Edicto de Nantes?",o:["Tolerancia religiosa para protestantes en Francia", "Independencia holandesa", "Tratado de paz franco-español", "Fundación de la Academia Francesa"],r:"A"},en:{t:"What was the Edict of Nantes?",o:["Religious tolerance for Protestants in France", "Dutch independence", "Franco-Spanish peace treaty", "French Academy founding"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Enrique VIII?",o:["Rey inglés que creó la Iglesia Anglicana", "Fundador Tudor", "Conquistador de Irlanda", "Arquitecto del Renacimiento inglés"],r:"A"},en:{t:"Who was Henry VIII?",o:["English king who created the Anglican Church", "Tudor founder", "Conqueror of Ireland", "English Renaissance architect"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue la Guerra de los Treinta Años?",o:["Conflicto religioso europeo 1618-1648", "Guerra de Sucesión española", "Conflicto franco-inglés", "Guerras italianas"],r:"A"},en:{t:"What was the Thirty Years' War?",o:["European religious conflict 1618-1648", "War of Spanish Succession", "Franco-English conflict", "Italian Wars"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Hammurabi?",o:["Rey babilónico que creó uno de los primeros códigos legales", "Faraón egipcio", "Rey persa", "Emperador asirio"],r:"A"},en:{t:"Who was Hammurabi?",o:["Babylonian king who created one of the first legal codes", "Egyptian pharaoh", "Persian king", "Assyrian emperor"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año fue el saqueo de Roma por los visigodos?",o:["410", "476", "455", "390"],r:"A"},en:{t:"In what year was Rome sacked by the Visigoths?",o:["410", "476", "455", "390"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue la Conjura de los Pazzi?",o:["Intento de asesinato de los Medici en Florencia", "Revuelta en Venecia", "Golpe en Milán", "Conspiración contra el Papa"],r:"A"},en:{t:"What was the Pazzi Conspiracy?",o:["Attempted assassination of the Medici in Florence", "Revolt in Venice", "Milan coup", "Conspiracy against the Pope"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue el último faraón de Egipto?",o:["Cleopatra VII", "Ramsés III", "Ptolomeo XV", "Nerón"],r:"A"},en:{t:"Who was the last pharaoh of Egypt?",o:["Cleopatra VII", "Ramses III", "Ptolemy XV", "Nero"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año fue la Batalla de Lepanto?",o:["1571", "1588", "1545", "1600"],r:"A"},en:{t:"In what year was the Battle of Lepanto?",o:["1571", "1588", "1545", "1600"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año se fundó el Islam (Hégira)?",o:["622 d.C.", "610 d.C.", "632 d.C.", "570 d.C."],r:"A"},en:{t:"In what year was Islam founded (Hijra)?",o:["622 AD", "610 AD", "632 AD", "570 AD"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue la Reconquista?",o:["Recuperación de la Península Ibérica del dominio musulmán", "Invasión árabe de Europa", "Cruzada contra los vikingos", "Guerra de religión en Francia"],r:"A"},en:{t:"What was the Reconquista?",o:["Recovery of Iberian Peninsula from Muslim rule", "Arab invasion of Europe", "Crusade against Vikings", "Religious war in France"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año fue el Concilio de Nicea?",o:["325 d.C.", "313 d.C.", "380 d.C.", "410 d.C."],r:"A"},en:{t:"In what year was the Council of Nicaea?",o:["325 AD", "313 AD", "380 AD", "410 AD"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Gengis Kan?",o:["Fundador del Imperio Mongol", "Sultán otomano", "Faraón egipcio", "Emperador chino"],r:"A"},en:{t:"Who was Genghis Khan?",o:["Founder of the Mongol Empire", "Ottoman sultan", "Egyptian pharaoh", "Chinese emperor"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue el Gran Cisma de 1054?",o:["División entre Iglesia Católica y Ortodoxa", "Reforma Protestante", "Disputa papal en Aviñón", "Concilio de Trento"],r:"A"},en:{t:"What was the Great Schism of 1054?",o:["Split between Catholic and Orthodox Church", "Protestant Reformation", "Papal dispute in Avignon", "Council of Trent"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿En qué año se proclamó la Primera República Francesa?",o:["1792", "1789", "1799", "1804"],r:"A"},en:{t:"In what year was the First French Republic proclaimed?",o:["1792", "1789", "1799", "1804"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Quién fue Julio II?",o:["Papa guerrero del Renacimiento", "Emperador romano", "Rey de Nápoles", "Cardenal español"],r:"A"},en:{t:"Who was Julius II?",o:["Warrior Pope of the Renaissance", "Roman Emperor", "King of Naples", "Spanish Cardinal"],r:"A"}},
-{c:"history",d:"hard",es:{t:"¿Qué fue el Saqueo de Constantinopla de 1204?",o:["Cuarta Cruzada saqueó la ciudad cristiana", "Conquista otomana", "Invasión persa", "Ataque ruso"],r:"A"},en:{t:"What was the Sack of Constantinople in 1204?",o:["Fourth Crusade sacked the Christian city", "Ottoman conquest", "Persian invasion", "Russian attack"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién interpretó a Iron Man en el MCU?",o:["Robert Downey Jr.", "Chris Evans", "Mark Ruffalo", "Chris Hemsworth"],r:"A"},en:{t:"Who played Iron Man in the MCU?",o:["Robert Downey Jr.", "Chris Evans", "Mark Ruffalo", "Chris Hemsworth"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿En qué año se lanzó el primer iPhone?",o:["2007", "2005", "2009", "2006"],r:"A"},en:{t:"In what year was the first iPhone released?",o:["2007", "2005", "2009", "2006"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién es el creador de Facebook?",o:["Mark Zuckerberg", "Steve Jobs", "Elon Musk", "Bill Gates"],r:"A"},en:{t:"Who created Facebook?",o:["Mark Zuckerberg", "Steve Jobs", "Elon Musk", "Bill Gates"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién cantó 'Thriller'?",o:["Michael Jackson", "Prince", "Whitney Houston", "Madonna"],r:"A"},en:{t:"Who sang 'Thriller'?",o:["Michael Jackson", "Prince", "Whitney Houston", "Madonna"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién es el personaje principal de Harry Potter?",o:["Harry Potter", "Hermione Granger", "Ron Weasley", "Draco Malfoy"],r:"A"},en:{t:"Who is the main character in Harry Potter?",o:["Harry Potter", "Hermione Granger", "Ron Weasley", "Draco Malfoy"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Qué empresa creó Minecraft?",o:["Mojang", "Activision", "EA", "Ubisoft"],r:"A"},en:{t:"Which company created Minecraft?",o:["Mojang", "Activision", "EA", "Ubisoft"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién es la Reina del Pop?",o:["Madonna", "Beyoncé", "Lady Gaga", "Rihanna"],r:"A"},en:{t:"Who is the Queen of Pop?",o:["Madonna", "Beyoncé", "Lady Gaga", "Rihanna"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién creó a Mickey Mouse?",o:["Walt Disney", "Jim Henson", "Chuck Jones", "Tex Avery"],r:"A"},en:{t:"Who created Mickey Mouse?",o:["Walt Disney", "Jim Henson", "Chuck Jones", "Tex Avery"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién escribió El Señor de los Anillos?",o:["J.R.R. Tolkien", "C.S. Lewis", "George R.R. Martin", "J.K. Rowling"],r:"A"},en:{t:"Who wrote The Lord of the Rings?",o:["J.R.R. Tolkien", "C.S. Lewis", "George R.R. Martin", "J.K. Rowling"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Qué director filmó Jurassic Park?",o:["Steven Spielberg", "James Cameron", "Christopher Nolan", "George Lucas"],r:"A"},en:{t:"Which director made Jurassic Park?",o:["Steven Spielberg", "James Cameron", "Christopher Nolan", "George Lucas"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Cuál es el videojuego más vendido de la historia?",o:["Minecraft", "Tetris", "GTA V", "Mario Bros"],r:"A"},en:{t:"What is the best-selling video game of all time?",o:["Minecraft", "Tetris", "GTA V", "Mario Bros"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Qué banda lanzó Bohemian Rhapsody?",o:["Queen", "The Beatles", "Led Zeppelin", "Pink Floyd"],r:"A"},en:{t:"Which band released Bohemian Rhapsody?",o:["Queen", "The Beatles", "Led Zeppelin", "Pink Floyd"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién protagonizó Forrest Gump?",o:["Tom Hanks", "Tom Cruise", "Brad Pitt", "Leonardo DiCaprio"],r:"A"},en:{t:"Who starred in Forrest Gump?",o:["Tom Hanks", "Tom Cruise", "Brad Pitt", "Leonardo DiCaprio"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién es el protagonista de El Rey León?",o:["Simba", "Mufasa", "Timón", "Pumba"],r:"A"},en:{t:"Who is the protagonist of The Lion King?",o:["Simba", "Mufasa", "Timon", "Pumbaa"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿En qué año nació YouTube?",o:["2005", "2003", "2007", "2004"],r:"A"},en:{t:"In what year was YouTube founded?",o:["2005", "2003", "2007", "2004"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién interpreta a Jack Sparrow?",o:["Johnny Depp", "Orlando Bloom", "Will Smith", "Vin Diesel"],r:"A"},en:{t:"Who plays Jack Sparrow?",o:["Johnny Depp", "Orlando Bloom", "Will Smith", "Vin Diesel"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién canta Despacito?",o:["Luis Fonsi", "J Balvin", "Daddy Yankee", "Bad Bunny"],r:"A"},en:{t:"Who sings Despacito?",o:["Luis Fonsi", "J Balvin", "Daddy Yankee", "Bad Bunny"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Qué consola lanzó Nintendo en 2017?",o:["Switch", "Wii U", "3DS", "GameCube"],r:"A"},en:{t:"What console did Nintendo release in 2017?",o:["Switch", "Wii U", "3DS", "GameCube"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién es la actriz más nominada al Oscar?",o:["Meryl Streep", "Cate Blanchett", "Katharine Hepburn", "Glenn Close"],r:"A"},en:{t:"Who is the most Oscar-nominated actress?",o:["Meryl Streep", "Cate Blanchett", "Katharine Hepburn", "Glenn Close"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién es el protagonista de Stranger Things?",o:["Eleven", "Mike", "Will", "Lucas"],r:"A"},en:{t:"Who is the main protagonist of Stranger Things?",o:["Eleven", "Mike", "Will", "Lucas"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Qué banda tiene más discos vendidos?",o:["The Beatles", "Elvis Presley", "Led Zeppelin", "Michael Jackson"],r:"A"},en:{t:"Which band has sold the most records?",o:["The Beatles", "Elvis Presley", "Led Zeppelin", "Michael Jackson"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Cuál es la red social con más usuarios?",o:["Facebook", "Instagram", "TikTok", "Twitter"],r:"A"},en:{t:"Which social network has the most users?",o:["Facebook", "Instagram", "TikTok", "Twitter"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿En qué año se fundó Spotify?",o:["2006", "2008", "2010", "2004"],r:"A"},en:{t:"In what year was Spotify founded?",o:["2006", "2008", "2010", "2004"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién escribió Cien años de soledad?",o:["García Márquez", "Vargas Llosa", "Borges", "Cortázar"],r:"A"},en:{t:"Who wrote One Hundred Years of Solitude?",o:["García Márquez", "Vargas Llosa", "Borges", "Cortázar"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Quién creó Los Simpson?",o:["Matt Groening", "Seth MacFarlane", "Mike Judge", "Dan Harmon"],r:"A"},en:{t:"Who created The Simpsons?",o:["Matt Groening", "Seth MacFarlane", "Mike Judge", "Dan Harmon"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Cuántas temporadas tiene Friends?",o:["10", "8", "12", "6"],r:"A"},en:{t:"How many seasons does Friends have?",o:["10", "8", "12", "6"],r:"A"}},
-{c:"entertainment",d:"easy",es:{t:"¿Qué videojuego usa el personaje de Mario?",o:["Nintendo", "Sega", "Atari", "Sony"],r:"A"},en:{t:"Which company owns Mario?",o:["Nintendo", "Sega", "Atari", "Sony"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿En qué año se estrenó la primera película de Star Wars?",o:["1977", "1980", "1975", "1983"],r:"A"},en:{t:"In what year was the first Star Wars film released?",o:["1977", "1980", "1975", "1983"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿En qué año se lanzó Fortnite?",o:["2017", "2015", "2019", "2016"],r:"A"},en:{t:"In what year was Fortnite released?",o:["2017", "2015", "2019", "2016"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién compuso la banda sonora de Star Wars?",o:["John Williams", "Hans Zimmer", "Ennio Morricone", "Howard Shore"],r:"A"},en:{t:"Who composed the Star Wars soundtrack?",o:["John Williams", "Hans Zimmer", "Ennio Morricone", "Howard Shore"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Cuántas temporadas tiene Breaking Bad?",o:["5", "4", "6", "7"],r:"A"},en:{t:"How many seasons does Breaking Bad have?",o:["5", "4", "6", "7"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿En qué año se estrenó Titanic de Cameron?",o:["1997", "1999", "1995", "2001"],r:"A"},en:{t:"In what year did Cameron's Titanic premiere?",o:["1997", "1999", "1995", "2001"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Cuántos libros tiene Harry Potter?",o:["7", "6", "8", "5"],r:"A"},en:{t:"How many books are in the Harry Potter series?",o:["7", "6", "8", "5"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿En qué plataforma se estrenó The Mandalorian?",o:["Disney+", "Netflix", "HBO", "Amazon"],r:"A"},en:{t:"On which platform did The Mandalorian debut?",o:["Disney+", "Netflix", "HBO", "Amazon"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién dirigió El Padrino?",o:["Francis Ford Coppola", "Martin Scorsese", "Ridley Scott", "Brian De Palma"],r:"A"},en:{t:"Who directed The Godfather?",o:["Francis Ford Coppola", "Martin Scorsese", "Ridley Scott", "Brian De Palma"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Cuál fue el primer largometraje animado de Disney?",o:["Blancanieves", "Pinocho", "Fantasía", "Bambi"],r:"A"},en:{t:"What was Disney's first feature-length animated film?",o:["Snow White", "Pinocchio", "Fantasia", "Bambi"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Qué video fue primero en llegar a mil millones en YouTube?",o:["Gangnam Style", "Despacito", "Baby", "Sorry"],r:"A"},en:{t:"Which video was first to reach 1 billion YouTube views?",o:["Gangnam Style", "Despacito", "Baby", "Sorry"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién interpretó a James Bond más veces?",o:["Roger Moore", "Sean Connery", "Daniel Craig", "Pierce Brosnan"],r:"A"},en:{t:"Who played James Bond the most times?",o:["Roger Moore", "Sean Connery", "Daniel Craig", "Pierce Brosnan"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Qué banda grabó Smells Like Teen Spirit?",o:["Nirvana", "Pearl Jam", "Soundgarden", "Alice in Chains"],r:"A"},en:{t:"Which band recorded Smells Like Teen Spirit?",o:["Nirvana", "Pearl Jam", "Soundgarden", "Alice in Chains"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién dirigió El Señor de los Anillos?",o:["Peter Jackson", "James Cameron", "Steven Spielberg", "Ridley Scott"],r:"A"},en:{t:"Who directed The Lord of the Rings trilogy?",o:["Peter Jackson", "James Cameron", "Steven Spielberg", "Ridley Scott"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Qué significa GTA?",o:["Grand Theft Auto", "Great Traffic Adventure", "Global Terror Agency", "Gun Target Action"],r:"A"},en:{t:"What does GTA stand for?",o:["Grand Theft Auto", "Great Traffic Adventure", "Global Terror Agency", "Gun Target Action"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Cuántas temporadas tiene Game of Thrones?",o:["8", "6", "7", "9"],r:"A"},en:{t:"How many seasons does Game of Thrones have?",o:["8", "6", "7", "9"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién es el artista femenina más vendida?",o:["Madonna", "Whitney Houston", "Celine Dion", "Mariah Carey"],r:"A"},en:{t:"Who is the best-selling female artist?",o:["Madonna", "Whitney Houston", "Celine Dion", "Mariah Carey"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Qué fue el primer servicio de streaming masivo?",o:["Netflix", "Hulu", "Amazon Prime", "Disney+"],r:"A"},en:{t:"What was the first major streaming service?",o:["Netflix", "Hulu", "Amazon Prime", "Disney+"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién escribió El Hobbit?",o:["J.R.R. Tolkien", "C.S. Lewis", "J.K. Rowling", "Ursula Le Guin"],r:"A"},en:{t:"Who wrote The Hobbit?",o:["J.R.R. Tolkien", "C.S. Lewis", "J.K. Rowling", "Ursula Le Guin"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿En qué año se fundó EA (Electronic Arts)?",o:["1982", "1979", "1985", "1990"],r:"A"},en:{t:"In what year was EA founded?",o:["1982", "1979", "1985", "1990"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Cuántos Emmys ganó Game of Thrones?",o:["59", "45", "38", "72"],r:"A"},en:{t:"How many Emmys did Game of Thrones win?",o:["59", "45", "38", "72"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién tiene el récord de semanas en el #1 de Billboard?",o:["Mariah Carey", "Taylor Swift", "Whitney Houston", "Beyoncé"],r:"A"},en:{t:"Who has the most weeks at #1 on the Billboard Hot 100?",o:["Mariah Carey", "Taylor Swift", "Whitney Houston", "Beyoncé"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Qué show tiene el episodio más visto de la historia?",o:["M*A*S*H", "Friends", "The Sopranos", "Seinfeld"],r:"A"},en:{t:"Which TV show has the most watched episode in history?",o:["M*A*S*H", "Friends", "The Sopranos", "Seinfeld"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Cuántos álbumes de estudio lanzaron The Beatles?",o:["13", "12", "11", "14"],r:"A"},en:{t:"How many studio albums did The Beatles release?",o:["13", "12", "11", "14"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién compuso la música de El Rey León (1994)?",o:["Hans Zimmer", "Elton John", "Alan Menken", "Howard Ashman"],r:"A"},en:{t:"Who composed the score for The Lion King (1994)?",o:["Hans Zimmer", "Elton John", "Alan Menken", "Howard Ashman"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Qué consola tiene más unidades vendidas?",o:["PlayStation 2", "Nintendo DS", "Game Boy", "PlayStation 4"],r:"A"},en:{t:"Which console has the most units sold?",o:["PlayStation 2", "Nintendo DS", "Game Boy", "PlayStation 4"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿Quién es el director de cine con mayor recaudación global?",o:["Steven Spielberg", "James Cameron", "Christopher Nolan", "Michael Bay"],r:"A"},en:{t:"Which film director has the highest global box office?",o:["Steven Spielberg", "James Cameron", "Christopher Nolan", "Michael Bay"],r:"A"}},
-{c:"entertainment",d:"medium",es:{t:"¿En qué año fue el debut de Taylor Swift?",o:["2006", "2004", "2008", "2010"],r:"A"},en:{t:"In what year did Taylor Swift debut?",o:["2006", "2004", "2008", "2010"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién compuso La Quinta Sinfonía?",o:["Beethoven", "Mozart", "Bach", "Brahms"],r:"A"},en:{t:"Who composed the Fifth Symphony?",o:["Beethoven", "Mozart", "Bach", "Brahms"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuántas películas de 007 hay en la saga oficial?",o:["25", "22", "28", "20"],r:"A"},en:{t:"How many official 007 films are there?",o:["25", "22", "28", "20"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Qué película ganó el primer Oscar a Mejor Película?",o:["Wings (1927)", "It Happened One Night", "Gone with the Wind", "Casablanca"],r:"A"},en:{t:"What film won the first Best Picture Oscar?",o:["Wings (1927)", "It Happened One Night", "Gone with the Wind", "Casablanca"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿En qué año se publicó el primer videojuego comercial?",o:["1972 (Pong)", "1968", "1980", "1975"],r:"A"},en:{t:"In what year was the first commercial video game released?",o:["1972 (Pong)", "1968", "1980", "1975"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién escribió Don Quijote de la Mancha?",o:["Cervantes", "Lope de Vega", "Quevedo", "Calderón"],r:"A"},en:{t:"Who wrote Don Quixote?",o:["Cervantes", "Lope de Vega", "Quevedo", "Calderón"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién compuso Las cuatro estaciones?",o:["Vivaldi", "Bach", "Handel", "Telemann"],r:"A"},en:{t:"Who composed The Four Seasons?",o:["Vivaldi", "Bach", "Handel", "Telemann"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Qué película animada ganó el primer Oscar de su categoría?",o:["Shrek (2002)", "Monsters Inc", "Spirit", "Jimmy Neutron"],r:"A"},en:{t:"Which animated film won the first Oscar in that category?",o:["Shrek (2002)", "Monsters Inc", "Spirit", "Jimmy Neutron"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuántas notas tiene la escala musical occidental?",o:["12", "7", "8", "10"],r:"A"},en:{t:"How many notes does the Western musical scale have?",o:["12", "7", "8", "10"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién compuso The Ring of the Nibelung?",o:["Wagner", "Brahms", "Mahler", "Bruckner"],r:"A"},en:{t:"Who composed The Ring of the Nibelung?",o:["Wagner", "Brahms", "Mahler", "Bruckner"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿En qué año se fundó la Academia de Artes y Ciencias Cinematográficas?",o:["1927", "1939", "1915", "1950"],r:"A"},en:{t:"In what year was the Academy of Motion Picture Arts and Sciences founded?",o:["1927", "1939", "1915", "1950"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuántas temporadas tiene The Wire?",o:["5", "4", "6", "3"],r:"A"},en:{t:"How many seasons does The Wire have?",o:["5", "4", "6", "3"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién es el creador de Sherlock Holmes?",o:["Arthur Conan Doyle", "Agatha Christie", "Edgar Allan Poe", "G.K. Chesterton"],r:"A"},en:{t:"Who created Sherlock Holmes?",o:["Arthur Conan Doyle", "Agatha Christie", "Edgar Allan Poe", "G.K. Chesterton"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿En qué año se estrenó el primer episodio de Doctor Who?",o:["1963", "1970", "1975", "1980"],r:"A"},en:{t:"In what year did Doctor Who first air?",o:["1963", "1970", "1975", "1980"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuántas películas del MCU hay hasta 2023?",o:["32", "28", "35", "25"],r:"A"},en:{t:"How many MCU films are there through 2023?",o:["32", "28", "35", "25"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién inventó el cine?",o:["Hermanos Lumière", "Thomas Edison", "Georges Méliès", "Eadweard Muybridge"],r:"A"},en:{t:"Who invented cinema?",o:["Lumière Brothers", "Thomas Edison", "Georges Méliès", "Eadweard Muybridge"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿En qué año se publicó Hamlet de Shakespeare?",o:["1603", "1595", "1610", "1590"],r:"A"},en:{t:"In what year was Shakespeare's Hamlet published?",o:["1603", "1595", "1610", "1590"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuál es el show de TV más largo en emitirse?",o:["Guiding Light (72 años)", "Days of Our Lives", "General Hospital", "The Young and the Restless"],r:"A"},en:{t:"What is the longest-running TV show?",o:["Guiding Light (72 years)", "Days of Our Lives", "General Hospital", "The Young and the Restless"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién dirigió Pulp Fiction?",o:["Quentin Tarantino", "Joel Coen", "David Fincher", "Paul Thomas Anderson"],r:"A"},en:{t:"Who directed Pulp Fiction?",o:["Quentin Tarantino", "Joel Coen", "David Fincher", "Paul Thomas Anderson"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién tiene más Grammys en la historia?",o:["Beyoncé", "Georg Solti", "Quincy Jones", "Paul McCartney"],r:"A"},en:{t:"Who has won the most Grammys?",o:["Beyoncé", "Georg Solti", "Quincy Jones", "Paul McCartney"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuál fue el primer álbum de Michael Jackson en solitario?",o:["Got to Be There", "Off the Wall", "Thriller", "Bad"],r:"A"},en:{t:"What was Michael Jackson's first solo album?",o:["Got to Be There", "Off the Wall", "Thriller", "Bad"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Quién escribió En busca del tiempo perdido?",o:["Marcel Proust", "Gustave Flaubert", "Émile Zola", "Victor Hugo"],r:"A"},en:{t:"Who wrote In Search of Lost Time?",o:["Marcel Proust", "Gustave Flaubert", "Émile Zola", "Victor Hugo"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿En qué año se estrenó la primera película de Pixar?",o:["1995 (Toy Story)", "1991", "2001", "1988"],r:"A"},en:{t:"In what year was Pixar's first film released?",o:["1995 (Toy Story)", "1991", "2001", "1988"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Qué es el sforzando en música?",o:["Acento repentino en una nota", "Tempo lento", "Melodía suave", "Compás compuesto"],r:"A"},en:{t:"What is sforzando in music?",o:["Sudden accent on a note", "Slow tempo", "Soft melody", "Compound meter"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿En qué año se estrenó The Dark Knight?",o:["2008", "2005", "2012", "2006"],r:"A"},en:{t:"In what year was The Dark Knight released?",o:["2008", "2005", "2012", "2006"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Cuántos libros publicó Agatha Christie?",o:["66", "50", "80", "45"],r:"A"},en:{t:"How many books did Agatha Christie publish?",o:["66", "50", "80", "45"],r:"A"}},
-{c:"entertainment",d:"hard",es:{t:"¿Qué compositor era sordo cuando escribió su 9a sinfonía?",o:["Beethoven", "Schumann", "Fauré", "Smetana"],r:"A"},en:{t:"Which composer was deaf when he wrote his 9th symphony?",o:["Beethoven", "Schumann", "Fauré", "Smetana"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó la Mona Lisa?",o:["Leonardo da Vinci", "Miguel Ángel", "Rafael", "Botticelli"],r:"A"},en:{t:"Who painted the Mona Lisa?",o:["Leonardo da Vinci", "Michelangelo", "Raphael", "Botticelli"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién esculpió el David?",o:["Miguel Ángel", "Donatello", "Bernini", "Rodin"],r:"A"},en:{t:"Who sculpted the David?",o:["Michelangelo", "Donatello", "Bernini", "Rodin"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿En qué museo está la Mona Lisa?",o:["Louvre", "Uffizi", "Prado", "Hermitage"],r:"A"},en:{t:"In which museum is the Mona Lisa?",o:["Louvre", "Uffizi", "Prado", "Hermitage"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó La noche estrellada?",o:["Van Gogh", "Monet", "Renoir", "Cézanne"],r:"A"},en:{t:"Who painted The Starry Night?",o:["Van Gogh", "Monet", "Renoir", "Cézanne"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué artista cortó su propia oreja?",o:["Van Gogh", "Gauguin", "Toulouse-Lautrec", "Cézanne"],r:"A"},en:{t:"Which artist cut off his own ear?",o:["Van Gogh", "Gauguin", "Toulouse-Lautrec", "Cézanne"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó el techo de la Capilla Sixtina?",o:["Miguel Ángel", "Leonardo da Vinci", "Rafael", "Botticelli"],r:"A"},en:{t:"Who painted the Sistine Chapel ceiling?",o:["Michelangelo", "Leonardo da Vinci", "Raphael", "Botticelli"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué movimiento fundó Pablo Picasso?",o:["Cubismo", "Surrealismo", "Fauvismo", "Expresionismo"],r:"A"},en:{t:"Which art movement did Picasso co-found?",o:["Cubism", "Surrealism", "Fauvism", "Expressionism"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿En qué país nació Mozart?",o:["Austria", "Alemania", "Italia", "Francia"],r:"A"},en:{t:"In which country was Mozart born?",o:["Austria", "Germany", "Italy", "France"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó Los girasoles?",o:["Van Gogh", "Monet", "Renoir", "Degas"],r:"A"},en:{t:"Who painted Sunflowers?",o:["Van Gogh", "Monet", "Renoir", "Degas"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué instrumento tocaba Beethoven?",o:["Piano", "Violín", "Flauta", "Trompeta"],r:"A"},en:{t:"What instrument did Beethoven primarily play?",o:["Piano", "Violin", "Flute", "Trumpet"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién escribió Romeo y Julieta?",o:["Shakespeare", "Cervantes", "Dante", "Molière"],r:"A"},en:{t:"Who wrote Romeo and Juliet?",o:["Shakespeare", "Cervantes", "Dante", "Molière"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué pintor español creó el Guernica?",o:["Picasso", "Dalí", "Miró", "Goya"],r:"A"},en:{t:"Which Spanish painter created Guernica?",o:["Picasso", "Dalí", "Miró", "Goya"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién esculpió El pensador?",o:["Rodin", "Bernini", "Donatello", "Brancusi"],r:"A"},en:{t:"Who sculpted The Thinker?",o:["Rodin", "Bernini", "Donatello", "Brancusi"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué arquitecto diseñó la Torre Eiffel?",o:["Gustave Eiffel", "Haussmann", "Le Corbusier", "Garnier"],r:"A"},en:{t:"Which architect designed the Eiffel Tower?",o:["Gustave Eiffel", "Haussmann", "Le Corbusier", "Garnier"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Cuántas sinfonías compuso Beethoven?",o:["9", "7", "11", "5"],r:"A"},en:{t:"How many symphonies did Beethoven compose?",o:["9", "7", "11", "5"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué movimiento usa la luz natural como elemento central?",o:["Impresionismo", "Cubismo", "Expresionismo", "Surrealismo"],r:"A"},en:{t:"Which art movement uses natural light as central element?",o:["Impressionism", "Cubism", "Expressionism", "Surrealism"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién diseñó la Sagrada Familia?",o:["Gaudí", "Miró", "Picasso", "Calatrava"],r:"A"},en:{t:"Who designed the Sagrada Familia?",o:["Gaudí", "Miró", "Picasso", "Calatrava"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó El nacimiento de Venus?",o:["Botticelli", "Rafael", "Leonardo", "Tiziano"],r:"A"},en:{t:"Who painted The Birth of Venus?",o:["Botticelli", "Raphael", "Leonardo", "Titian"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué poeta italiano escribió la Divina Comedia?",o:["Dante", "Petrarca", "Boccaccio", "Tasso"],r:"A"},en:{t:"Which Italian poet wrote the Divine Comedy?",o:["Dante", "Petrarch", "Boccaccio", "Tasso"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué estilo usan las catedrales medievales europeas?",o:["Gótico", "Románico", "Barroco", "Neoclásico"],r:"A"},en:{t:"What style do medieval European cathedrals use?",o:["Gothic", "Romanesque", "Baroque", "Neoclassical"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó Las Meninas?",o:["Velázquez", "Goya", "El Greco", "Zurbarán"],r:"A"},en:{t:"Who painted Las Meninas?",o:["Velázquez", "Goya", "El Greco", "Zurbarán"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Cuántas cuerdas tiene un violín?",o:["4", "5", "6", "3"],r:"A"},en:{t:"How many strings does a violin have?",o:["4", "5", "6", "3"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién escribió El Quijote?",o:["Cervantes", "Lope de Vega", "Quevedo", "Gracián"],r:"A"},en:{t:"Who wrote Don Quixote?",o:["Cervantes", "Lope de Vega", "Quevedo", "Gracián"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Qué artista es conocido por sus relojes derretidos?",o:["Dalí", "Magritte", "Chirico", "Ernst"],r:"A"},en:{t:"Which artist is known for melting clocks?",o:["Dalí", "Magritte", "Chirico", "Ernst"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién compuso La Traviata?",o:["Verdi", "Puccini", "Rossini", "Bellini"],r:"A"},en:{t:"Who composed La Traviata?",o:["Verdi", "Puccini", "Rossini", "Bellini"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Quién pintó La joven de la perla?",o:["Vermeer", "Rembrandt", "Hals", "Steen"],r:"A"},en:{t:"Who painted Girl with a Pearl Earring?",o:["Vermeer", "Rembrandt", "Hals", "Steen"],r:"A"}},
-{c:"arts",d:"easy",es:{t:"¿Cuántas teclas tiene un piano estándar?",o:["88", "76", "92", "84"],r:"A"},en:{t:"How many keys does a standard piano have?",o:["88", "76", "92", "84"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿En qué año pintó Picasso el Guernica?",o:["1937", "1927", "1945", "1932"],r:"A"},en:{t:"In what year did Picasso paint Guernica?",o:["1937", "1927", "1945", "1932"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué movimiento lideró Andy Warhol?",o:["Pop Art", "Arte conceptual", "Op Art", "Minimalismo"],r:"A"},en:{t:"Which art movement did Andy Warhol lead?",o:["Pop Art", "Conceptual Art", "Op Art", "Minimalism"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Cuántas notas hay en una escala mayor?",o:["7", "5", "8", "12"],r:"A"},en:{t:"How many notes are in a major scale?",o:["7", "5", "8", "12"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién diseñó el Guggenheim de Bilbao?",o:["Frank Gehry", "Renzo Piano", "Zaha Hadid", "Norman Foster"],r:"A"},en:{t:"Who designed the Guggenheim in Bilbao?",o:["Frank Gehry", "Renzo Piano", "Zaha Hadid", "Norman Foster"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Cuántos movimientos tiene una sinfonía clásica?",o:["4", "3", "5", "2"],r:"A"},en:{t:"How many movements does a classical symphony have?",o:["4", "3", "5", "2"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué instrumento es el rey de los instrumentos?",o:["Órgano", "Piano", "Violín", "Guitarra"],r:"A"},en:{t:"Which instrument is called the king of instruments?",o:["Organ", "Piano", "Violin", "Guitar"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién escribió Crimen y castigo?",o:["Dostoievski", "Tolstoi", "Chéjov", "Gorki"],r:"A"},en:{t:"Who wrote Crime and Punishment?",o:["Dostoevsky", "Tolstoy", "Chekhov", "Gorky"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué artista mexicana pintó Las dos Fridas?",o:["Frida Kahlo", "María Izquierdo", "Remedios Varo", "Leonora Carrington"],r:"A"},en:{t:"Which Mexican artist painted The Two Fridas?",o:["Frida Kahlo", "María Izquierdo", "Remedios Varo", "Leonora Carrington"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿En qué ciudad está el Museo del Prado?",o:["Madrid", "Barcelona", "Sevilla", "Valencia"],r:"A"},en:{t:"In which city is the Museo del Prado?",o:["Madrid", "Barcelona", "Seville", "Valencia"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué poeta chileno ganó el Nobel en 1971?",o:["Pablo Neruda", "Vicente Huidobro", "Gabriela Mistral", "Nicanor Parra"],r:"A"},en:{t:"Which Chilean poet won the Nobel in 1971?",o:["Pablo Neruda", "Vicente Huidobro", "Gabriela Mistral", "Nicanor Parra"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué movimiento representó Salvador Dalí?",o:["Surrealismo", "Cubismo", "Fauvismo", "Dadaísmo"],r:"A"},en:{t:"Which art movement did Dalí represent?",o:["Surrealism", "Cubism", "Fauvism", "Dadaism"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién pintó El grito?",o:["Edvard Munch", "James Ensor", "Egon Schiele", "Otto Dix"],r:"A"},en:{t:"Who painted The Scream?",o:["Edvard Munch", "James Ensor", "Egon Schiele", "Otto Dix"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿En qué ciudad está el museo Uffizi?",o:["Florencia", "Roma", "Milán", "Venecia"],r:"A"},en:{t:"In which city is the Uffizi museum?",o:["Florence", "Rome", "Milan", "Venice"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Cuántas teclas tiene un piano estándar?",o:["88", "76", "92", "84"],r:"A"},en:{t:"How many keys does a standard piano have?",o:["88", "76", "92", "84"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién diseñó el Guggenheim de Nueva York?",o:["Frank Lloyd Wright", "Philip Johnson", "Mies van der Rohe", "Le Corbusier"],r:"A"},en:{t:"Who designed the Guggenheim in New York?",o:["Frank Lloyd Wright", "Philip Johnson", "Mies van der Rohe", "Le Corbusier"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿En qué año pintó Van Gogh La noche estrellada?",o:["1889", "1886", "1892", "1884"],r:"A"},en:{t:"In what year did Van Gogh paint The Starry Night?",o:["1889", "1886", "1892", "1884"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué escritora ganó el Nobel de Literatura en 1993?",o:["Toni Morrison", "Maya Angelou", "Alice Walker", "Gloria Naylor"],r:"A"},en:{t:"Which writer won the Nobel in 1993?",o:["Toni Morrison", "Maya Angelou", "Alice Walker", "Gloria Naylor"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién compuso Las cuatro estaciones?",o:["Vivaldi", "Handel", "Telemann", "Corelli"],r:"A"},en:{t:"Who composed The Four Seasons?",o:["Vivaldi", "Handel", "Telemann", "Corelli"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿En qué país nació Frida Kahlo?",o:["México", "España", "Argentina", "Cuba"],r:"A"},en:{t:"In which country was Frida Kahlo born?",o:["Mexico", "Spain", "Argentina", "Cuba"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Cuántas obras de teatro escribió Shakespeare?",o:["37", "25", "50", "44"],r:"A"},en:{t:"How many plays did Shakespeare write?",o:["37", "25", "50", "44"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué poeta del Siglo de Oro escribió La vida es sueño?",o:["Calderón de la Barca", "Lope de Vega", "Quevedo", "Góngora"],r:"A"},en:{t:"Who wrote Life Is a Dream?",o:["Calderón de la Barca", "Lope de Vega", "Quevedo", "Góngora"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién fue el arquitecto del Partenón?",o:["Ictino y Calícrates", "Fidias", "Praxíteles", "Lisipo"],r:"A"},en:{t:"Who were the architects of the Parthenon?",o:["Ictinus and Callicrates", "Phidias", "Praxiteles", "Lysippus"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Cuántos conciertos para piano compuso Mozart?",o:["27", "20", "30", "15"],r:"A"},en:{t:"How many piano concertos did Mozart compose?",o:["27", "20", "30", "15"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿En qué año pintó Van Gogh La noche estrellada?",o:["1889", "1884", "1892", "1886"],r:"A"},en:{t:"When did Van Gogh paint The Starry Night?",o:["1889", "1884", "1892", "1886"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Qué movimiento literario representa García Márquez?",o:["Realismo mágico", "Modernismo", "Naturalismo", "Vanguardismo"],r:"A"},en:{t:"Which literary movement is García Márquez associated with?",o:["Magical Realism", "Modernism", "Naturalism", "Avant-garde"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Quién diseñó la pirámide del Louvre?",o:["I.M. Pei", "Renzo Piano", "Frank Gehry", "Norman Foster"],r:"A"},en:{t:"Who designed the Louvre Pyramid?",o:["I.M. Pei", "Renzo Piano", "Frank Gehry", "Norman Foster"],r:"A"}},
-{c:"arts",d:"medium",es:{t:"¿Cuántas cuerdas tiene un chelo?",o:["4", "5", "6", "3"],r:"A"},en:{t:"How many strings does a cello have?",o:["4", "5", "6", "3"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿En qué año fue inaugurada la Ópera de Sídney?",o:["1973", "1965", "1980", "1969"],r:"A"},en:{t:"In what year was the Sydney Opera House inaugurated?",o:["1973", "1965", "1980", "1969"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué movimiento iniciaron Braque y Picasso?",o:["Cubismo analítico", "Futurismo", "Surrealismo", "Dadaísmo"],r:"A"},en:{t:"Which movement did Braque and Picasso initiate?",o:["Analytical Cubism", "Futurism", "Surrealism", "Dadaism"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Quién compuso El anillo del nibelungo?",o:["Wagner", "Brahms", "Mahler", "Bruckner"],r:"A"},en:{t:"Who composed The Ring of the Nibelung?",o:["Wagner", "Brahms", "Mahler", "Bruckner"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué escritor ruso escribió Guerra y Paz?",o:["Tolstoi", "Dostoievski", "Turguénev", "Gógol"],r:"A"},en:{t:"Which Russian writer wrote War and Peace?",o:["Tolstoy", "Dostoevsky", "Turgenev", "Gogol"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿En qué años fue construido el Partenón?",o:["447-438 a.C.", "480 a.C.", "500 a.C.", "430 a.C."],r:"A"},en:{t:"In what years was the Parthenon built?",o:["447-438 BC", "480 BC", "500 BC", "430 BC"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Quién fue el primer artista en usar perspectiva lineal?",o:["Brunelleschi", "Alberti", "Masaccio", "Donatello"],r:"A"},en:{t:"Who was first to use linear perspective?",o:["Brunelleschi", "Alberti", "Masaccio", "Donatello"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Cuántas obras compuso Bach aprox.?",o:["1.100", "500", "300", "2.000"],r:"A"},en:{t:"How many works did Bach compose approximately?",o:["1,100", "500", "300", "2,000"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿En qué año compuso Beethoven su Novena Sinfonía (ya sordo)?",o:["1824", "1820", "1827", "1816"],r:"A"},en:{t:"In what year did Beethoven complete his 9th Symphony?",o:["1824", "1820", "1827", "1816"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué movimiento surgió en Zúrich en 1916?",o:["Dadaísmo", "Surrealismo", "Constructivismo", "Futurismo"],r:"A"},en:{t:"Which art movement originated in Zurich in 1916?",o:["Dadaism", "Surrealism", "Constructivism", "Futurism"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Quién diseñó la capilla de Ronchamp?",o:["Le Corbusier", "Mies van der Rohe", "Walter Gropius", "Alvar Aalto"],r:"A"},en:{t:"Who designed the Ronchamp Chapel?",o:["Le Corbusier", "Mies van der Rohe", "Walter Gropius", "Alvar Aalto"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué escritor argentino escribió Ficciones?",o:["Borges", "Cortázar", "Bioy Casares", "Sábato"],r:"A"},en:{t:"Which Argentine writer wrote Ficciones?",o:["Borges", "Cortázar", "Bioy Casares", "Sábato"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿En qué año murió Mozart?",o:["1791", "1800", "1787", "1795"],r:"A"},en:{t:"In what year did Mozart die?",o:["1791", "1800", "1787", "1795"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Quién fundó la Bauhaus?",o:["Walter Gropius", "Paul Klee", "Wassily Kandinsky", "Mies van der Rohe"],r:"A"},en:{t:"Who founded the Bauhaus?",o:["Walter Gropius", "Paul Klee", "Wassily Kandinsky", "Mies van der Rohe"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué poeta francés escribió Las flores del mal?",o:["Baudelaire", "Rimbaud", "Verlaine", "Mallarmé"],r:"A"},en:{t:"Which French poet wrote The Flowers of Evil?",o:["Baudelaire", "Rimbaud", "Verlaine", "Mallarmé"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Quién pintó El jardín de las delicias?",o:["El Bosco", "Brueghel", "Cranach", "Dürer"],r:"A"},en:{t:"Who painted The Garden of Earthly Delights?",o:["Hieronymus Bosch", "Brueghel", "Cranach", "Dürer"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿En qué año se inauguró el Centro Pompidou?",o:["1977", "1969", "1983", "1972"],r:"A"},en:{t:"In what year did the Centre Pompidou open?",o:["1977", "1969", "1983", "1972"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué escritora inglesa escribió Orgullo y prejuicio?",o:["Jane Austen", "Charlotte Brontë", "Emily Brontë", "Virginia Woolf"],r:"A"},en:{t:"Which English writer wrote Pride and Prejudice?",o:["Jane Austen", "Charlotte Brontë", "Emily Brontë", "Virginia Woolf"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Cuántos cuartetos de cuerda compuso Beethoven?",o:["16", "12", "8", "20"],r:"A"},en:{t:"How many string quartets did Beethoven compose?",o:["16", "12", "8", "20"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué es el sfumato en pintura?",o:["Técnica de contornos difusos de Leonardo", "Pincelada impresionista", "Perspectiva aérea", "Punto de fuga múltiple"],r:"A"},en:{t:"What is sfumato in painting?",o:["Leonardo's blurred contour technique", "Impressionist brushstroke", "Aerial perspective", "Multiple vanishing point"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué poeta español ganó el Nobel en 1977?",o:["Vicente Aleixandre", "Rafael Alberti", "García Lorca", "Antonio Machado"],r:"A"},en:{t:"Which Spanish poet won the Nobel in 1977?",o:["Vicente Aleixandre", "Rafael Alberti", "García Lorca", "Antonio Machado"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿En qué año murió Frida Kahlo?",o:["1954", "1960", "1948", "1970"],r:"A"},en:{t:"In what year did Frida Kahlo die?",o:["1954", "1960", "1948", "1970"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué es el dodecafonismo?",o:["Sistema musical basado en 12 notas iguales", "Música para 12 instrumentos", "12 compases por sección", "Armonía de 12 acordes"],r:"A"},en:{t:"What is dodecaphonism?",o:["Music system based on 12 equal notes", "Music for 12 instruments", "12 bars per section", "Harmony of 12 chords"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Quién escribió Ulises (la novela modernista)?",o:["James Joyce", "Virginia Woolf", "Samuel Beckett", "T.S. Eliot"],r:"A"},en:{t:"Who wrote Ulysses (the modernist novel)?",o:["James Joyce", "Virginia Woolf", "Samuel Beckett", "T.S. Eliot"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Cuántas sinfonías compuso Schubert?",o:["9 (la 8a incompleta)", "7", "11", "6"],r:"A"},en:{t:"How many symphonies did Schubert compose?",o:["9 (8th unfinished)", "7", "11", "6"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Cuántos cuadros vendió Van Gogh en vida?",o:["1", "0", "5", "10"],r:"A"},en:{t:"How many paintings did Van Gogh sell in his lifetime?",o:["1", "0", "5", "10"],r:"A"}},
-{c:"arts",d:"hard",es:{t:"¿Qué movimiento literario inicia Kafka?",o:["Expresionismo literario", "Naturalismo", "Existencialismo", "Dadaísmo"],r:"A"},en:{t:"Which literary movement does Kafka represent?",o:["Literary Expressionism", "Naturalism", "Existentialism", "Dadaism"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos jugadores hay en un equipo de fútbol?",o:["11", "10", "9", "12"],r:"A"},en:{t:"How many players are on a soccer team?",o:["11", "10", "9", "12"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿En qué país se originó el fútbol moderno?",o:["Inglaterra", "Brasil", "España", "Italia"],r:"A"},en:{t:"Where did modern soccer originate?",o:["England", "Brazil", "Spain", "Italy"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos anillos tiene el símbolo olímpico?",o:["5", "6", "4", "7"],r:"A"},en:{t:"How many rings are in the Olympic symbol?",o:["5", "6", "4", "7"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿En qué deporte se usa el término touchdown?",o:["Fútbol americano", "Rugby", "Béisbol", "Críquet"],r:"A"},en:{t:"In which sport is touchdown used?",o:["American football", "Rugby", "Baseball", "Cricket"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos jugadores forman un equipo de baloncesto?",o:["5", "6", "4", "7"],r:"A"},en:{t:"How many players make up a basketball team?",o:["5", "6", "4", "7"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué país ha ganado más Copas del Mundo de fútbol?",o:["Brasil", "Alemania", "Italia", "Argentina"],r:"A"},en:{t:"Which country has won the most FIFA World Cups?",o:["Brazil", "Germany", "Italy", "Argentina"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuánto dura un partido de fútbol regular?",o:["90 minutos", "80 minutos", "100 minutos", "60 minutos"],r:"A"},en:{t:"How long does a regular soccer match last?",o:["90 minutes", "80 minutes", "100 minutes", "60 minutes"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Quién es el máximo goleador de la historia del fútbol?",o:["Cristiano Ronaldo", "Messi", "Pelé", "Romario"],r:"A"},en:{t:"Who is the all-time top scorer in soccer?",o:["Cristiano Ronaldo", "Messi", "Pelé", "Romario"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos jugadores hay en un equipo de béisbol?",o:["9", "10", "8", "11"],r:"A"},en:{t:"How many players are on a baseball team?",o:["9", "10", "8", "11"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué deporte practica Michael Jordan?",o:["Baloncesto", "Béisbol", "Fútbol americano", "Golf"],r:"A"},en:{t:"What sport did Michael Jordan play?",o:["Basketball", "Baseball", "Football", "Golf"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos hoyos tiene un campo de golf?",o:["18", "9", "27", "12"],r:"A"},en:{t:"How many holes does a standard golf course have?",o:["18", "9", "27", "12"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué deporte se juega en Wimbledon?",o:["Tenis", "Golf", "Cricket", "Rugby"],r:"A"},en:{t:"Which sport is played at Wimbledon?",o:["Tennis", "Golf", "Cricket", "Rugby"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué equipo ganó más Champions League?",o:["Real Madrid", "Barcelona", "Bayern Múnich", "Milan"],r:"A"},en:{t:"Which club has won the most Champions League titles?",o:["Real Madrid", "Barcelona", "Bayern Munich", "Milan"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos jugadores tiene un equipo de voleibol?",o:["6", "5", "7", "8"],r:"A"},en:{t:"How many players are on a volleyball team?",o:["6", "5", "7", "8"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿En qué deporte compite el Tour de France?",o:["Ciclismo", "Atletismo", "Triatlón", "Esquí"],r:"A"},en:{t:"In which sport is the Tour de France?",o:["Cycling", "Athletics", "Triathlon", "Skiing"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué deporte practica Serena Williams?",o:["Tenis", "Golf", "Squash", "Pádel"],r:"A"},en:{t:"What sport does Serena Williams play?",o:["Tennis", "Golf", "Squash", "Padel"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos cuartos tiene un partido de la NBA?",o:["4", "3", "2", "5"],r:"A"},en:{t:"How many quarters does an NBA game have?",o:["4", "3", "2", "5"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos jugadores puede tener un equipo de rugby?",o:["15", "13", "11", "17"],r:"A"},en:{t:"How many players are on a rugby team?",o:["15", "13", "11", "17"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué deporte practica Usain Bolt?",o:["Atletismo (velocidad)", "Fútbol", "Ciclismo", "Natación"],r:"A"},en:{t:"What sport does Usain Bolt practice?",o:["Track and field", "Soccer", "Cycling", "Swimming"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿En qué país se celebraron los primeros JJ.OO. modernos?",o:["Grecia (1896)", "Francia (1900)", "EE.UU. (1904)", "UK (1908)"],r:"A"},en:{t:"Where were the first modern Olympics held?",o:["Greece (1896)", "France (1900)", "USA (1904)", "UK (1908)"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuánto dura cada período en el hockey sobre hielo?",o:["20 min", "15 min", "25 min", "30 min"],r:"A"},en:{t:"How long is each period in ice hockey?",o:["20 min", "15 min", "25 min", "30 min"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos sets tiene un partido de tenis al mejor de 5?",o:["5", "3", "4", "6"],r:"A"},en:{t:"How many sets in a best-of-5 tennis match?",o:["5", "3", "4", "6"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos intentos tiene un saltador de longitud?",o:["6", "4", "3", "8"],r:"A"},en:{t:"How many attempts does a long jumper get?",o:["6", "4", "3", "8"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Qué deporte practica Tiger Woods?",o:["Golf", "Tenis", "Béisbol", "Natación"],r:"A"},en:{t:"What sport does Tiger Woods play?",o:["Golf", "Tennis", "Baseball", "Swimming"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos puntos da anotar un gol en fútbol?",o:["1", "2", "3", "0"],r:"A"},en:{t:"How many points does a goal in soccer score?",o:["1", "2", "3", "0"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿En qué deporte se usa el término ace?",o:["Tenis", "Golf", "Baloncesto", "Béisbol"],r:"A"},en:{t:"In which sport is the term ace used?",o:["Tennis", "Golf", "Basketball", "Baseball"],r:"A"}},
-{c:"sports",d:"easy",es:{t:"¿Cuántos jugadores juegan en un partido de waterpolo?",o:["7 por equipo", "6", "9", "5"],r:"A"},en:{t:"How many players per team in water polo?",o:["7", "6", "9", "5"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué año se celebraron los JJ.OO. de Barcelona?",o:["1992", "1988", "1996", "1984"],r:"A"},en:{t:"In what year were the Barcelona Olympics held?",o:["1992", "1988", "1996", "1984"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos metros tiene una piscina olímpica?",o:["50", "25", "100", "33"],r:"A"},en:{t:"How many meters is an Olympic swimming pool?",o:["50", "25", "100", "33"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué país ha ganado más medallas de oro olímpicas?",o:["EE.UU.", "Rusia/URSS", "China", "Alemania"],r:"A"},en:{t:"Which country has won the most Olympic gold medals?",o:["USA", "Russia/USSR", "China", "Germany"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos equipos participan en la NFL?",o:["32", "30", "28", "34"],r:"A"},en:{t:"How many teams are in the NFL?",o:["32", "30", "28", "34"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos sets tiene un partido de voleibol máximo?",o:["5", "3", "7", "6"],r:"A"},en:{t:"How many sets maximum does a volleyball match have?",o:["5", "3", "7", "6"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué país ganó la Copa del Mundo 2022?",o:["Argentina", "Francia", "Croacia", "Marruecos"],r:"A"},en:{t:"Which country won the 2022 World Cup?",o:["Argentina", "France", "Croatia", "Morocco"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos km corre el atleta en la maratón olímpica?",o:["42,195 km", "40 km", "45 km", "38 km"],r:"A"},en:{t:"How long is the Olympic marathon?",o:["42.195 km", "40 km", "45 km", "38 km"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué año ganó Michael Jordan su primer anillo?",o:["1991", "1993", "1989", "1996"],r:"A"},en:{t:"In what year did Michael Jordan win his first title?",o:["1991", "1993", "1989", "1996"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántas etapas tiene el Tour de France?",o:["21", "18", "24", "15"],r:"A"},en:{t:"How many stages does the Tour de France have?",o:["21", "18", "24", "15"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué equipo de la NBA tiene más campeonatos?",o:["Boston Celtics", "Los Angeles Lakers", "Chicago Bulls", "Golden State Warriors"],r:"A"},en:{t:"Which NBA team has the most championships?",o:["Boston Celtics", "Los Angeles Lakers", "Chicago Bulls", "Golden State Warriors"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántas categorías de peso hay en el boxeo profesional?",o:["17", "12", "15", "20"],r:"A"},en:{t:"How many weight classes are in professional boxing?",o:["17", "12", "15", "20"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué nadador tiene más medallas olímpicas?",o:["Michael Phelps", "Mark Spitz", "Ian Thorpe", "Ryan Lochte"],r:"A"},en:{t:"Which swimmer has the most Olympic medals?",o:["Michael Phelps", "Mark Spitz", "Ian Thorpe", "Ryan Lochte"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué año fue el primer Gran Premio de F1?",o:["1950", "1946", "1955", "1960"],r:"A"},en:{t:"In what year was the first F1 Grand Prix?",o:["1950", "1946", "1955", "1960"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué piloto de F1 tiene más campeonatos?",o:["Lewis Hamilton (7)", "Schumacher (7)", "Senna (3)", "Prost (4)"],r:"A"},en:{t:"Which F1 driver has the most championships?",o:["Lewis Hamilton (7)", "Schumacher (7)", "Senna (3)", "Prost (4)"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos puntos vale un try en rugby?",o:["5", "3", "4", "6"],r:"A"},en:{t:"How many points is a try worth in rugby?",o:["5", "3", "4", "6"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué ciudad fue el primer maratón olímpico moderno?",o:["Atenas", "París", "Londres", "Chicago"],r:"A"},en:{t:"In which city was the first modern Olympic marathon?",o:["Athens", "Paris", "London", "Chicago"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos jugadores puede haber activos en béisbol?",o:["26", "25", "30", "28"],r:"A"},en:{t:"How many active players can be on a baseball roster?",o:["26", "25", "30", "28"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuál es el récord mundial en salto de altura?",o:["2,45 m (Sotomayor)", "2,50 m", "2,40 m", "2,42 m"],r:"A"},en:{t:"What is the high jump world record?",o:["2.45 m (Sotomayor)", "2.50 m", "2.40 m", "2.42 m"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué deporte se usa el término par?",o:["Golf", "Tenis", "Cricket", "Billar"],r:"A"},en:{t:"In which sport is par used for scoring?",o:["Golf", "Tennis", "Cricket", "Billiards"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos puntos vale un 3 en baloncesto?",o:["3", "2", "4", "1"],r:"A"},en:{t:"How many points is a 3-point shot worth?",o:["3", "2", "4", "1"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué país tiene más títulos en Wimbledon masculino?",o:["Estados Unidos", "Reino Unido", "Australia", "Suiza"],r:"A"},en:{t:"Which country has the most men's Wimbledon titles?",o:["United States", "United Kingdom", "Australia", "Switzerland"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos Grands Slams tiene Novak Djokovic?",o:["24", "22", "21", "20"],r:"A"},en:{t:"How many Grand Slams does Novak Djokovic have?",o:["24", "22", "21", "20"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué año debutó Brasil en la Copa del Mundo?",o:["1930", "1934", "1938", "1950"],r:"A"},en:{t:"In what year did Brazil debut at the World Cup?",o:["1930", "1934", "1938", "1950"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué año fue Colombia al Mundial por primera vez?",o:["1962", "1966", "1970", "1958"],r:"A"},en:{t:"In what year did Colombia first qualify for the World Cup?",o:["1962", "1966", "1970", "1958"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Cuántos rounds máximos tiene un combate de boxeo profesional?",o:["12", "15", "10", "20"],r:"A"},en:{t:"How many rounds maximum in professional boxing?",o:["12", "15", "10", "20"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿Qué significa el término deuce en tenis?",o:["Empate 40-40", "30 puntos", "45 puntos", "Punto doble"],r:"A"},en:{t:"What does deuce mean in tennis?",o:["40-40 tie", "30 points", "45 points", "Double point"],r:"A"}},
-{c:"sports",d:"medium",es:{t:"¿En qué año fue el primer Super Bowl?",o:["1967", "1970", "1965", "1972"],r:"A"},en:{t:"In what year was the first Super Bowl?",o:["1967", "1970", "1965", "1972"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuál es el récord mundial de 100m?",o:["Usain Bolt (9,58s)", "Asafa Powell", "Tyson Gay", "Christian Coleman"],r:"A"},en:{t:"Who holds the 100m world record?",o:["Usain Bolt (9.58s)", "Asafa Powell", "Tyson Gay", "Christian Coleman"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos Grand Slams tiene Roger Federer?",o:["20", "17", "22", "19"],r:"A"},en:{t:"How many Grand Slams does Roger Federer have?",o:["20", "17", "22", "19"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Qué equipo ganó el primer Super Bowl?",o:["Green Bay Packers", "Dallas Cowboys", "New York Giants", "Kansas City Chiefs"],r:"A"},en:{t:"Which team won the first Super Bowl?",o:["Green Bay Packers", "Dallas Cowboys", "New York Giants", "Kansas City Chiefs"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos goles marcó Pelé en su carrera?",o:["1.281", "1.000", "900", "1.500"],r:"A"},en:{t:"How many goals did Pelé score in his career?",o:["1,281", "1,000", "900", "1,500"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Qué equipo ganó la primera Copa del Mundo de 1930?",o:["Uruguay", "Argentina", "Brasil", "Italia"],r:"A"},en:{t:"Which team won the first World Cup in 1930?",o:["Uruguay", "Argentina", "Brazil", "Italy"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos minutos dura un cuarto en la NFL?",o:["15 minutos", "20 minutos", "12 minutos", "18 minutos"],r:"A"},en:{t:"How many minutes is an NFL quarter?",o:["15 minutes", "20 minutes", "12 minutes", "18 minutes"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Qué tenista tiene más semanas como número 1 ATP?",o:["Novak Djokovic", "Roger Federer", "Pete Sampras", "Rafael Nadal"],r:"A"},en:{t:"Which tennis player has the most weeks at ATP #1?",o:["Novak Djokovic", "Roger Federer", "Pete Sampras", "Rafael Nadal"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos km recorre el Ironman en total?",o:["226 km", "180 km", "150 km", "200 km"],r:"A"},en:{t:"How many total km does an Ironman triathlon cover?",o:["226 km", "180 km", "150 km", "200 km"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿En qué año fue el debut del tenis en los JJ.OO. modernos?",o:["1896", "1900", "1924", "1988"],r:"A"},en:{t:"In what year did tennis debut in the modern Olympics?",o:["1896", "1900", "1924", "1988"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos metros tiene el sprint de 400m?",o:["Una vuelta completa a la pista", "Media vuelta", "Dos vueltas", "Tres cuartos"],r:"A"},en:{t:"What distance does 400m represent on a track?",o:["One full lap", "Half a lap", "Two laps", "Three quarters"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿En qué año se incluyó el snowboard en los JJ.OO.?",o:["1998", "2002", "1994", "2006"],r:"A"},en:{t:"In what year was snowboarding added to the Olympics?",o:["1998", "2002", "1994", "2006"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos jugadores componen el cricket?",o:["11", "12", "10", "9"],r:"A"},en:{t:"How many players are on a cricket team?",o:["11", "12", "10", "9"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Qué equipo fue el primero en ganar 3 Champions seguidas?",o:["Real Madrid (2016-18)", "Ajax", "Bayern Munich", "Milan"],r:"A"},en:{t:"Which team first won 3 consecutive Champions Leagues?",o:["Real Madrid (2016-18)", "Ajax", "Bayern Munich", "Milan"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos km tiene la etapa más larga del Tour de France?",o:["~260 km", "~200 km", "~300 km", "~180 km"],r:"A"},en:{t:"How long is the longest Tour de France stage?",o:["~260 km", "~200 km", "~300 km", "~180 km"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos Grand Slams tiene Rafael Nadal?",o:["22", "20", "21", "19"],r:"A"},en:{t:"How many Grand Slams does Rafael Nadal have?",o:["22", "20", "21", "19"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿En qué año se fundó la FIFA?",o:["1904", "1910", "1896", "1920"],r:"A"},en:{t:"In what year was FIFA founded?",o:["1904", "1910", "1896", "1920"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Qué significa hat-trick en fútbol?",o:["3 goles del mismo jugador en un partido", "Gol de cabeza", "Tiro libre directo", "Penalti"],r:"A"},en:{t:"What is a hat-trick in soccer?",o:["3 goals by the same player in one match", "Header goal", "Direct free kick", "Penalty"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos sets gana un partido de tenis al mejor de 3?",o:["2", "1", "3", "2 o 3"],r:"A"},en:{t:"How many sets win a best-of-3 tennis match?",o:["2", "1", "3", "2 or 3"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿En qué año Colombia ganó su primera Copa América?",o:["Nunca (aún)", "2001", "1975", "2019"],r:"A"},en:{t:"Has Colombia ever won Copa América?",o:["Never (not yet)", "2001", "1975", "2019"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos metros nadan en los 100m libre?",o:["100", "50", "200", "Depende"],r:"A"},en:{t:"How many meters is the 100m freestyle swim?",o:["100", "50", "200", "Depends"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos puntos vale un touchdown en la NFL?",o:["6", "7", "5", "4"],r:"A"},en:{t:"How many points is a touchdown worth in the NFL?",o:["6", "7", "5", "4"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿En qué año fue el primer campeonato mundial de ajedrez?",o:["1886", "1900", "1920", "1950"],r:"A"},en:{t:"In what year was the first chess World Championship?",o:["1886", "1900", "1920", "1950"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántas vueltas tiene el circuito de Mónaco aprox.?",o:["78", "60", "50", "90"],r:"A"},en:{t:"Approximately how many laps is the Monaco F1 circuit?",o:["78", "60", "50", "90"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Qué velocidad alcanza el récord de saque en tenis masculino?",o:["263 km/h", "220 km/h", "240 km/h", "280 km/h"],r:"A"},en:{t:"What speed does the men's tennis serve world record reach?",o:["263 km/h", "220 km/h", "240 km/h", "280 km/h"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿Cuántos jugadores puede haber en un equipo de polo?",o:["4", "6", "3", "5"],r:"A"},en:{t:"How many players are on a polo team?",o:["4", "6", "3", "5"],r:"A"}},
-{c:"sports",d:"hard",es:{t:"¿En qué año fue el primer Campeonato Mundial de Atletismo?",o:["1983", "1990", "1976", "1980"],r:"A"},en:{t:"In what year was the first World Athletics Championship?",o:["1983", "1990", "1976", "1980"],r:"A"}},
-];
+// ── QUESTION BANK — lazy loaded from external file ──────────────
+let QB = null; // populated on first use
 
-// ── GENERATOR ────────────────────────────────────────────────────
-function generateAutoGame(config) {
-  const lang = config.lang || 'es';
-  const count = config.count || 10;
-  const categories = config.categories || ['science','geography','history','entertainment','arts','sports'];
-  const difficulty = config.difficulty || 'mixed';
-
-  let pool = QB.filter(q =>
-    categories.includes(q.c) &&
-    (difficulty === 'mixed' || q.d === difficulty)
-  );
-
-  // Shuffle
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
+async function loadQuestionBank() {
+  if (QB !== null) return true; // already loaded
+  try {
+    // Try to load from same directory as the page
+    const base = window.location.pathname.replace(/[^/]*$/, '');
+    const url = base + 'question-bank.js';
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Bank not found');
+    const code = await resp.text();
+    // Execute the bank code in current scope
+    const fn = new Function(code + '\nreturn { QB, generateAutoGame };');
+    const result = fn();
+    QB = result.QB;
+    // Also make generateAutoGame available globally
+    window._generateAutoGame = result.generateAutoGame;
+    return true;
+  } catch(e) {
+    console.error('Failed to load question bank:', e);
+    return false;
   }
-
-  // Balance across categories
-  if (categories.length > 1) {
-    const perCat = Math.ceil(count / categories.length);
-    const selected = [];
-    categories.forEach(cat => {
-      const catQ = pool.filter(q => q.c === cat);
-      selected.push(...catQ.slice(0, perCat));
-    });
-    // Re-shuffle and trim
-    for (let i = selected.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [selected[i], selected[j]] = [selected[j], selected[i]];
-    }
-    pool = selected.slice(0, count);
-  } else {
-    pool = pool.slice(0, count);
-  }
-
-  return pool.map(item => {
-    const loc = item[lang] || item.es;
-    return {
-      text: loc.t,
-      options: { A: loc.o[0], B: loc.o[1], C: loc.o[2], D: loc.o[3] },
-      correct: loc.r,
-      type: 'multiple',
-      time: 20,
-      category: item.c,
-      difficulty: item.d,
-    };
-  });
 }
 
+function generateAutoGame(config) {
+  // Delegates to the loaded function
+  if (!QB || !window._generateAutoGame) return [];
+  return window._generateAutoGame(config);
+}
+
+
+
+
+// ── SHUFFLE QUESTION OPTIONS ─────────────────────────
+// Randomizes A/B/C/D so correct answer isn't always A
+function shuffleQuestionOptions(q) {
+  if (!q.options || q.type === 'truefalse') return q;
+  const keys = ['A','B','C','D'];
+  // Fisher-Yates shuffle on keys
+  for (let i = keys.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [keys[i], keys[j]] = [keys[j], keys[i]];
+  }
+  const oldCorrectText = q.options[q.correct];
+  const newOptions = {};
+  keys.forEach((oldKey, idx) => {
+    newOptions[['A','B','C','D'][idx]] = q.options[oldKey];
+  });
+  // Find which new key has the correct answer text
+  const newCorrect = Object.keys(newOptions).find(k => newOptions[k] === oldCorrectText);
+  return { ...q, options: newOptions, correct: newCorrect };
+}
+
+function shuffleAllOptions(qs) {
+  return qs.map(shuffleQuestionOptions);
+}
 
 // ── AUTO GAME MODULE ─────────────────────────────────
 let autoCats = new Set(['science','geography','history','entertainment','arts','sports']);
@@ -4380,15 +3908,26 @@ window.generateAndLaunch = async function() {
   if (autoCats.size === 0) { toast(lang==='es'?'Selecciona al menos una categoría':'Select at least one category'); return; }
 
   btn.disabled = true;
+  btn.textContent = lang==='es'?'Cargando banco...':'Loading bank...';
+
+  // Load bank lazily on first use
+  const loaded = await loadQuestionBank();
+  if (!loaded) {
+    toast(lang==='es'?'Error cargando preguntas. Verifica tu conexión.':'Error loading questions. Check your connection.');
+    btn.disabled = false;
+    btn.textContent = lang==='es'?'✨ Generar y guardar juego':'✨ Generate and save game';
+    return;
+  }
   btn.textContent = lang==='es'?'Generando...':'Generating...';
 
   try {
-    const generated = generateAutoGame({
+    let generated = generateAutoGame({
       lang,
       count,
       categories: Array.from(autoCats),
       difficulty,
     });
+    generated = shuffleAllOptions(generated);
 
     if (generated.length === 0) {
       toast(lang==='es'?'No hay preguntas disponibles con esos filtros':'No questions available with those filters');
