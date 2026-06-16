@@ -2961,6 +2961,8 @@ function listenGameState() {
   unsub=onValue(ref(db,`games/${gameCode}`),snap=>{
     const game=snap.val(); if(!game) return;
     if(game.status==='playing'){
+      // Always sync questions from Firebase in case host shuffled them after join
+      if(game.questions && game.questions.length > 0) questions = game.questions;
       const qi=game.currentQuestion;
       if(qi!==undefined&&qi!==currentQIndex){
         currentQIndex=qi; playerAnswered=false;
