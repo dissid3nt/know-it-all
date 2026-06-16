@@ -869,6 +869,17 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         <button class="auto-cat-btn active" data-cat="sports" onclick="toggleAutoCat('sports')" id="btn-cat-sports">⚽ Deportes</button>
       </div>
     </div>
+    <!-- Difficulty toggle buttons (same style as categories) -->
+    <div class="settings-section">
+      <h3 id="auto-diff-label">DIFICULTAD</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="auto-diff-grid">
+        <button class="auto-cat-btn active" data-diff="very_easy" onclick="toggleAutoDiff('very_easy')" id="btn-diff-very_easy">🟢 Muy fácil</button>
+        <button class="auto-cat-btn active" data-diff="easy" onclick="toggleAutoDiff('easy')" id="btn-diff-easy">🔵 Fácil</button>
+        <button class="auto-cat-btn active" data-diff="medium" onclick="toggleAutoDiff('medium')" id="btn-diff-medium">🟡 Media</button>
+        <button class="auto-cat-btn active" data-diff="hard" onclick="toggleAutoDiff('hard')" id="btn-diff-hard">🟠 Difícil</button>
+        <button class="auto-cat-btn active" data-diff="very_hard" onclick="toggleAutoDiff('very_hard')" id="btn-diff-very_hard">🔴 Muy difícil</button>
+      </div>
+    </div>
     <!-- Options -->
     <div class="settings-section">
       <h3 id="auto-opts-label">OPCIONES</h3>
@@ -879,17 +890,8 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
           <option value="10" selected>10</option>
           <option value="15">15</option>
           <option value="20">20</option>
-        </select>
-      </div>
-      <div class="settings-row">
-        <div><div class="settings-row-label" id="auto-diff-label">Dificultad</div></div>
-        <select id="auto-difficulty" style="padding:8px 12px;border-radius:10px;font-family:var(--font-display);font-size:0.88rem;font-weight:700;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);">
-          <option value="mixed" selected id="auto-diff-mixed">Mixta</option>
-          <option value="very_easy" id="auto-diff-very-easy">Muy fácil</option>
-          <option value="easy" id="auto-diff-easy">Fácil</option>
-          <option value="medium" id="auto-diff-medium">Media</option>
-          <option value="hard" id="auto-diff-hard">Difícil</option>
-          <option value="very_hard" id="auto-diff-very-hard">Muy difícil</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
         </select>
       </div>
       <div class="settings-row">
@@ -901,13 +903,33 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
         </select>
       </div>
     </div>
-    <!-- Generate button -->
-    <button class="btn btn-primary" style="width:100%;font-size:1rem;padding:14px;" onclick="generateAndLaunch()" id="btn-generate">
-      ✨ Generar y guardar juego
-    </button>
+    <!-- Generate buttons -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+      <button class="btn btn-secondary" style="width:100%;font-size:0.95rem;padding:13px;" onclick="generateQuickPlay()" id="btn-generate-free">
+        ▶ Generar juego rápido
+      </button>
+      <button class="btn btn-primary" style="width:100%;font-size:1rem;padding:14px;" onclick="generateAndLaunch()" id="btn-generate">
+        💾 Generar y guardar juego
+      </button>
+    </div>
     <p class="muted" style="font-size:0.78rem;text-align:center;margin-top:10px;" id="auto-hint">
-      Se generarán preguntas aleatorias del banco. Cada partida es única.
+      Generar y guardar guarda el juego en tus proyectos para jugarlo después.
     </p>
+  </div>
+</div>
+
+<!-- ══ FLYOUT: Quick play confirm ══ -->
+<div id="modal-quickplay-confirm" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9000;display:none;align-items:center;justify-content:center;">
+  <div class="modal-card" style="max-width:360px;width:90%;padding:28px 24px;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:12px;">⚡</div>
+    <h2 style="margin:0 0 8px;font-size:1.2rem;" id="qp-title">Juego rápido</h2>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin:0 0 20px;" id="qp-desc">
+      Estás a punto de iniciar una partida rápida. <strong>Esta sesión no se guardará</strong> en tus proyectos y no podrás repetirla.
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-quickplay-confirm').style.display='none';" id="qp-cancel">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmQuickPlay()" id="qp-confirm">▶ Continuar</button>
+    </div>
   </div>
 </div>
 
@@ -1373,7 +1395,24 @@ function showScreen(id) {
   screens.forEach(function(s) { s.classList.remove('active'); });
   var el = document.getElementById(id);
   if (el) el.classList.add('active');
+  // Push state so back button stays within the app
+  if (history.state?.screenId !== id) {
+    history.pushState({ screenId: id }, '', window.location.href.split('?')[0] + (id !== 'screen-landing' ? '?s=' + id.replace('screen-','') : ''));
+  }
 }
+// Handle browser back/forward
+window.addEventListener('popstate', function(e) {
+  if (e.state && e.state.screenId) {
+    var screens = document.querySelectorAll('.screen');
+    screens.forEach(function(s) { s.classList.remove('active'); });
+    var el = document.getElementById(e.state.screenId);
+    if (el) el.classList.add('active');
+  } else {
+    // No state = first page load, show current active screen
+    var active = document.querySelector('.screen.active');
+    if (!active) { var el = document.getElementById('screen-landing'); if(el) el.classList.add('active'); }
+  }
+});
 // openModal / closeModal — needed for cancel button before module loads
 function openModal(id) {
   var el = document.getElementById(id);
@@ -1487,6 +1526,7 @@ const T = {
     autoTitle:'🤖 Juego automático', autoCatLabel:'CATEGORÍAS', autoOptsLabel:'OPCIONES',
     autoCountLabel:'Número de preguntas', autoDiffLabel:'Dificultad', autoTimeLabel:'Tiempo por pregunta',
     autoDiffMixed:'Mixta', autoDiffVeryEasy:'Muy fácil', autoDiffEasy:'Fácil', autoDiffMedium:'Media', autoDiffHard:'Difícil', autoDiffVeryHard:'Muy difícil',
+    autoDiffLabel:'DIFICULTAD', autoQuickPlay:'▶ Generar juego rápido', autoSavePlay:'💾 Generar y guardar juego', autoHint:'Generar y guardar guarda el juego en tus proyectos.',
     autoHint:'Se generarán preguntas aleatorias del banco. Cada partida es única.',
     btnGenerate:'✨ Generar y guardar juego',
     catScience:'🔬 Ciencia', catGeo:'🌍 Geografía', catHist:'📜 Historia',
@@ -1647,6 +1687,7 @@ const T = {
     autoTitle:'🤖 Auto game', autoCatLabel:'CATEGORIES', autoOptsLabel:'OPTIONS',
     autoCountLabel:'Number of questions', autoDiffLabel:'Difficulty', autoTimeLabel:'Time per question',
     autoDiffMixed:'Mixed', autoDiffVeryEasy:'Very easy', autoDiffEasy:'Easy', autoDiffMedium:'Medium', autoDiffHard:'Hard', autoDiffVeryHard:'Very hard',
+    autoDiffLabel:'DIFFICULTY', autoQuickPlay:'▶ Quick game (no save)', autoSavePlay:'💾 Generate and save game', autoHint:'Generate & save stores the game in your projects to replay.',
     autoHint:'Random questions generated from the bank. Every game is unique.',
     btnGenerate:'✨ Generate and save game',
     catScience:'🔬 Science', catGeo:'🌍 Geography', catHist:'📜 History',
@@ -2205,6 +2246,11 @@ window.goToDashboard = function() {
   stopPreview();
   questions = []; currentQIndex = -1; gameCode = null;
   unsubscribers.forEach(u=>u()); unsubscribers=[];
+  // Re-enable generate button in case it was left disabled
+  const btnGen = document.getElementById('btn-generate');
+  if (btnGen) { btnGen.disabled = false; btnGen.textContent = lang==='es'?'💾 Generar y guardar juego':'💾 Generate and save game'; }
+  const btnGenFree = document.getElementById('btn-generate-free');
+  if (btnGenFree) { btnGenFree.disabled = false; btnGenFree.textContent = lang==='es'?'▶ Generar juego rápido':'▶ Quick game (no save)'; }
   if (currentUser) { loadDashboard(); showScreen('screen-dashboard'); }
   else showScreen('screen-landing');
 }
@@ -3889,6 +3935,70 @@ function shuffleAllOptions(qs) {
 
 // ── AUTO GAME MODULE ─────────────────────────────────
 let autoCats = new Set(['science','geography','history','entertainment','arts','sports']);
+let autoDiffs = new Set(['very_easy','easy','medium','hard','very_hard']);
+
+window.toggleAutoDiff = function(diff) {
+  const btn = document.getElementById('btn-diff-' + diff);
+  if (autoDiffs.has(diff)) {
+    if (autoDiffs.size <= 1) { toast(lang==='es'?'Selecciona al menos una dificultad':'Select at least one difficulty'); return; }
+    autoDiffs.delete(diff);
+    if (btn) btn.classList.remove('active');
+  } else {
+    autoDiffs.add(diff);
+    if (btn) btn.classList.add('active');
+  }
+};
+
+window.generateQuickPlay = function() {
+  if (autoCats.size === 0) { toast(lang==='es'?'Selecciona al menos una categoría':'Select at least one category'); return; }
+  if (autoDiffs.size === 0) { toast(lang==='es'?'Selecciona al menos una dificultad':'Select at least one difficulty'); return; }
+  // Show flyout confirmation
+  const modal = document.getElementById('modal-quickplay-confirm');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.confirmQuickPlay = async function() {
+  const modal = document.getElementById('modal-quickplay-confirm');
+  if (modal) modal.style.display = 'none';
+  const btn = document.getElementById('btn-generate-free');
+  if (btn) { btn.disabled = true; btn.textContent = lang==='es'?'Cargando...':'Loading...'; }
+  const count = parseInt(document.getElementById('auto-count').value) || 10;
+  const timePerQ = parseInt(document.getElementById('auto-time').value) || 20;
+  // Build difficulty: if all selected use 'mixed', else pick first selected (generateAutoGame supports mixed from set)
+  const diffArray = Array.from(autoDiffs);
+  const loaded = await loadQuestionBank();
+  if (!loaded) {
+    toast(lang==='es'?'Error cargando preguntas':'Error loading questions');
+    if (btn) { btn.disabled = false; btn.textContent = lang==='es'?'▶ Generar juego rápido':'▶ Quick game (no save)'; }
+    return;
+  }
+  try {
+    // Generate mixing selected difficulties
+    let pool = [];
+    for (const diff of diffArray) {
+      const partial = generateAutoGame({ lang, count: Math.ceil(count / diffArray.length), categories: Array.from(autoCats), difficulty: diff });
+      pool = pool.concat(partial);
+    }
+    // Shuffle and trim to count
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+    pool = pool.slice(0, count);
+    if (pool.length === 0) {
+      toast(lang==='es'?'No hay preguntas disponibles':'No questions available');
+      if (btn) { btn.disabled = false; btn.textContent = lang==='es'?'▶ Generar juego rápido':'▶ Quick game (no save)'; }
+      return;
+    }
+    pool.forEach(q => { q.time = timePerQ; });
+    questions = pool;
+    currentProjectId = null;
+    currentProjectName = lang==='es'?'Juego rápido':'Quick Game';
+    if (btn) { btn.disabled = false; btn.textContent = lang==='es'?'▶ Generar juego rápido':'▶ Quick game (no save)'; }
+    goToLobby();
+  } catch(e) {
+    console.error(e);
+    toast(lang==='es'?'Error al generar':'Generation error');
+    if (btn) { btn.disabled = false; btn.textContent = lang==='es'?'▶ Generar juego rápido':'▶ Quick game (no save)'; }
+  }
+};
 
 window.toggleAutoCat = function(cat) {
   const btn = document.querySelector(`.auto-cat-btn[data-cat="${cat}"]`);
@@ -3904,7 +4014,9 @@ window.toggleAutoCat = function(cat) {
 
 window.generateAndLaunch = async function() {
   const count = parseInt(document.getElementById('auto-count').value) || 10;
-  const difficulty = document.getElementById('auto-difficulty').value;
+  // Build difficulty from selected toggle buttons
+  const diffArray = Array.from(autoDiffs);
+  const difficulty = diffArray.length === 5 ? 'mixed' : (diffArray.length === 1 ? diffArray[0] : 'mixed');
   const timePerQ = parseInt(document.getElementById('auto-time').value) || 20;
   const btn = document.getElementById('btn-generate');
 
@@ -3924,12 +4036,18 @@ window.generateAndLaunch = async function() {
   btn.textContent = lang==='es'?'Generando...':'Generating...';
 
   try {
-    let generated = generateAutoGame({
-      lang,
-      count,
-      categories: Array.from(autoCats),
-      difficulty,
-    });
+    // Generate mixing all selected difficulties
+    let generated = [];
+    if (diffArray.length <= 1) {
+      generated = generateAutoGame({ lang, count, categories: Array.from(autoCats), difficulty: diffArray[0] || 'mixed' });
+    } else {
+      for (const d of diffArray) {
+        const partial = generateAutoGame({ lang, count: Math.ceil(count / diffArray.length), categories: Array.from(autoCats), difficulty: d });
+        generated = generated.concat(partial);
+      }
+      for (let i = generated.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [generated[i],generated[j]]=[generated[j],generated[i]]; }
+      generated = generated.slice(0, count);
+    }
     // Note: shuffleAllOptions happens in launchGame, not here
     if (generated.length === 0) {
       toast(lang==='es'?'No hay preguntas disponibles con esos filtros':'No questions available with those filters');
@@ -3950,8 +4068,9 @@ window.generateAndLaunch = async function() {
       history: lang==='es'?'Historia':'History', entertainment: lang==='es'?'Entretenimiento':'Entertainment',
       arts: lang==='es'?'Artes':'Arts', sports: lang==='es'?'Deportes':'Sports' };
     const catList = Array.from(autoCats).map(c => catNames[c]).join(', ');
-    const diffLabel = { mixed: lang==='es'?'Mixto':'Mixed', easy: lang==='es'?'Fácil':'Easy',
-      very_easy: lang==='es'?'Muy fácil':'Very easy', medium: lang==='es'?'Media':'Medium', hard: lang==='es'?'Difícil':'Hard', very_hard: lang==='es'?'Muy difícil':'Very hard' }[difficulty] || difficulty;
+    const diffNameMap = { mixed: lang==='es'?'Mixto':'Mixed', easy: lang==='es'?'Fácil':'Easy',
+      very_easy: lang==='es'?'Muy fácil':'Very easy', medium: lang==='es'?'Media':'Medium', hard: lang==='es'?'Difícil':'Hard', very_hard: lang==='es'?'Muy difícil':'Very hard' };
+    const diffLabel = diffArray.length === 5 ? (lang==='es'?'Mixto':'Mixed') : diffArray.map(d => diffNameMap[d]||d).join('+');
     currentProjectName = `Auto: ${catList} · ${diffLabel} · ${count}Q`;
 
     // Save to Firebase
