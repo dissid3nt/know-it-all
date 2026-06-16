@@ -2,11 +2,18 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Know It All">
+<meta name="application-name" content="Know It All">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237C3AED'/%3E%3Crect x='18' y='16' width='64' height='50' rx='14' fill='white'/%3E%3Cpolygon points='28,66 10,88 46,66' fill='white'/%3E%3Ctext x='50' y='58' font-family='Arial' font-size='52' font-weight='700' fill='%237C3AED' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E" type="image/svg+xml">
 <meta name="theme-color" content="#7C3AED">
 <title>Know It All 🎯 v2.1</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <!-- build:20260615-r3 -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap');
@@ -318,69 +325,224 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
 .drag-handle:hover{color:var(--text);}
 
 /* ── MOBILE IN-GAME FONT BOOST ── */
+/* ═══════════════════════════════════════════════════════════
+   MOBILE OPTIMIZATION — full responsive overhaul
+   Targets: phones (≤480px) and small tablets (≤768px)
+═══════════════════════════════════════════════════════════ */
+
+/* ── Base: safe area insets (notch, home bar) ── */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}
+
+/* Prevent double-tap zoom on buttons */
+button, select, input { touch-action: manipulation; }
+
+/* ── Screens: use dvh for real mobile height ── */
+.screen {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+/* ── Dashboard ── */
+@media (max-width: 600px) {
+  .dash-header { padding: 12px 16px; }
+  .dash-body { padding: 12px 16px 24px; }
+  .dash-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dash-card { padding: 18px 14px; border-radius: 16px; gap: 8px; }
+  .dash-card-icon { font-size: 1.6rem; }
+  .dash-card-title { font-size: 0.85rem; }
+  .dash-card-desc { font-size: 0.72rem; display: none; }
+  .dash-greeting { font-size: 1.4rem; }
+  .dash-logo-sm { font-size: 1.1rem; }
+  .user-pill { max-width: 120px; }
+  .user-name { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #btn-signout { display: none; } /* hidden on mobile - in menu instead */
+  .section-label { font-size: 0.65rem; }
+  .projects-list { gap: 8px; }
+  .project-card { padding: 14px 16px; }
+  .project-name { font-size: 0.95rem; }
+  .project-meta { font-size: 0.72rem; }
+}
+
+/* ── Page header (builder, auto-game, etc.) ── */
+@media (max-width: 600px) {
+  .page-header {
+    padding: 12px 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  .page-header h1 { font-size: 1.1rem; }
+  .page-body { padding: 16px; }
+}
+
+/* ── Auto-game screen ── */
+@media (max-width: 600px) {
+  .settings-section { margin-bottom: 16px; }
+  .settings-section h3 { font-size: 0.65rem; margin-bottom: 8px; }
+  .auto-cat-btn { font-size: 0.82rem; padding: 8px 12px; border-radius: 10px; }
+  .settings-row { padding: 10px 0; }
+  .settings-row-label { font-size: 0.9rem; }
+  #btn-generate, #btn-generate-free { font-size: 0.95rem; padding: 14px; border-radius: 14px; }
+}
+
+/* ── Lobby / host game ── */
+@media (max-width: 600px) {
+  .lobby-code { font-size: 3.5rem; letter-spacing: 8px; }
+  .host-q-text { font-size: 1.3rem; line-height: 1.5; }
+  .opt-host { font-size: 0.88rem; padding: 10px 12px; }
+  #host-timer { font-size: 2.8rem; }
+  .host-header { padding: 10px 14px; }
+  .answer-bar-row { padding: 6px 8px; font-size: 0.8rem; }
+  #next-btn { font-size: 0.95rem; padding: 14px; width: 100%; max-width: 100%; border-radius: 14px; }
+  .leaderboard-row { padding: 12px 14px; font-size: 0.95rem; }
+  .leaderboard-score { font-size: 1rem; }
+  .leaderboard-name { font-size: 0.95rem; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+/* ── Player answer screen ── */
 @media (max-width: 480px) {
-  /* Question text */
+  #screen-player-answer {
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
   .player-q-text {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     line-height: 1.55;
+    padding: 0 16px;
   }
-  /* Timer */
   .player-timer {
-    font-size: 2.6rem;
+    font-size: 2.8rem;
   }
-  /* Answer buttons — bigger text, taller tap targets */
+  .answer-btns {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 12px;
+    width: 100%;
+    max-width: 100%;
+  }
   .answer-btn {
-    font-size: 1.1rem;
-    padding: 22px 10px;
+    font-size: 0.95rem;
+    padding: 18px 8px;
+    min-height: 90px;
+    border-radius: 14px;
   }
   .answer-btn .opt-letter {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
   }
-  /* True/False buttons */
   .tf-btn {
-    font-size: 1.25rem;
-    padding: 28px 16px;
+    font-size: 1.2rem;
+    padding: 24px 16px;
+    border-radius: 14px;
   }
-  /* Score display */
   .player-score-display {
-    font-size: 1.75rem;
+    font-size: 1.6rem;
   }
-  /* Result badge */
   .result-badge {
-    font-size: 1.15rem;
-    padding: 18px 20px;
+    font-size: 1.05rem;
+    padding: 16px 18px;
+    margin: 8px 12px;
   }
-  /* Question counter + score row */
-  #screen-player-answer .muted {
-    font-size: 0.9rem;
+  .reaction-bar { padding: 8px 12px; }
+  .reaction-btn { font-size: 1.5rem; width: 48px; height: 48px; }
+}
+
+/* ── Player wait screen ── */
+@media (max-width: 480px) {
+  #player-wait-name { font-size: 1.6rem !important; }
+  #screen-player-wait .muted { font-size: 0.95rem; }
+  .wait-logo { font-size: 1.5rem; }
+}
+
+/* ── Player final screen ── */
+@media (max-width: 480px) {
+  #player-final-title { font-size: 1.6rem; }
+  #player-final-score { font-size: 2.5rem !important; }
+  #player-final-rank { font-size: 0.95rem; }
+  .score-row { padding: 12px 12px; }
+  .score-name { font-size: 0.9rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .score-pts { font-size: 0.9rem; }
+}
+
+/* ── Join screen ── */
+@media (max-width: 480px) {
+  #screen-player-join { padding: 20px 16px; padding-top: max(20px, env(safe-area-inset-top)); }
+  #player-code-input { font-size: 2rem; letter-spacing: 8px; padding: 14px; }
+  #player-name-input { font-size: 1rem; padding: 14px; }
+}
+
+/* ── Modals ── */
+@media (max-width: 480px) {
+  .modal-card {
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    padding: 24px 20px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
   }
-  /* Wait screen */
-  #player-wait-name {
-    font-size: 1.75rem !important;
-  }
-  #screen-player-wait .muted {
-    font-size: 1rem;
-  }
-  /* Final screen */
-  #player-final-title {
-    font-size: 1.75rem;
-  }
-  #player-final-score {
-    font-size: 2.75rem !important;
-  }
-  #player-final-rank {
-    font-size: 1rem;
-  }
-  .score-row {
-    padding: 14px 12px;
-  }
-  .score-name {
-    font-size: 1rem;
-  }
-  .score-pts {
-    font-size: 1rem;
+  .modal-overlay {
+    align-items: flex-end !important;
   }
 }
+
+/* ── Question builder ── */
+@media (max-width: 600px) {
+  .q-preview-item { padding: 12px 14px; }
+  .q-preview-text { font-size: 0.9rem; }
+  .inline-edit-form { padding: 12px; }
+  #screen-edit-questions .page-body { padding: 12px; }
+  .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
+}
+
+/* ── Podium screen ── */
+@media (max-width: 480px) {
+  .podium-bar { width: 80px; }
+  .podium-name { font-size: 0.78rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .podium-score { font-size: 0.72rem; }
+  #screen-podium { padding: 16px 12px; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+}
+
+/* ── General touch improvements ── */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger hit targets for touch */
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 36px; }
+  select { min-height: 44px; }
+  input[type="text"], input[type="email"], input[type="password"] { min-height: 48px; font-size: 16px; /* prevents iOS zoom */ }
+  /* Remove hover states that look broken on touch */
+  .dash-card:hover { transform: none; }
+  .answer-btn:hover { transform: none; }
+  /* Active states for feedback */
+  .dash-card:active { transform: scale(0.97); }
+  .answer-btn:active { transform: scale(0.97); opacity: 0.85; }
+  .btn:active { opacity: 0.8; transform: scale(0.98); }
+  .auto-cat-btn:active { transform: scale(0.95); }
+}
+
+/* ── Landscape mobile ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .player-timer { font-size: 2rem; }
+  .player-q-text { font-size: 1rem; padding: 0 12px; }
+  .answer-btns { gap: 6px; padding: 0 8px; }
+  .answer-btn { min-height: 60px; padding: 10px 8px; font-size: 0.85rem; }
+  .reaction-bar { display: none; }
+}
+
+/* ── Prevent overscroll bounce on iOS ── */
+html { overscroll-behavior: none; }
+#screen-dashboard .dash-body, .page-body {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 /* ── V2: QUESTION IMAGE ── */
 .q-image-wrap{width:100%;max-width:600px;margin:10px auto;border-radius:12px;overflow:hidden;background:var(--surface2);border:1px solid var(--border);}
@@ -837,7 +999,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <div id="auth-register-form" style="display:none;flex-direction:column;gap:10px;">
       <div><label>Nombre</label><input type="text" id="reg-name" placeholder="Tu nombre"></div>
       <div><label>Correo</label><input type="email" id="reg-email" placeholder="tu@correo.com"></div>
-      <div><label>Contraseña</label><input type="password" id="reg-password" placeholder="Mínimo 6 caracteres"></div>
+      <div><label>Contraseña</label><input type="password" id="reg-password" style="font-size:16px;" placeholder="Mínimo 6 caracteres"></div>
       <button class="btn btn-primary btn-full" onclick="registerEmail()" id="btn-register" style="margin-top:4px;">Crear cuenta</button>
       <div class="auth-divider">o</div>
       <button class="btn-google" onclick="loginGoogle()">
@@ -1334,7 +1496,7 @@ label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:block;text-t
     <label id="label-code">Código del juego</label>
     <input type="text" id="player-code-input" placeholder="Ej: ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2rem;text-align:center;margin-bottom:12px;" oninput="this.value=this.value.toUpperCase()">
     <label id="label-name">Tu nombre</label>
-    <input type="text" id="player-name-input" maxlength="20" style="margin-bottom:16px;">
+    <input type="text" id="player-name-input" style="font-size:16px;" maxlength="20" style="margin-bottom:16px;">
     <button class="btn btn-green" onclick="joinGame()" id="btn-join">Entrar al juego 🎯</button>
   </div>
   <button class="btn btn-secondary btn-sm" onclick="showScreen('screen-landing')" id="btn-back-join">← Volver</button>
@@ -4147,4 +4309,52 @@ try {
 })();
 </script>
 </body>
+<!-- PWA Install Banner -->
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:env(safe-area-inset-bottom,0);left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 20px;z-index:9999;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+  <div style="flex:1;">
+    <div style="font-weight:800;font-size:0.9rem;">📲 Instalar Know It All</div>
+    <div style="font-size:0.75rem;color:var(--text2);margin-top:2px;">Agrégala a tu pantalla de inicio</div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="triggerInstall()" style="white-space:nowrap;">Instalar</button>
+  <button onclick="document.getElementById('pwa-install-banner').style.display='none';" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:4px;">✕</button>
+</div>
+
+<script>
+// ── Service Worker registration (PWA offline support) ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+// ── PWA Install prompt ──
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'none';
+});
+window.triggerInstall = function() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+  }
+};
+
+// ── Fix iOS viewport height (100vh bug) ──
+function setVH() {
+  document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+}
+setVH();
+window.addEventListener('resize', setVH);
+
+// ── Prevent pull-to-refresh on Android ──
+document.addEventListener('touchstart', function(e) {}, { passive: true });
+</script>
 </html>
