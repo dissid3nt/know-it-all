@@ -2413,7 +2413,8 @@ window.launchGame = async function() {
   if (audioCtx.state === 'suspended') await audioCtx.resume();
   startBgMusic();
   currentQIndex=0;
-  await update(ref(db,`games/${gameCode}`),{status:'playing',currentQuestion:0});
+  // Save shuffled questions to Firebase so all players see same options order
+  await update(ref(db,`games/${gameCode}`),{status:'playing',currentQuestion:0,questions});
   showScreen('screen-host-game');
   document.getElementById('host-game-code-display').textContent = gameCode;
   loadHostQuestion(0); listenResponses(); listenScoreboard(); listenReactions();
@@ -3927,8 +3928,7 @@ window.generateAndLaunch = async function() {
       categories: Array.from(autoCats),
       difficulty,
     });
-    generated = shuffleAllOptions(generated);
-
+    // Note: shuffleAllOptions happens in launchGame, not here
     if (generated.length === 0) {
       toast(lang==='es'?'No hay preguntas disponibles con esos filtros':'No questions available with those filters');
       btn.disabled = false;
@@ -3949,7 +3949,7 @@ window.generateAndLaunch = async function() {
       arts: lang==='es'?'Artes':'Arts', sports: lang==='es'?'Deportes':'Sports' };
     const catList = Array.from(autoCats).map(c => catNames[c]).join(', ');
     const diffLabel = { mixed: lang==='es'?'Mixto':'Mixed', easy: lang==='es'?'Fácil':'Easy',
-      medium: lang==='es'?'Media':'Medium', hard: lang==='es'?'Difícil':'Hard' }[difficulty];
+      very_easy: lang==='es'?'Muy fácil':'Very easy', medium: lang==='es'?'Media':'Medium', hard: lang==='es'?'Difícil':'Hard', very_hard: lang==='es'?'Muy difícil':'Very hard' }[difficulty] || difficulty;
     currentProjectName = `Auto: ${catList} · ${diffLabel} · ${count}Q`;
 
     // Save to Firebase
